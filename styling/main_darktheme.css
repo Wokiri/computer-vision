@@ -1,0 +1,185 @@
+/* --- GLOBAL STYLES (QApplication and Main Window) --- */
+QMainWindow,
+QWidget {
+    background-color: #2e2e2e;
+    /* Dark background */
+    color: #f0f0f0;
+    /* Light text color */
+    font-family: "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 10pt;
+}
+
+/* --- HEADER BAR (If using a QToolBar) --- */
+QToolBar {
+    background-color: #1e1e1e;
+    border: none;
+    spacing: 5px;
+}
+
+/* --- SIDEBAR & TOOL BUTTONS (Left Panel) --- */
+/* The main sidebar area */
+QDockWidget {
+    background-color: #282828;
+    border: none;
+}
+
+QDockWidget::title {
+    padding: 5px;
+    background-color: #383838;
+}
+
+/* Tool Buttons in the sidebar */
+QPushButton {
+    /* Base style for all buttons */
+    background-color: #383838;
+    border: 1px solid #555555;
+    color: #f0f0f0;
+    padding: 8px 15px;
+    border-radius: 4px;
+    min-height: 25px;
+    /* Ensures consistent size */
+}
+
+/* Hover and Click effects for buttons */
+QPushButton:hover {
+    background-color: #4a4a4a;
+}
+
+/* Selected tool/active state in sidebar (e.g., if using QToolButton) */
+QPushButton:checked,
+QPushButton:pressed {
+    background-color: #0078d4;
+    /* Accent color - Royal Blue */
+    border-color: #0078d4;
+    color: #ffffff;
+}
+
+/* Specific styling for the large "Upload Image" button */
+QPushButton#UploadButton {
+    background-color: #009688;
+    /* Teal accent */
+    border-color: #009688;
+    font-weight: bold;
+    padding: 10px 20px;
+}
+
+QPushButton#UploadButton:hover {
+    background-color: #00bfa5;
+}
+
+/* --- MAIN VIEWER & STATUS BAR (Viewport and Footer) --- */
+/* Central widget where the image is displayed */
+QGraphicsView,
+QLabel#ImagePreview {
+    background-color: #1e1e1e;
+    /* Pure black for image viewing clarity */
+    border: 1px dashed #555555;
+    /* For the drag and drop box */
+}
+
+/* Footer Bar/Status Bar */
+QStatusBar {
+    background-color: #1e1e1e;
+    color: #a0a0a0;
+    border-top: 1px solid #383838;
+    padding: 3px;
+}
+
+/* --- SETTINGS PANEL (Right Collapsible Panel) --- */
+/* Assuming the right panel uses QWidget or QScrollArea */
+QScrollArea,
+QWidget#SettingsPanel {
+    background-color: #383838;
+    border: none;
+    padding: 10px;
+}
+
+QLabel {
+    color: #f0f0f0;
+    padding: 5px 0;
+}
+
+/* --- INPUTS (Sliders, Text Fields, Checkboxes) --- */
+QLineEdit {
+    background-color: #2e2e2e;
+    border: 1px solid #555555;
+    padding: 5px;
+    border-radius: 3px;
+    color: #f0f0f0;
+}
+
+/* Sliders (e.g., Confidence, Noise Reduction) */
+QSlider::groove:horizontal {
+    border: 1px solid #555555;
+    height: 8px;
+    /* height of the groove */
+    background: #4a4a4a;
+    margin: 2px 0;
+    border-radius: 4px;
+}
+
+QSlider::handle:horizontal {
+    background: #0078d4;
+    /* Accent color */
+    border: 1px solid #0078d4;
+    width: 12px;
+    margin: -3px 0;
+    /* center the handle vertically */
+    border-radius: 6px;
+}
+
+/* Radio Buttons and Checkboxes */
+QRadioButton::indicator,
+QCheckBox::indicator {
+    width: 13px;
+    height: 13px;
+    border: 1px solid #555555;
+    background-color: #2e2e2e;
+}
+
+QRadioButton::indicator:checked,
+QCheckBox::indicator:checked {
+    background-color: #0078d4;
+    /* Checked state accent */
+    border: 1px solid #0078d4;
+}
+
+/* --- COMBO BOXES/DROPDOWNS --- */
+QComboBox {
+    background-color: #383838;
+    border: 1px solid #555555;
+    padding: 5px;
+    border-radius: 4px;
+    color: #f0f0f0;
+}
+
+QComboBox::drop-down {
+    border: none;
+    subcontrol-origin: padding;
+    subcontrol-position: top right;
+    width: 15px;
+}
+
+QComboBox::down-arrow {
+    image: url(":/icons/down_arrow_light.png");
+    /* You'll need a custom icon */
+}
+
+/* --- GROUP BOXES (For tool organization) --- */
+QGroupBox {
+    border: 1px solid #555555;
+    border-radius: 5px;
+    margin-top: 1ex;
+    /* leave space at the top for the title */
+    background-color: #333333;
+}
+
+QGroupBox::title {
+    subcontrol-origin: margin;
+    subcontrol-position: top left;
+    /* position at the top left */
+    padding: 0 3px;
+    color: #a0a0a0;
+    background-color: #333333;
+    /* Match group box background */
+}

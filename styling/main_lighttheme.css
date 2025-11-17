@@ -1,0 +1,187 @@
+/* --- GLOBAL STYLES (QApplication and Main Window) --- */
+QMainWindow,
+QWidget {
+    background-color: #f0f0f0;
+    /* Light background */
+    color: #1e1e1e;
+    /* Dark text color */
+    font-family: "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 10pt;
+}
+
+/* --- HEADER BAR (If using a QToolBar) --- */
+QToolBar {
+    background-color: #e6e6e6;
+    border: none;
+    spacing: 5px;
+}
+
+/* --- SIDEBAR & TOOL BUTTONS (Left Panel) --- */
+/* The main sidebar area */
+QDockWidget {
+    background-color: #ffffff;
+    /* White background */
+    border: none;
+}
+
+QDockWidget::title {
+    padding: 5px;
+    background-color: #f0f0f0;
+}
+
+/* Tool Buttons in the sidebar */
+QPushButton {
+    /* Base style for all buttons */
+    background-color: #e0e0e0;
+    border: 1px solid #cccccc;
+    color: #1e1e1e;
+    padding: 8px 15px;
+    border-radius: 4px;
+    min-height: 25px;
+}
+
+/* Hover and Click effects for buttons */
+QPushButton:hover {
+    background-color: #d4d4d4;
+}
+
+/* Selected tool/active state in sidebar */
+QPushButton:checked,
+QPushButton:pressed {
+    background-color: #0078d4;
+    /* Accent color - Royal Blue */
+    border-color: #0078d4;
+    color: #ffffff;
+    /* White text on accent */
+}
+
+/* Specific styling for the large "Upload Image" button */
+QPushButton#UploadButton {
+    background-color: #009688;
+    /* Teal accent */
+    border-color: #009688;
+    color: #ffffff;
+    /* White text for high visibility */
+    font-weight: bold;
+    padding: 10px 20px;
+}
+
+QPushButton#UploadButton:hover {
+    background-color: #00bfa5;
+}
+
+/* --- MAIN VIEWER & STATUS BAR (Viewport and Footer) --- */
+/* Central widget where the image is displayed */
+QGraphicsView,
+QLabel#ImagePreview {
+    background-color: #e6e6e6;
+    /* Light gray for viewing area */
+    border: 1px dashed #cccccc;
+    /* Light border for the drag and drop box */
+}
+
+/* Footer Bar/Status Bar */
+QStatusBar {
+    background-color: #e6e6e6;
+    color: #555555;
+    border-top: 1px solid #cccccc;
+    padding: 3px;
+}
+
+/* --- SETTINGS PANEL (Right Collapsible Panel) --- */
+/* Assuming the right panel uses QWidget or QScrollArea */
+QScrollArea,
+QWidget#SettingsPanel {
+    background-color: #ffffff;
+    /* White background */
+    border: none;
+    padding: 10px;
+}
+
+QLabel {
+    color: #1e1e1e;
+    padding: 5px 0;
+}
+
+/* --- INPUTS (Sliders, Text Fields, Checkboxes) --- */
+QLineEdit {
+    background-color: #ffffff;
+    border: 1px solid #cccccc;
+    padding: 5px;
+    border-radius: 3px;
+    color: #1e1e1e;
+}
+
+/* Sliders (e.g., Confidence, Noise Reduction) */
+QSlider::groove:horizontal {
+    border: 1px solid #cccccc;
+    height: 8px;
+    /* height of the groove */
+    background: #e0e0e0;
+    margin: 2px 0;
+    border-radius: 4px;
+}
+
+QSlider::handle:horizontal {
+    background: #0078d4;
+    /* Accent color */
+    border: 1px solid #0078d4;
+    width: 12px;
+    margin: -3px 0;
+    /* center the handle vertically */
+    border-radius: 6px;
+}
+
+/* Radio Buttons and Checkboxes */
+QRadioButton::indicator,
+QCheckBox::indicator {
+    width: 13px;
+    height: 13px;
+    border: 1px solid #999999;
+    background-color: #ffffff;
+}
+
+QRadioButton::indicator:checked,
+QCheckBox::indicator:checked {
+    background-color: #0078d4;
+    /* Checked state accent */
+    border: 1px solid #0078d4;
+}
+
+/* --- COMBO BOXES/DROPDOWNS --- */
+QComboBox {
+    background-color: #ffffff;
+    border: 1px solid #cccccc;
+    padding: 5px;
+    border-radius: 4px;
+    color: #1e1e1e;
+}
+
+QComboBox::drop-down {
+    border: none;
+    subcontrol-origin: padding;
+    subcontrol-position: top right;
+    width: 15px;
+}
+
+QComboBox::down-arrow {
+    /* You would need to use a dark down arrow icon for the light theme */
+    image: url(":/icons/down_arrow_dark.png");
+}
+
+/* --- GROUP BOXES (For tool organization) --- */
+QGroupBox {
+    border: 1px solid #cccccc;
+    border-radius: 5px;
+    margin-top: 1ex;
+    /* leave space at the top for the title */
+    background-color: #fcfcfc;
+}
+
+QGroupBox::title {
+    subcontrol-origin: margin;
+    subcontrol-position: top left;
+    padding: 0 3px;
+    color: #555555;
+    background-color: #fcfcfc;
+}
