@@ -33,9 +33,9 @@ python -m venv .venv
 
 # Activate virtual environment
 # On Windows:
-image_lab_env\Scripts\activate
+.\.venv\Scripts\activate
 # On macOS/Linux:
-source .venv/bin/activate
+source ./.venv/bin/activate
 ```
 
 ## To run the program:

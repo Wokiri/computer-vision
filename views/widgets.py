@@ -41,8 +41,8 @@ class ResizeWidget(QtWidgets.QWidget):
         self.ui.width_resize_lineEdit.setValidator(int_validator)
         self.ui.height_resize_lineEdit.setValidator(int_validator)
 
-        self.ui.contentAwareCheckBox.stateChanged.connect(self.contentAwareCheckState)
-        self.contentAwareCheckState()
+        self.ui.contentAwareCheckBox.stateChanged.connect(self.content_aware_check_state)
+        self.content_aware_check_state()
 
         # Add aspect ratio options to combo box
         self.ui.resize_image_comboBox.clear()
@@ -68,7 +68,7 @@ class ResizeWidget(QtWidgets.QWidget):
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose, False)
         self.setWindowModality(QtCore.Qt.NonModal)
 
-    def contentAwareCheckState(self):
+    def content_aware_check_state(self):
         """
         Toggle text bold based on checkbox state using QFont
         """
@@ -84,6 +84,9 @@ class ObjectDetectionWidget(QtWidgets.QWidget):
         self.ui = Ui_ObjectDetectionTool()
         self.ui.setupUi(self)
 
+        self.ui.boundinBoxPreviewCheckbox.stateChanged.connect(self.bound_box_preview_state)
+        self.bound_box_preview_state()
+
         # Dialog-like appearance and behavior
         self.setWindowFlags(
             QtCore.Qt.Tool | 
@@ -93,3 +96,11 @@ class ObjectDetectionWidget(QtWidgets.QWidget):
         )
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose, False)
         self.setWindowModality(QtCore.Qt.NonModal)
+
+    def bound_box_preview_state(self):
+        """
+        Toggle text bold based on checkbox state using QFont
+        """
+        font = self.ui.boundinBoxPreviewCheckbox.font()
+        font.setBold(self.ui.boundinBoxPreviewCheckbox.isChecked())
+        self.ui.boundinBoxPreviewCheckbox.setFont(font)

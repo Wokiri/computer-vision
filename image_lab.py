@@ -7,6 +7,7 @@ from views.widgets import FilterWidget, ObjectDetectionWidget, ResizeWidget
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
+
 class ImageLab(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
@@ -18,7 +19,7 @@ class ImageLab(QtWidgets.QMainWindow):
         self.filter_widget = FilterWidget(self)
         self.object_detection_widget = ObjectDetectionWidget(self)
 
-        self.initializeUI()
+        self.initialize_ui()
 
         self.image_processor = None
 
@@ -48,25 +49,25 @@ class ImageLab(QtWidgets.QMainWindow):
             "Custom": None
         }
 
-        self.ui.resizeBtn.clicked.connect(self.processingSelection)
-        self.ui.obj_detectionBtn.clicked.connect(self.processingSelection)
-        self.ui.filtersBtn.clicked.connect(self.processingSelection)
+        self.ui.resizeBtn.clicked.connect(self.processing_selection)
+        self.ui.obj_detectionBtn.clicked.connect(self.processing_selection)
+        self.ui.filtersBtn.clicked.connect(self.processing_selection)
 
         # Connect UploadButton
-        self.ui.UploadButton.clicked.connect(self.selectAndDisplayImage)
+        self.ui.UploadButton.clicked.connect(self.select_and_display_image)
         
         # Connect Zoom ComboBox
-        self.ui.selectStandardZoomComboBox.currentTextChanged.connect(self.applyStandardZoom)
+        self.ui.selectStandardZoomComboBox.currentTextChanged.connect(self.apply_standard_zoom)
 
-        self.ui.zoomInButton.clicked.connect(lambda: self.applyZoomIn(5))
-        self.ui.zoomOutButton.clicked.connect(lambda: self.applyZoomOut(5))
+        self.ui.zoomInButton.clicked.connect(lambda: self.apply_zoom_in(5))
+        self.ui.zoomOutButton.clicked.connect(lambda: self.apply_zoom_out(5))
 
         # Connect signals
         self.resize_widget.ui.width_resize_lineEdit.textChanged.connect(self.on_width_changed)
         self.resize_widget.ui.height_resize_lineEdit.textChanged.connect(self.on_height_changed)
         self.resize_widget.ui.resize_image_comboBox.currentTextChanged.connect(self.on_aspect_ratio_changed)
 
-    def initializeUI(self):
+    def initialize_ui(self):
         """Initialize UI settings for QGraphicsView and zoom controls"""
         # Set up the QGraphicsView and QGraphicsScene
         self.scene = QtWidgets.QGraphicsScene()
@@ -82,15 +83,15 @@ class ImageLab(QtWidgets.QMainWindow):
         self.ui.ImagePreview.setBackgroundBrush(QtGui.QBrush(QtGui.QColor(240, 240, 240)))
         
         # Initialize zoom combo box
-        self.initializeZoomComboBox()
+        self.initialize_zoom_combo_box()
         
         # Add placeholder text
-        self.showPlaceholderText()
+        self.show_placeholder_text()
         
         # Enable mouse wheel zoom
-        self.ui.ImagePreview.wheelEvent = self.graphicsViewWheelEvent
+        self.ui.ImagePreview.wheelEvent = self.graphics_view_wheel_event
 
-    def initializeZoomComboBox(self):
+    def initialize_zoom_combo_box(self):
         """Initialize the zoom combo box with standard options"""
         zoom_options = [
             "Fit to View",
@@ -111,33 +112,33 @@ class ImageLab(QtWidgets.QMainWindow):
         self.ui.selectStandardZoomComboBox.addItems(zoom_options)
         self.ui.selectStandardZoomComboBox.setCurrentText("Fit to View")
 
-    def applyStandardZoom(self, zoom_option):
+    def apply_standard_zoom(self, zoom_option):
         """Apply standard zoom level based on combo box selection"""
         if not self.current_pixmap_item:
             return
             
         if zoom_option == "Fit to View":
-            self.zoomFitToView()
+            self.zoom_fit_to_view()
         elif zoom_option == "Actual Size":
-            self.zoomActualSize()
+            self.zoom_actual_size()
         elif zoom_option.endswith('%'):
-            self.zoomByPercentage(zoom_option)
+            self.zoom_by_percentage(zoom_option)
         elif "custom" in zoom_option.lower():
-            self.showCustomZoomDialog()
+            self.show_custom_zoom_dialog()
 
-    def zoomFitToView(self):
+    def zoom_fit_to_view(self):
         """Zoom to fit the entire image in the view"""
         if self.current_pixmap_item:
             self.ui.ImagePreview.fitInView(self.scene.sceneRect(), QtCore.Qt.KeepAspectRatio)
-            self.current_zoom_level = self.calculateCurrentZoomLevel()
-            self.updateZoomComboBoxDisplay()
+            self.current_zoom_level = self.calculate_current_zoom_level()
+            self.update_zoom_combo_box_display()
 
-    def zoomActualSize(self):
+    def zoom_actual_size(self):
         """Zoom to 100% (actual pixel size)"""
         if self.current_pixmap_item:
-            self.applyZoomLevel(1.0)
+            self.apply_zoom_level(1.0)
 
-    def zoomByPercentage(self, percentage_text):
+    def zoom_by_percentage(self, percentage_text):
         """Zoom by percentage value"""
         try:
             # Extract percentage number from text (remove % sign)
@@ -145,18 +146,17 @@ class ImageLab(QtWidgets.QMainWindow):
             zoom_level = percentage / 100.0
             
             if self.min_zoom <= zoom_level <= self.max_zoom:
-                self.applyZoomLevel(zoom_level)
+                self.apply_zoom_level(zoom_level)
                 
         except ValueError:
             print(f"Invalid percentage format: {percentage_text}")
 
-
-    def applyZoomIn(self, zoom_factor=5, checked=None):
+    def apply_zoom_in(self, zoom_factor=5, checked=None):
         if self.current_pixmap_item:
-            currentZoom = self.calculateCurrentZoomLevel()
+            current_zoom = self.calculate_current_zoom_level()
             
             # Convert to percentage for easier calculation
-            current_percent = currentZoom * 100
+            current_percent = current_zoom * 100
             
             # Find the next multiple of zoom_factor
             next_multiple = ((current_percent + zoom_factor - 1) // zoom_factor) * zoom_factor
@@ -168,15 +168,14 @@ class ImageLab(QtWidgets.QMainWindow):
             zoom_level = next_multiple / 100.0
             
             zoom_level = max(self.min_zoom, min(self.max_zoom, zoom_level))
-            self.applyZoomLevel(zoom_level)
+            self.apply_zoom_level(zoom_level)
 
-    
-    def applyZoomOut(self, zoom_factor=5, checked=None):
+    def apply_zoom_out(self, zoom_factor=5, checked=None):
         if self.current_pixmap_item:
-            currentZoom = self.calculateCurrentZoomLevel()
+            current_zoom = self.calculate_current_zoom_level()
             
             # Convert to percentage for easier calculation
-            current_percent = currentZoom * 100
+            current_percent = current_zoom * 100
             
             # Find the previous multiple of zoom_factor
             prev_multiple = ((current_percent - 1) // zoom_factor) * zoom_factor
@@ -188,10 +187,9 @@ class ImageLab(QtWidgets.QMainWindow):
             zoom_level = prev_multiple / 100.0
             
             zoom_level = max(self.min_zoom, min(self.max_zoom, zoom_level))
-            self.applyZoomLevel(zoom_level)
+            self.apply_zoom_level(zoom_level)
 
-
-    def applyZoomLevel(self, zoom_level):
+    def apply_zoom_level(self, zoom_level):
         """Apply specific zoom level"""
         if not self.current_pixmap_item:
             return
@@ -206,9 +204,9 @@ class ImageLab(QtWidgets.QMainWindow):
         self.ui.ImagePreview.setTransform(transform)
         
         self.current_zoom_level = zoom_level
-        self.updateZoomComboBoxDisplay()
+        self.update_zoom_combo_box_display()
 
-    def calculateCurrentZoomLevel(self):
+    def calculate_current_zoom_level(self):
         """Calculate current zoom level based on view transformation"""
         if not self.current_pixmap_item:
             return 1.0
@@ -216,14 +214,12 @@ class ImageLab(QtWidgets.QMainWindow):
         # Get the transform and extract scale
         transform = self.ui.ImagePreview.transform()
         return transform.m11()  # Horizontal scale component
-    
-    
-    def getZoomComboBoxItems(self):
+
+    def get_zoom_combo_box_items(self):
         combo = self.ui.selectStandardZoomComboBox
         return [combo.itemText(i) for i in range(combo.count())]
-    
 
-    def updateZoomComboBoxDisplay(self):
+    def update_zoom_combo_box_display(self):
         """Update combo box to reflect current zoom level, without triggering events"""
         # Block signals to prevent infinite loop
         self.ui.selectStandardZoomComboBox.blockSignals(True)
@@ -238,9 +234,10 @@ class ImageLab(QtWidgets.QMainWindow):
         if index >= 0:
             self.ui.selectStandardZoomComboBox.setCurrentText(standard_option)
         else:
-            custom_index = self.ui.selectStandardZoomComboBox.findText("^Custom", QtCore.Qt.MatchRegularExpression)
+            custom_index = self.ui.selectStandardZoomComboBox.findText(
+                "^Custom", QtCore.Qt.MatchRegularExpression
+            )
             if custom_index >= 0:
-                
                 # Use the existing custom item
                 self.ui.selectStandardZoomComboBox.setCurrentIndex(custom_index)
                 # Update it to show the current percentage
@@ -255,7 +252,7 @@ class ImageLab(QtWidgets.QMainWindow):
         # Restore signals
         self.ui.selectStandardZoomComboBox.blockSignals(False)
 
-    def showCustomZoomDialog(self):
+    def show_custom_zoom_dialog(self):
         """Show dialog for custom zoom input"""
         if not self.current_pixmap_item:
             return
@@ -274,9 +271,9 @@ class ImageLab(QtWidgets.QMainWindow):
         
         if ok:
             zoom_level = zoom_value / 100.0
-            self.applyZoomLevel(zoom_level)
+            self.apply_zoom_level(zoom_level)
 
-    def graphicsViewWheelEvent(self, event):
+    def graphics_view_wheel_event(self, event):
         """Handle mouse wheel events for zooming"""
         if event.modifiers() & QtCore.Qt.ControlModifier:
             # Zoom with Ctrl + Mouse Wheel
@@ -292,17 +289,17 @@ class ImageLab(QtWidgets.QMainWindow):
             new_zoom = max(self.min_zoom, min(self.max_zoom, new_zoom))
             
             # Apply zoom
-            self.applyZoomLevel(new_zoom)
+            self.apply_zoom_level(new_zoom)
             
             # Update combo box
-            self.updateZoomComboBoxDisplay()
+            self.update_zoom_combo_box_display()
             
             event.accept()
         else:
             # Default wheel behavior (scroll)
             QtWidgets.QGraphicsView.wheelEvent(self.ui.ImagePreview, event)
 
-    def showPlaceholderText(self):
+    def show_placeholder_text(self):
         """Show placeholder text in the graphics view"""
         self.scene.clear()
         text_item = self.scene.addText("No Image Selected")
@@ -312,13 +309,13 @@ class ImageLab(QtWidgets.QMainWindow):
         text_item.setFont(font)
         
         # Center the text
-        self.centerContent()
+        self.center_content()
 
-    def centerContent(self):
+    def center_content(self):
         """Center the content in the graphics view"""
         self.ui.ImagePreview.fitInView(self.scene.itemsBoundingRect(), QtCore.Qt.KeepAspectRatio)
 
-    def selectAndDisplayImage(self):
+    def select_and_display_image(self):
         """Select an image file and display it in the preview"""
         # Supported image formats
         file_filter = "Image Files (*.png *.jpg *.jpeg *.bmp *.gif *.tiff *.webp);;All Files (*)"
@@ -332,13 +329,13 @@ class ImageLab(QtWidgets.QMainWindow):
         )
         
         if file_path:
-            self.loadAndDisplayImage(file_path)
+            self.load_and_display_image(file_path)
 
-    def loadAndDisplayImage(self, file_path):
+    def load_and_display_image(self, file_path):
         """Load image from file path and display in preview"""
         try:
             # Clear previous image
-            self.clearImagePreview()
+            self.clear_image_preview()
             
             # Load image
             pixmap = QtGui.QPixmap(file_path)
@@ -352,25 +349,25 @@ class ImageLab(QtWidgets.QMainWindow):
             self.current_image = pixmap
             
             # Display image in QGraphicsView
-            self.displayImageInPreview(pixmap)
+            self.display_image_in_preview(pixmap)
             
             # Reset to "Fit to View" when new image is loaded
             self.ui.selectStandardZoomComboBox.setCurrentText("Fit to View")
-            self.zoomFitToView()
+            self.zoom_fit_to_view()
             
             # Update window title with filename
             filename = Path(file_path).name
             self.setWindowTitle(f"ImageLab - {filename}")
             
             # Enable tool buttons if they were disabled
-            self.enableToolButtons(True)
+            self.enable_tool_buttons(True)
 
             self.image_processor = ImageProcessor(file_path)
             
             if self.image_processor.is_image_loaded():
                 self.statusBar().showMessage(f"Successfully loaded image: {file_path}", 3000)
 
-                w,h = self.image_processor.get_image_dimensions()
+                w, h = self.image_processor.get_image_dimensions()
 
                 # Store original dimensions and aspect ratio
                 self.original_width = w
@@ -385,11 +382,9 @@ class ImageLab(QtWidgets.QMainWindow):
                 self.ui.imageDimensionsLabel.setText(f"Width: {w} × Height: {h}")
                 self.resize_widget.ui.width_resize_lineEdit.setText(str(w))
                 self.resize_widget.ui.height_resize_lineEdit.setText(str(h))
-                
             
         except Exception as e:
             QtWidgets.QMessageBox.critical(self, "Error", f"Failed to load image: {str(e)}")
-
 
     def on_aspect_ratio_changed(self, ratio_name):
         """When aspect ratio selection changes"""
@@ -451,7 +446,7 @@ class ImageLab(QtWidgets.QMainWindow):
         except ValueError:
             pass
 
-    def displayImageInPreview(self, pixmap):
+    def display_image_in_preview(self, pixmap):
         """Display pixmap in QGraphicsView with proper scaling"""
         # Clear the scene
         self.scene.clear()
@@ -462,7 +457,7 @@ class ImageLab(QtWidgets.QMainWindow):
         # Set the scene rect to match the pixmap
         self.scene.setSceneRect(self.current_pixmap_item.boundingRect())
 
-    def clearImagePreview(self):
+    def clear_image_preview(self):
         """Clear the image preview and reset to placeholder state"""
         self.scene.clear()
         self.current_image = None
@@ -471,7 +466,7 @@ class ImageLab(QtWidgets.QMainWindow):
         self.current_zoom_level = 1.0
         
         # Reset to placeholder state
-        self.showPlaceholderText()
+        self.show_placeholder_text()
         
         # Reset zoom combo box
         self.ui.selectStandardZoomComboBox.setCurrentText("Fit to View")
@@ -480,77 +475,77 @@ class ImageLab(QtWidgets.QMainWindow):
         self.setWindowTitle("ImageLab")
         
         # Disable tool buttons when no image is loaded
-        self.enableToolButtons(False)
+        self.enable_tool_buttons(False)
 
-    def enableToolButtons(self, enabled):
+    def enable_tool_buttons(self, enabled):
         """Enable or disable tool buttons based on image availability"""
         self.ui.resizeBtn.setEnabled(enabled)
         self.ui.filtersBtn.setEnabled(enabled)
         self.ui.obj_detectionBtn.setEnabled(enabled)
 
-    def resizeEvent(self, event):
+    def resize_event(self, event):
         """Handle window resize to update image preview scaling"""
         super().resizeEvent(event)
         if self.current_pixmap_item and self.ui.selectStandardZoomComboBox.currentText() == "Fit to View":
-            self.zoomFitToView()
+            self.zoom_fit_to_view()
 
-    def getCurrentImage(self):
+    def get_current_image(self):
         """Get the current loaded image as QPixmap"""
         return self.current_image
 
-    def getCurrentImagePath(self):
+    def get_current_image_path(self):
         """Get the path of the current loaded image"""
         return self.current_image_path
 
-    def hasImageLoaded(self):
+    def has_image_loaded(self):
         """Check if an image is currently loaded"""
         return self.current_image is not None
 
     # Add Drag and Drop Support
-    def dragEnterEvent(self, event):
+    def drag_enter_event(self, event):
         """Handle drag enter event for file drops"""
         if event.mimeData().hasUrls():
             # Check if any of the dragged files are images
             for url in event.mimeData().urls():
                 file_path = url.toLocalFile()
-                if self.isImageFile(file_path):
+                if self.is_image_file(file_path):
                     event.acceptProposedAction()
                     return
         event.ignore()
 
-    def dragMoveEvent(self, event):
+    def drag_move_event(self, event):
         """Handle drag move event"""
         if event.mimeData().hasUrls():
             for url in event.mimeData().urls():
                 file_path = url.toLocalFile()
-                if self.isImageFile(file_path):
+                if self.is_image_file(file_path):
                     event.acceptProposedAction()
                     return
         event.ignore()
 
-    def dropEvent(self, event):
+    def drop_event(self, event):
         """Handle drop event for image files"""
         for url in event.mimeData().urls():
             file_path = url.toLocalFile()
-            if self.isImageFile(file_path):
-                self.loadAndDisplayImage(file_path)
+            if self.is_image_file(file_path):
+                self.load_and_display_image(file_path)
                 event.acceptProposedAction()
                 return
         event.ignore()
 
-    def isImageFile(self, file_path):
+    def is_image_file(self, file_path):
         """Check if file is a supported image format"""
         image_extensions = {'.png', '.jpg', '.jpeg', '.bmp', '.gif', '.tiff', '.webp'}
         file_path = Path(file_path)
         return file_path.is_file() and file_path.suffix.lower() in image_extensions
 
     # Enable drag and drop for the main window
-    def setAcceptDrops(self, accept):
+    def set_accept_drops(self, accept):
         """Override to enable drag and drop for the main window and graphics view"""
         super().setAcceptDrops(accept)
         self.ui.ImagePreview.setAcceptDrops(accept)
 
-    def positionToolWidget(self, widget, side="right", margin=10):
+    def position_tool_widget(self, widget, side="right", margin=10):
         """Position tool widget with screen boundary checking"""
         main_window_geometry = self.geometry()
         screen_geometry = QtWidgets.QApplication.primaryScreen().availableGeometry()
@@ -581,10 +576,10 @@ class ImageLab(QtWidgets.QMainWindow):
             
         widget.move(x, y)
 
-    def processingSelection(self):
+    def processing_selection(self):
         """Handle tool selection with image validation"""
         # Check if an image is loaded before showing tools
-        if not self.hasImageLoaded():
+        if not self.has_image_loaded():
             QtWidgets.QMessageBox.information(
                 self, 
                 "No Image", 
@@ -612,10 +607,9 @@ class ImageLab(QtWidgets.QMainWindow):
                 self.current_tool = None
             else:
                 # Show the new tool and update current_tool
-                self.positionToolWidget(tool_to_show, "right")
+                self.position_tool_widget(tool_to_show, "right")
                 tool_to_show.show()
                 self.current_tool = tool_to_show
-                
 
 
 if __name__ == "__main__":

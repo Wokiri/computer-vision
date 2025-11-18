@@ -256,16 +256,4 @@ class ImageProcessor:
         except Exception as e:
             print(f"Error converting image to QPixmap: {e}")
             return QPixmap()
-    
-    def get_image_info(self):
-        """Get information about the current image"""
-        if self.current_image is not None:
-            height, width = self.current_image.shape[:2]
-            channels = self.current_image.shape[2] if len(self.current_image.shape) == 3 else 1
-            return {
-                'width': width,
-                'height': height,
-                'channels': channels,
-                'file_path': self.image_path
-            }
-        return {}
+        
