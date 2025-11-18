@@ -46,21 +46,3 @@ source .venv/bin/activate
 python image_lab.py
 
 ```
-
-## 🚀 Features
-
-- **Image Upload & Display**: Support for multiple image formats (PNG, JPG, JPEG, BMP, TIFF)
-- **Smart Resizing**: 
-  - Maintain aspect ratio
-  - Content-aware resizing (seam carving)
-  - Precise dimension control
-- **Advanced Filters**:
-  - Grayscale conversion
-  - Blur and sharpening
-  - Edge detection
-  - Sepia tone
-  - Brightness and contrast adjustment
-- **Object Detection**: Basic face detection using Haar cascades
-- **Zoom Controls**: Standard zoom levels and custom zoom in/out
-- **Real-time Preview**: Instant visualization of processing results
-
