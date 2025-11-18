@@ -41,7 +41,7 @@ class ResizeWidget(QtWidgets.QWidget):
         self.ui.width_resize_lineEdit.setValidator(int_validator)
         self.ui.height_resize_lineEdit.setValidator(int_validator)
 
-        self.ui.contentAwareCheckBox.stateChanged.connect(self.content_aware_check_state)
+        self.ui.content_aware_checkBox.stateChanged.connect(self.content_aware_check_state)
         self.content_aware_check_state()
 
         # Add aspect ratio options to combo box
@@ -72,9 +72,9 @@ class ResizeWidget(QtWidgets.QWidget):
         """
         Toggle text bold based on checkbox state using QFont
         """
-        font = self.ui.contentAwareCheckBox.font()
-        font.setBold(self.ui.contentAwareCheckBox.isChecked())
-        self.ui.contentAwareCheckBox.setFont(font)
+        font = self.ui.content_aware_checkBox.font()
+        font.setBold(self.ui.content_aware_checkBox.isChecked())
+        self.ui.content_aware_checkBox.setFont(font)
 
 
 class ObjectDetectionWidget(QtWidgets.QWidget):

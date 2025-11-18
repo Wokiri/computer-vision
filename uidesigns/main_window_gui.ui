@@ -422,8 +422,8 @@ QGroupBox::title {
               <property name="currentIndex">
                <number>1</number>
               </property>
-              <widget class="QWidget" name="page"/>
-              <widget class="QWidget" name="page_3">
+              <widget class="QWidget" name="processed_image_page"/>
+              <widget class="QWidget" name="original_image_page">
                <layout class="QGridLayout" name="gridLayout_2">
                 <item row="0" column="0">
                  <widget class="QGraphicsView" name="ImagePreview"/>
@@ -467,7 +467,6 @@ QGroupBox::title {
                 </item>
                </layout>
               </widget>
-              <widget class="QWidget" name="page_2"/>
              </widget>
             </item>
             <item>

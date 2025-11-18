@@ -27,9 +27,14 @@ class ImageLab(QtWidgets.QMainWindow):
         self.current_tool = None
         
         # Track current image
-        self.current_image = None
-        self.current_image_path = None
-        self.current_pixmap_item = None
+        self.original_image = None
+        self.original_image_path = None
+        self.original_pixmap_item = None
+
+        # Track processed image
+        self.processed_image = None
+        self.processed_image_path = None
+        self.processed_pixmap_item = None
         
         # Zoom tracking
         self.current_zoom_level = 1.0
@@ -66,6 +71,12 @@ class ImageLab(QtWidgets.QMainWindow):
         self.resize_widget.ui.width_resize_lineEdit.textChanged.connect(self.on_width_changed)
         self.resize_widget.ui.height_resize_lineEdit.textChanged.connect(self.on_height_changed)
         self.resize_widget.ui.resize_image_comboBox.currentTextChanged.connect(self.on_aspect_ratio_changed)
+
+        self.resize_widget.ui.cancel_resize_btn.clicked.connect(self.close_resize_widget)
+        self.resize_widget.ui.apply_resize_btn.clicked.connect(self.resize_image)
+
+        self.close_shortcut = QtWidgets.QShortcut(QtGui.QKeySequence("Esc"), self)
+        self.close_shortcut.activated.connect(self.close_active_tool)
 
     def initialize_ui(self):
         """Initialize UI settings for QGraphicsView and zoom controls"""
@@ -114,7 +125,7 @@ class ImageLab(QtWidgets.QMainWindow):
 
     def apply_standard_zoom(self, zoom_option):
         """Apply standard zoom level based on combo box selection"""
-        if not self.current_pixmap_item:
+        if not self.original_pixmap_item:
             return
             
         if zoom_option == "Fit to View":
@@ -128,14 +139,14 @@ class ImageLab(QtWidgets.QMainWindow):
 
     def zoom_fit_to_view(self):
         """Zoom to fit the entire image in the view"""
-        if self.current_pixmap_item:
+        if self.original_pixmap_item:
             self.ui.ImagePreview.fitInView(self.scene.sceneRect(), QtCore.Qt.KeepAspectRatio)
             self.current_zoom_level = self.calculate_current_zoom_level()
             self.update_zoom_combo_box_display()
 
     def zoom_actual_size(self):
         """Zoom to 100% (actual pixel size)"""
-        if self.current_pixmap_item:
+        if self.original_pixmap_item:
             self.apply_zoom_level(1.0)
 
     def zoom_by_percentage(self, percentage_text):
@@ -152,7 +163,7 @@ class ImageLab(QtWidgets.QMainWindow):
             print(f"Invalid percentage format: {percentage_text}")
 
     def apply_zoom_in(self, zoom_factor=5, checked=None):
-        if self.current_pixmap_item:
+        if self.original_pixmap_item:
             current_zoom = self.calculate_current_zoom_level()
             
             # Convert to percentage for easier calculation
@@ -171,7 +182,7 @@ class ImageLab(QtWidgets.QMainWindow):
             self.apply_zoom_level(zoom_level)
 
     def apply_zoom_out(self, zoom_factor=5, checked=None):
-        if self.current_pixmap_item:
+        if self.original_pixmap_item:
             current_zoom = self.calculate_current_zoom_level()
             
             # Convert to percentage for easier calculation
@@ -191,7 +202,7 @@ class ImageLab(QtWidgets.QMainWindow):
 
     def apply_zoom_level(self, zoom_level):
         """Apply specific zoom level"""
-        if not self.current_pixmap_item:
+        if not self.original_pixmap_item:
             return
             
         # Clamp zoom level to min/max values
@@ -208,7 +219,7 @@ class ImageLab(QtWidgets.QMainWindow):
 
     def calculate_current_zoom_level(self):
         """Calculate current zoom level based on view transformation"""
-        if not self.current_pixmap_item:
+        if not self.original_pixmap_item:
             return 1.0
             
         # Get the transform and extract scale
@@ -254,7 +265,7 @@ class ImageLab(QtWidgets.QMainWindow):
 
     def show_custom_zoom_dialog(self):
         """Show dialog for custom zoom input"""
-        if not self.current_pixmap_item:
+        if not self.original_pixmap_item:
             return
             
         current_percentage = int(self.current_zoom_level * 100)
@@ -345,8 +356,8 @@ class ImageLab(QtWidgets.QMainWindow):
                 return
             
             # Store image data
-            self.current_image_path = file_path
-            self.current_image = pixmap
+            self.original_image_path = file_path
+            self.original_image = pixmap
             
             # Display image in QGraphicsView
             self.display_image_in_preview(pixmap)
@@ -452,17 +463,17 @@ class ImageLab(QtWidgets.QMainWindow):
         self.scene.clear()
         
         # Add pixmap to scene
-        self.current_pixmap_item = self.scene.addPixmap(pixmap)
+        self.original_pixmap_item = self.scene.addPixmap(pixmap)
         
         # Set the scene rect to match the pixmap
-        self.scene.setSceneRect(self.current_pixmap_item.boundingRect())
+        self.scene.setSceneRect(self.original_pixmap_item.boundingRect())
 
     def clear_image_preview(self):
         """Clear the image preview and reset to placeholder state"""
         self.scene.clear()
-        self.current_image = None
-        self.current_image_path = None
-        self.current_pixmap_item = None
+        self.original_image = None
+        self.original_image_path = None
+        self.original_pixmap_item = None
         self.current_zoom_level = 1.0
         
         # Reset to placeholder state
@@ -486,20 +497,20 @@ class ImageLab(QtWidgets.QMainWindow):
     def resize_event(self, event):
         """Handle window resize to update image preview scaling"""
         super().resizeEvent(event)
-        if self.current_pixmap_item and self.ui.selectStandardZoomComboBox.currentText() == "Fit to View":
+        if self.original_pixmap_item and self.ui.selectStandardZoomComboBox.currentText() == "Fit to View":
             self.zoom_fit_to_view()
 
-    def get_current_image(self):
+    def get_original_image(self):
         """Get the current loaded image as QPixmap"""
-        return self.current_image
+        return self.original_image
 
-    def get_current_image_path(self):
+    def get_original_image_path(self):
         """Get the path of the current loaded image"""
-        return self.current_image_path
+        return self.original_image_path
 
     def has_image_loaded(self):
         """Check if an image is currently loaded"""
-        return self.current_image is not None
+        return self.original_image is not None
 
     # Add Drag and Drop Support
     def drag_enter_event(self, event):
@@ -610,6 +621,118 @@ class ImageLab(QtWidgets.QMainWindow):
                 self.position_tool_widget(tool_to_show, "right")
                 tool_to_show.show()
                 self.current_tool = tool_to_show
+
+    def close_resize_widget(self):
+        """Close the resize widget"""
+        if self.current_tool == self.resize_widget:
+            self.resize_widget.hide()
+            self.current_tool = None
+
+    def close_active_tool(self):
+        """Close the currently active tool with Escape key"""
+        if self.current_tool:
+            self.current_tool.hide()
+            self.current_tool = None
+
+    def resize_image(self):
+        """Resize the current image with the specified parameters"""
+        if not self.has_image_loaded():
+            QtWidgets.QMessageBox.warning(self, "No Image", "Please load an image first.")
+            return
+        
+        try:
+            # Get width and height from line edits
+            new_width = int(self.resize_widget.ui.width_resize_lineEdit.text())
+            new_height = int(self.resize_widget.ui.height_resize_lineEdit.text())
+            
+            # Validate dimensions
+            if new_width <= 0 or new_height <= 0:
+                QtWidgets.QMessageBox.warning(
+                    self, 
+                    "Invalid Dimensions", 
+                    "Width and height must be positive numbers."
+                )
+                return
+            
+            if new_width > 10000 or new_height > 10000:
+                QtWidgets.QMessageBox.warning(
+                    self,
+                    "Dimensions Too Large",
+                    "Width and height cannot exceed 10000 pixels."
+                )
+                return
+            
+            # Get content-aware setting
+            content_aware = self.resize_widget.ui.content_aware_checkBox.isChecked()
+            
+            # Determine if we should maintain aspect ratio
+            aspect_ratio_mode = self.resize_widget.ui.resize_image_comboBox.currentText()
+            maintain_aspect_ratio = re.search(r'original', aspect_ratio_mode, re.IGNORECASE)
+            
+            # Perform the resize operation
+            success = self.image_processor.resize_image(
+                new_width=new_width,
+                new_height=new_height,
+                maintain_aspect_ratio=maintain_aspect_ratio,
+                content_aware=content_aware
+            )
+            
+            if success:
+                # Get the resized image and update the display
+                resized_image = self.image_processor.current_image
+                if resized_image is not None:
+                    height, width, _ = resized_image.shape
+                    bytes_per_line = 3 * width
+                    q_image = QtGui.QImage(
+                        resized_image.data, 
+                        width, 
+                        height, 
+                        bytes_per_line, 
+                        QtGui.QImage.Format_RGB888
+                    )
+                    pixmap = QtGui.QPixmap.fromImage(q_image)
+                    
+                    # Update the display
+                    self.display_image_in_preview(pixmap)
+                    self.current_image = pixmap
+                    
+                    # Update dimensions label
+                    self.ui.imageDimensionsLabel.setText(f"Width: {width} × Height: {height}")
+                    
+                    # Show success message
+                    self.statusBar().showMessage(
+                        f"Image resized to {width}×{height} pixels", 
+                        3000
+                    )
+                    
+                    # Close the resize widget after successful operation
+                    self.close_resize_widget()
+                else:
+                    QtWidgets.QMessageBox.critical(
+                        self,
+                        "Resize Error",
+                        "Failed to get resized image from processor."
+                    )
+            else:
+                QtWidgets.QMessageBox.critical(
+                    self,
+                    "Resize Failed",
+                    "Image processor failed to resize the image."
+                )
+                
+        except ValueError as e:
+            print(e)
+            QtWidgets.QMessageBox.warning(
+                self,
+                "Invalid Input",
+                "Please enter valid numeric values for width and height."
+            )
+        except Exception as e:
+            QtWidgets.QMessageBox.critical(
+                self,
+                "Resize Error",
+                f"An unexpected error occurred: {str(e)}"
+            )
 
 
 if __name__ == "__main__":
