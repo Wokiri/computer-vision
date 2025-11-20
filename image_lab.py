@@ -54,12 +54,15 @@ class ImageLab(QtWidgets.QMainWindow):
             "Custom": None
         }
 
-        self.ui.resizeBtn.clicked.connect(self.processing_selection)
-        self.ui.obj_detectionBtn.clicked.connect(self.processing_selection)
-        self.ui.filtersBtn.clicked.connect(self.processing_selection)
+        self.ui.resizeBtn.clicked.connect(self.processing_tool_selection)
+        self.ui.obj_detectionBtn.clicked.connect(self.processing_tool_selection)
+        self.ui.filtersBtn.clicked.connect(self.processing_tool_selection)
 
         # Connect UploadButton
         self.ui.UploadButton.clicked.connect(self.select_and_display_image)
+
+        # Connect UploadButton
+        self.ui.save_as_pushButton.clicked.connect(self.save_resized_image)
         
         # Connect Zoom ComboBox
         self.ui.selectStandardZoomComboBox.currentTextChanged.connect(self.apply_standard_zoom)
@@ -162,7 +165,7 @@ class ImageLab(QtWidgets.QMainWindow):
         except ValueError:
             print(f"Invalid percentage format: {percentage_text}")
 
-    def apply_zoom_in(self, zoom_factor=5, checked=None):
+    def apply_zoom_in(self, zoom_factor=5):
         if self.original_pixmap_item:
             current_zoom = self.calculate_current_zoom_level()
             
@@ -181,7 +184,7 @@ class ImageLab(QtWidgets.QMainWindow):
             zoom_level = max(self.min_zoom, min(self.max_zoom, zoom_level))
             self.apply_zoom_level(zoom_level)
 
-    def apply_zoom_out(self, zoom_factor=5, checked=None):
+    def apply_zoom_out(self, zoom_factor=5):
         if self.original_pixmap_item:
             current_zoom = self.calculate_current_zoom_level()
             
@@ -376,7 +379,7 @@ class ImageLab(QtWidgets.QMainWindow):
             self.image_processor = ImageProcessor(file_path)
             
             if self.image_processor.is_image_loaded():
-                self.statusBar().showMessage(f"Successfully loaded image: {file_path}", 3000)
+                self.statusBar().showMessage(f"Successfully loaded image: {file_path}", 5000)
 
                 w, h = self.image_processor.get_image_dimensions()
 
@@ -404,15 +407,22 @@ class ImageLab(QtWidgets.QMainWindow):
         
         aspect_ratio = self.aspect_ratios[ratio_name]
         
-        # Get current width and calculate new height
         try:
             current_width = int(self.resize_widget.ui.width_resize_lineEdit.text())
-            new_height = int(round(current_width / aspect_ratio))
+            current_height = int(self.resize_widget.ui.height_resize_lineEdit.text())
             
-            # Block signals to prevent recursive calls
-            self.resize_widget.ui.height_resize_lineEdit.blockSignals(True)
-            self.resize_widget.ui.height_resize_lineEdit.setText(str(new_height))
-            self.resize_widget.ui.height_resize_lineEdit.blockSignals(False)
+            
+            if all([current_width > 0, current_height > 0, aspect_ratio > 0]):
+                if current_width / current_height > aspect_ratio:
+                    new_height = int(current_width / aspect_ratio)
+                    self.resize_widget.ui.height_resize_lineEdit.blockSignals(True)
+                    self.resize_widget.ui.height_resize_lineEdit.setText(str(new_height))
+                    self.resize_widget.ui.height_resize_lineEdit.blockSignals(False)
+                else:
+                    new_width = int(current_height * aspect_ratio)
+                    self.resize_widget.ui.width_resize_lineEdit.blockSignals(True)
+                    self.resize_widget.ui.width_resize_lineEdit.setText(str(new_width))
+                    self.resize_widget.ui.width_resize_lineEdit.blockSignals(False)
             
         except ValueError:
             pass
@@ -587,7 +597,7 @@ class ImageLab(QtWidgets.QMainWindow):
             
         widget.move(x, y)
 
-    def processing_selection(self):
+    def processing_tool_selection(self):
         """Handle tool selection with image validation"""
         # Check if an image is loaded before showing tools
         if not self.has_image_loaded():
@@ -646,7 +656,7 @@ class ImageLab(QtWidgets.QMainWindow):
             new_height = int(self.resize_widget.ui.height_resize_lineEdit.text())
             
             # Validate dimensions
-            if new_width <= 0 or new_height <= 0:
+            if any([new_width <= 0, new_height <= 0]):
                 QtWidgets.QMessageBox.warning(
                     self, 
                     "Invalid Dimensions", 
@@ -654,7 +664,7 @@ class ImageLab(QtWidgets.QMainWindow):
                 )
                 return
             
-            if new_width > 10000 or new_height > 10000:
+            if any([new_width > 10000, new_height > 10000]):
                 QtWidgets.QMessageBox.warning(
                     self,
                     "Dimensions Too Large",
@@ -668,28 +678,22 @@ class ImageLab(QtWidgets.QMainWindow):
             # Determine if we should maintain aspect ratio
             aspect_ratio_mode = self.resize_widget.ui.resize_image_comboBox.currentText()
             maintain_aspect_ratio = re.search(r'original', aspect_ratio_mode, re.IGNORECASE)
+            content_aware_alg = self.resize_widget.ui.resize_algorithm_comboBox.currentText()
             
             # Perform the resize operation
             success = self.image_processor.resize_image(
                 new_width=new_width,
                 new_height=new_height,
                 maintain_aspect_ratio=maintain_aspect_ratio,
-                content_aware=content_aware
+                content_aware=content_aware,
+                content_aware_alg=content_aware_alg
             )
             
             if success:
                 # Get the resized image and update the display
-                resized_image = self.image_processor.current_image
-                if resized_image is not None:
-                    height, width, _ = resized_image.shape
-                    bytes_per_line = 3 * width
-                    q_image = QtGui.QImage(
-                        resized_image.data, 
-                        width, 
-                        height, 
-                        bytes_per_line, 
-                        QtGui.QImage.Format_RGB888
-                    )
+                q_image = self.processed_q_image()
+                if q_image:
+                    height, width, _ = self.processed_image.shape
                     pixmap = QtGui.QPixmap.fromImage(q_image)
                     
                     # Update the display
@@ -733,6 +737,68 @@ class ImageLab(QtWidgets.QMainWindow):
                 "Resize Error",
                 f"An unexpected error occurred: {str(e)}"
             )
+
+    def processed_q_image(self):
+        if self.image_processor.current_image is not None:
+            self.processed_image = self.image_processor.current_image
+            height, width, _ = self.processed_image.shape
+            bytes_per_line = 3 * width
+            return QtGui.QImage(
+                self.processed_image.data, 
+                width, 
+                height, 
+                bytes_per_line, 
+                QtGui.QImage.Format_RGB888
+            )
+        return None
+
+    def save_resized_image(self):
+        """Save the processed image to a file"""
+        if self.processed_image is None:
+            QtWidgets.QMessageBox.warning(self, "Warning", "No processed image to save!")
+            return
+        
+        # Get image dimensions
+        height, width, _ = self.processed_image.shape
+        
+        # Generate default filename
+        default_filename = (
+            f"{self.image_processor.get_image_filename()}"
+            f"_resized_{width}_{height}"
+            f"{self.image_processor.get_image_extension()}"
+        )
+        
+        # Default directory
+        default_directory = self.image_processor.get_image_directory()
+        default_path = str(Path(default_directory) / default_filename)
+        
+        # Supported image formats for saving
+        file_filter = "Image Files (*.png *.jpg *.jpeg *.bmp *.gif *.tiff *.webp);;All Files (*)"
+        
+        # Open save file dialog
+        file_path, _ = QtWidgets.QFileDialog.getSaveFileName(
+            self,
+            "Save Resized Image",
+            default_path,
+            file_filter
+        )
+        
+        if file_path:
+            try:
+                # Create QImage from processed image data
+                q_image = self.processed_q_image()
+                if q_image:
+                    # Save using QImage
+                    success = q_image.save(file_path)
+                    if success:
+                        message = f'Image saved successfully!<br><br>Location: <a href="file:///{file_path}">{file_path}</a>'
+                        QtWidgets.QMessageBox.information(self, "Success", message)
+                    else:
+                        QtWidgets.QMessageBox.critical(self, "Error", "Failed to save image!")
+                else:
+                    QtWidgets.QMessageBox.critical(self, "Error", "Failed to create processed image!")
+            except Exception as e:
+                QtWidgets.QMessageBox.critical(self, "Error", f"Error saving image: {str(e)}")
 
 
 if __name__ == "__main__":

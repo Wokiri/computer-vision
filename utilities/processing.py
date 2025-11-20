@@ -4,24 +4,20 @@ import numpy as np
 from PyQt5.QtGui import QImage, QPixmap
 
 class ImageProcessor:
-    def __init__(self, file_path=None):
+    def __init__(self, file_path):
         self.current_image = None
         self.original_image = None
-        self.image_path = None
+        self.image_path = Path(file_path)
+        self.load_image()
         
-        # If a file path is provided during instantiation, load the image
-        if file_path:
-            self.load_image(file_path)
-        
-    def load_image(self, image_path):
+    def load_image(self):
         """Load an image from file path"""
         try:
             # Convert to Path object and validate
-            image_path = Path(image_path)
+            image_path = self.image_path
             if not self._is_valid_image_path(image_path):
                 return False
-                
-            self.image_path = image_path
+            
             self.original_image = cv.imread(str(image_path))
             if self.original_image is None:
                 raise ValueError(f"Could not load image from {image_path}")
@@ -102,39 +98,50 @@ class ImageProcessor:
             return width, height
         return 0, 0
     
-    def resize_image(self, new_width, new_height, maintain_aspect_ratio=True, content_aware=False):
+    def resize_image(self, new_width, new_height, maintain_aspect_ratio=False, content_aware=False, content_aware_alg=None):
         """Resize the current image"""
         if self.current_image is None:
             return False
             
         try:
-            if maintain_aspect_ratio and new_width > 0 and new_height > 0:
-                # Calculate aspect ratio
-                h, w = self.current_image.shape[:2]
-                aspect_ratio = w / h
-                
-                if new_width / new_height > aspect_ratio:
-                    new_width = int(new_height * aspect_ratio)
+            if all([new_width > 0, new_height > 0]):
+                if maintain_aspect_ratio:
+                    # Calculate aspect ratio
+                    h, w = self.original_image.shape[:2]
+                    aspect_ratio = w / h
+
+                    if new_width / new_height == aspect_ratio:
+                        pass
+                    elif new_width / new_height > aspect_ratio:
+                        new_height = int(new_width / aspect_ratio)
+                    else:
+                        new_width = int(new_height * aspect_ratio)
+            
+                if content_aware:
+                    self.current_image = self._seam_carving_resize(new_width, new_height, algorithm=content_aware_alg)
                 else:
-                    new_height = int(new_width / aspect_ratio)
-            
-            if content_aware:
-                # Use seam carving for content-aware resizing
-                self.current_image = self._seam_carving_resize(new_width, new_height)
-            else:
-                # Standard resizing
-                self.current_image = cv.resize(self.current_image, (new_width, new_height), interpolation=cv.INTER_AREA)
-            
-            return True
+                    # Standard resizing
+                    resized_image_bgr = cv.resize(self.current_image, (new_width, new_height), interpolation=cv.INTER_AREA)
+                    # Convert BGR to RGB
+                    self.current_image = cv.cvtColor(resized_image_bgr, cv.COLOR_BGR2RGB)
+                
+                return True
         except Exception as e:
             print(f"Error resizing image: {e}")
             return False
     
-    def _seam_carving_resize(self, new_width, new_height):
+    def _seam_carving_resize(self, new_width, new_height, algorithm=None):
         """Content-aware resizing using seam carving"""
-        # This is a simplified implementation - you might want to use a proper seam carving library
-        # For now, we'll use standard resizing as a placeholder
-        return cv.resize(self.current_image, (new_width, new_height), interpolation=cv.INTER_AREA)
+        if not algorithm:
+            # This is a simplified implementation - you might want to use a proper seam carving library
+            # For now, we'll use standard resizing as a placeholder
+            resized_image_bgr = cv.resize(self.current_image, (new_width, new_height), interpolation=cv.INTER_AREA)
+            # Convert BGR to RGB
+            return cv.cvtColor(resized_image_bgr, cv.COLOR_BGR2RGB)
+        else:
+            resized_image_bgr = cv.resize(self.current_image, (new_width, new_height), interpolation=cv.INTER_AREA)
+            # Convert BGR to RGB
+            return cv.cvtColor(resized_image_bgr, cv.COLOR_BGR2RGB)
     
     def apply_filter(self, filter_type, **kwargs):
         """Apply various filters to the image"""

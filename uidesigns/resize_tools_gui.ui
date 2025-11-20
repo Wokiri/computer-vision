@@ -32,19 +32,6 @@
       <number>5</number>
      </property>
      <item>
-      <spacer name="verticalSpacer">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>20</width>
-         <height>40</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
       <layout class="QVBoxLayout" name="verticalLayout_8">
        <property name="leftMargin">
         <number>5</number>
@@ -78,6 +65,34 @@
          <property name="checked">
           <bool>true</bool>
          </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QWidget" name="algorithmWidget" native="true">
+         <layout class="QFormLayout" name="algorithmFormLayout">
+          <property name="leftMargin">
+           <number>4</number>
+          </property>
+          <property name="topMargin">
+           <number>4</number>
+          </property>
+          <property name="rightMargin">
+           <number>4</number>
+          </property>
+          <property name="bottomMargin">
+           <number>4</number>
+          </property>
+          <item row="0" column="0">
+           <widget class="QLabel" name="algorithmLabel">
+            <property name="text">
+             <string>Algorithm</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QComboBox" name="resize_algorithm_comboBox"/>
+          </item>
+         </layout>
         </widget>
        </item>
        <item>

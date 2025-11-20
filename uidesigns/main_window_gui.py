@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_ImageLab(object):
     def setupUi(self, ImageLab):
         ImageLab.setObjectName("ImageLab")
-        ImageLab.resize(806, 686)
+        ImageLab.resize(870, 706)
         ImageLab.setStyleSheet("/* --- GLOBAL STYLES (QApplication and Main Window) --- */\n"
 "QMainWindow, QWidget {\n"
 "    background-color: #f0f0f0; /* Light background */\n"
@@ -60,7 +60,7 @@ class Ui_ImageLab(object):
 "    background-color: #e0e0e0;\n"
 "    border: 1px solid #cccccc;\n"
 "    color: #1e1e1e;\n"
-"    padding: 8px 15px;\n"
+"    padding: 10px 15px;\n"
 "    border-radius: 4px;\n"
 "    min-height: 25px;\n"
 "}\n"
@@ -183,13 +183,111 @@ class Ui_ImageLab(object):
 "    background-color: #fcfcfc;\n"
 "}\n"
 "\n"
+"/* --- MENU BAR --- */\n"
+"QMenuBar {\n"
+"    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,\n"
+"                                stop:0 #ffffff, stop:1 #f8f9fa);\n"
+"    border-bottom: 1px solid #dee2e6;\n"
+"    padding: 2px;\n"
+"}\n"
+"\n"
+"QMenuBar::item {\n"
+"    padding: 4px 8px;\n"
+"    background: transparent;\n"
+"    border-radius: 3px;\n"
+"}\n"
+"\n"
+"QMenuBar::item:selected {\n"
+"    background-color: #007bff;\n"
+"    color: #ffffff;\n"
+"}\n"
+"\n"
+"QMenu {\n"
+"    background-color: #ffffff;\n"
+"    border: 1px solid #dee2e6;\n"
+"    border-radius: 4px;\n"
+"    padding: 4px;\n"
+"}\n"
+"\n"
+"QMenu::item {\n"
+"    padding: 6px 20px;\n"
+"    border-radius: 3px;\n"
+"}\n"
+"\n"
+"QMenu::item:selected {\n"
+"    background-color: #007bff;\n"
+"    color: #ffffff;\n"
+"}\n"
+"\n"
+"/* --- SEPARATOR LINES --- */\n"
+"Line {\n"
+"    background-color: #dee2e6;\n"
+"    border: none;\n"
+"    height: 1px;\n"
+"    margin: 8px 0;\n"
+"}\n"
+"\n"
+"/* --- SPACERS AND LAYOUT ENHANCEMENTS --- */\n"
+"QSpacer {\n"
+"    background: transparent;\n"
+"}\n"
+"\n"
+"/* --- SCROLL AREAS --- */\n"
+"QScrollArea {\n"
+"    border: 1px solid #e9ecef;\n"
+"    border-radius: 6px;\n"
+"    background-color: #ffffff;\n"
+"}\n"
+"\n"
+"QScrollBar:vertical {\n"
+"    border: none;\n"
+"    background: #f8f9fa;\n"
+"    width: 12px;\n"
+"    margin: 0px;\n"
+"    border-radius: 6px;\n"
+"}\n"
+"\n"
+"QScrollBar::handle:vertical {\n"
+"    background: #adb5bd;\n"
+"    border-radius: 6px;\n"
+"    min-height: 20px;\n"
+"}\n"
+"\n"
+"QScrollBar::handle:vertical:hover {\n"
+"    background: #6c757d;\n"
+"}\n"
+"\n"
+"/* --- SPECIFIC WIDGET STATES --- */\n"
+"QPushButton:disabled {\n"
+"    background-color: #e9ecef;\n"
+"    color: #6c757d;\n"
+"    border-color: #ced4da;\n"
+"}\n"
+"\n"
+"QLineEdit:disabled {\n"
+"    background-color: #f8f9fa;\n"
+"    color: #6c757d;\n"
+"    border-color: #e9ecef;\n"
+"}\n"
+"\n"
 "#fileMgtLabel, #processingToolsLabel {\n"
 "    font-weight: 600;\n"
+"    padding: 5px 0;\n"
 "}\n"
 "\n"
 "#dimsLabel, #imageDimensionsLabel {\n"
 "    font-size: 7.5pt;\n"
 "    padding: 2px;\n"
+"    color: #6c757d;\n"
+"    background-color: #f8f9fa;\n"
+"    border-radius: 1px;\n"
+"}\n"
+"\n"
+"#statusLabel {\n"
+"    font-weight: 600;\n"
+"    color: #495057;\n"
+"    background-color: #e9ecef;\n"
+"    border: 1px solid #dee2e6;\n"
 "}\n"
 "\n"
 "\n"
@@ -229,22 +327,22 @@ class Ui_ImageLab(object):
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_2.setContentsMargins(0, 5, 0, 5)
         self.horizontalLayout_2.setObjectName("horizontalLayout_2")
-        self.pushButton_3 = QtWidgets.QPushButton(self.horizontalFrame)
-        self.pushButton_3.setObjectName("pushButton_3")
-        self.horizontalLayout_2.addWidget(self.pushButton_3)
-        self.pushButton_4 = QtWidgets.QPushButton(self.horizontalFrame)
-        self.pushButton_4.setObjectName("pushButton_4")
-        self.horizontalLayout_2.addWidget(self.pushButton_4)
+        self.save_pushButton = QtWidgets.QPushButton(self.horizontalFrame)
+        self.save_pushButton.setObjectName("save_pushButton")
+        self.horizontalLayout_2.addWidget(self.save_pushButton)
+        self.save_as_pushButton = QtWidgets.QPushButton(self.horizontalFrame)
+        self.save_as_pushButton.setObjectName("save_as_pushButton")
+        self.horizontalLayout_2.addWidget(self.save_as_pushButton)
         self.verticalLayout_2.addLayout(self.horizontalLayout_2)
         self.verticalLayout.addLayout(self.verticalLayout_2)
-        spacerItem = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        spacerItem = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Preferred)
         self.verticalLayout.addItem(spacerItem)
         self.line_2 = QtWidgets.QFrame(self.horizontalFrame)
         self.line_2.setFrameShadow(QtWidgets.QFrame.Plain)
         self.line_2.setFrameShape(QtWidgets.QFrame.HLine)
         self.line_2.setObjectName("line_2")
         self.verticalLayout.addWidget(self.line_2)
-        spacerItem1 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        spacerItem1 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Preferred)
         self.verticalLayout.addItem(spacerItem1)
         self.verticalLayout_3 = QtWidgets.QVBoxLayout()
         self.verticalLayout_3.setContentsMargins(5, 5, 5, 5)
@@ -262,6 +360,8 @@ class Ui_ImageLab(object):
         self.filtersBtn.setObjectName("filtersBtn")
         self.verticalLayout_3.addWidget(self.filtersBtn)
         self.verticalLayout.addLayout(self.verticalLayout_3)
+        spacerItem2 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.verticalLayout.addItem(spacerItem2)
         self.horizontalLayout.addLayout(self.verticalLayout)
         self.verticalFrame_4 = QtWidgets.QFrame(self.horizontalFrame)
         self.verticalFrame_4.setObjectName("verticalFrame_4")
@@ -295,8 +395,8 @@ class Ui_ImageLab(object):
         self.imageDimensionsLabel.setText("")
         self.imageDimensionsLabel.setObjectName("imageDimensionsLabel")
         self.horizontalLayout_3.addWidget(self.imageDimensionsLabel)
-        spacerItem2 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_3.addItem(spacerItem2)
+        spacerItem3 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_3.addItem(spacerItem3)
         self.gridLayout_2.addLayout(self.horizontalLayout_3, 1, 0, 1, 1)
         self.stackedWidget.addWidget(self.original_image_page)
         self.verticalLayout_4.addWidget(self.stackedWidget)
@@ -338,8 +438,8 @@ class Ui_ImageLab(object):
         self.zoomOutButton.setObjectName("zoomOutButton")
         self.horizontalLayout_5.addWidget(self.zoomOutButton)
         self.horizontalLayout_4.addLayout(self.horizontalLayout_5)
-        spacerItem3 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_4.addItem(spacerItem3)
+        spacerItem4 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_4.addItem(spacerItem4)
         self.horizontalLayout_8 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_8.setContentsMargins(4, 4, 4, 4)
         self.horizontalLayout_8.setObjectName("horizontalLayout_8")
@@ -385,13 +485,13 @@ class Ui_ImageLab(object):
         self.horizontalLayout_6.addWidget(self.statusLabel)
         self.verticalLayout_6.addLayout(self.horizontalLayout_6)
         self.horizontalLayout_9.addLayout(self.verticalLayout_6)
-        spacerItem4 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_9.addItem(spacerItem4)
+        spacerItem5 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_9.addItem(spacerItem5)
         self.verticalLayout_5.addWidget(self.horizontalFrame_6)
         self.gridLayout.addLayout(self.verticalLayout_5, 0, 0, 1, 1)
         ImageLab.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(ImageLab)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 806, 24))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 870, 31))
         self.menubar.setObjectName("menubar")
         self.menuFile = QtWidgets.QMenu(self.menubar)
         self.menuFile.setObjectName("menuFile")
@@ -432,8 +532,8 @@ class Ui_ImageLab(object):
         self.fileMgtLabel.setText(_translate("ImageLab", "File Management"))
         self.UploadButton.setText(_translate("ImageLab", "Upload Image"))
         self.pushButton.setText(_translate("ImageLab", "Recent Files"))
-        self.pushButton_3.setText(_translate("ImageLab", "Save"))
-        self.pushButton_4.setText(_translate("ImageLab", "Save As"))
+        self.save_pushButton.setText(_translate("ImageLab", "Save"))
+        self.save_as_pushButton.setText(_translate("ImageLab", "Save As"))
         self.processingToolsLabel.setText(_translate("ImageLab", "Processing Tools"))
         self.resizeBtn.setText(_translate("ImageLab", "Resize/Aspect Ratios"))
         self.obj_detectionBtn.setText(_translate("ImageLab", "Object Detection"))

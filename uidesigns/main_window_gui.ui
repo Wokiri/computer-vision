@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>806</width>
-    <height>686</height>
+    <width>870</width>
+    <height>706</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -59,7 +59,7 @@ QPushButton {
     background-color: #e0e0e0;
     border: 1px solid #cccccc;
     color: #1e1e1e;
-    padding: 8px 15px;
+    padding: 10px 15px;
     border-radius: 4px;
     min-height: 25px;
 }
@@ -182,13 +182,111 @@ QGroupBox::title {
     background-color: #fcfcfc;
 }
 
+/* --- MENU BAR --- */
+QMenuBar {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                stop:0 #ffffff, stop:1 #f8f9fa);
+    border-bottom: 1px solid #dee2e6;
+    padding: 2px;
+}
+
+QMenuBar::item {
+    padding: 4px 8px;
+    background: transparent;
+    border-radius: 3px;
+}
+
+QMenuBar::item:selected {
+    background-color: #007bff;
+    color: #ffffff;
+}
+
+QMenu {
+    background-color: #ffffff;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    padding: 4px;
+}
+
+QMenu::item {
+    padding: 6px 20px;
+    border-radius: 3px;
+}
+
+QMenu::item:selected {
+    background-color: #007bff;
+    color: #ffffff;
+}
+
+/* --- SEPARATOR LINES --- */
+Line {
+    background-color: #dee2e6;
+    border: none;
+    height: 1px;
+    margin: 8px 0;
+}
+
+/* --- SPACERS AND LAYOUT ENHANCEMENTS --- */
+QSpacer {
+    background: transparent;
+}
+
+/* --- SCROLL AREAS --- */
+QScrollArea {
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    background-color: #ffffff;
+}
+
+QScrollBar:vertical {
+    border: none;
+    background: #f8f9fa;
+    width: 12px;
+    margin: 0px;
+    border-radius: 6px;
+}
+
+QScrollBar::handle:vertical {
+    background: #adb5bd;
+    border-radius: 6px;
+    min-height: 20px;
+}
+
+QScrollBar::handle:vertical:hover {
+    background: #6c757d;
+}
+
+/* --- SPECIFIC WIDGET STATES --- */
+QPushButton:disabled {
+    background-color: #e9ecef;
+    color: #6c757d;
+    border-color: #ced4da;
+}
+
+QLineEdit:disabled {
+    background-color: #f8f9fa;
+    color: #6c757d;
+    border-color: #e9ecef;
+}
+
 #fileMgtLabel, #processingToolsLabel {
     font-weight: 600;
+    padding: 5px 0;
 }
 
 #dimsLabel, #imageDimensionsLabel {
     font-size: 7.5pt;
     padding: 2px;
+    color: #6c757d;
+    background-color: #f8f9fa;
+    border-radius: 1px;
+}
+
+#statusLabel {
+    font-weight: 600;
+    color: #495057;
+    background-color: #e9ecef;
+    border: 1px solid #dee2e6;
 }
 
 
@@ -297,14 +395,14 @@ QGroupBox::title {
                 <number>5</number>
                </property>
                <item>
-                <widget class="QPushButton" name="pushButton_3">
+                <widget class="QPushButton" name="save_pushButton">
                  <property name="text">
                   <string>Save</string>
                  </property>
                 </widget>
                </item>
                <item>
-                <widget class="QPushButton" name="pushButton_4">
+                <widget class="QPushButton" name="save_as_pushButton">
                  <property name="text">
                   <string>Save As</string>
                  </property>
@@ -318,6 +416,9 @@ QGroupBox::title {
             <spacer name="verticalSpacer_3">
              <property name="orientation">
               <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeType">
+              <enum>QSizePolicy::Preferred</enum>
              </property>
              <property name="sizeHint" stdset="0">
               <size>
@@ -341,6 +442,9 @@ QGroupBox::title {
             <spacer name="verticalSpacer">
              <property name="orientation">
               <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeType">
+              <enum>QSizePolicy::Preferred</enum>
              </property>
              <property name="sizeHint" stdset="0">
               <size>
@@ -393,6 +497,19 @@ QGroupBox::title {
               </widget>
              </item>
             </layout>
+           </item>
+           <item>
+            <spacer name="verticalSpacer_2">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
            </item>
           </layout>
          </item>
@@ -721,8 +838,8 @@ QGroupBox::title {
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>806</width>
-     <height>24</height>
+     <width>870</width>
+     <height>31</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
