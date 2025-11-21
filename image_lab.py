@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Dict, List, Union
 import numpy as np
 import re
 from uidesigns.main_window_gui import Ui_ImageLab
@@ -42,7 +43,7 @@ class ImageLab(QtWidgets.QMainWindow):
         self.max_zoom = 10.0
 
         # Define aspect ratio presets
-        self.aspect_ratios = {
+        self.aspect_ratios: Dict[str, Union[float, None]] = {
             "Original": None,
             "1:1": 1,
             "4:3": 4/3,
@@ -554,7 +555,7 @@ class ImageLab(QtWidgets.QMainWindow):
                 return
         event.ignore()
 
-    def is_image_file(self, file_path):
+    def is_image_file(self, file_path:str):
         """Check if file is a supported image format"""
         image_extensions = {'.png', '.jpg', '.jpeg', '.bmp', '.gif', '.tiff', '.webp'}
         file_path = Path(file_path)
@@ -566,7 +567,7 @@ class ImageLab(QtWidgets.QMainWindow):
         super().setAcceptDrops(accept)
         self.ui.ImagePreview.setAcceptDrops(accept)
 
-    def position_tool_widget(self, widget, side="right", margin=10):
+    def position_tool_widget(self, widget: Union[FilterWidget, ObjectDetectionWidget, ResizeWidget], side="right", margin=10):
         """Position tool widget with screen boundary checking"""
         main_window_geometry = self.geometry()
         screen_geometry = QtWidgets.QApplication.primaryScreen().availableGeometry()
@@ -652,8 +653,8 @@ class ImageLab(QtWidgets.QMainWindow):
         
         try:
             # Get width and height from line edits
-            new_width = int(self.resize_widget.ui.width_resize_lineEdit.text())
-            new_height = int(self.resize_widget.ui.height_resize_lineEdit.text())
+            new_width: int = int(self.resize_widget.ui.width_resize_lineEdit.text())
+            new_height: int = int(self.resize_widget.ui.height_resize_lineEdit.text())
             
             # Validate dimensions
             if any([new_width <= 0, new_height <= 0]):
@@ -690,8 +691,9 @@ class ImageLab(QtWidgets.QMainWindow):
             )
             
             if success:
+                self.processed_image = self.image_processor.current_image
                 # Get the resized image and update the display
-                q_image = self.processed_q_image()
+                q_image = self.image_processor.convert_cv_image(self.processed_image, output_format="qimage")
                 if q_image:
                     height, width, _ = self.processed_image.shape
                     pixmap = QtGui.QPixmap.fromImage(q_image)
@@ -738,20 +740,6 @@ class ImageLab(QtWidgets.QMainWindow):
                 f"An unexpected error occurred: {str(e)}"
             )
 
-    def processed_q_image(self):
-        if self.image_processor.current_image is not None:
-            self.processed_image = self.image_processor.current_image
-            height, width, _ = self.processed_image.shape
-            bytes_per_line = 3 * width
-            return QtGui.QImage(
-                self.processed_image.data, 
-                width, 
-                height, 
-                bytes_per_line, 
-                QtGui.QImage.Format_RGB888
-            )
-        return None
-
     def save_resized_image(self):
         """Save the processed image to a file"""
         if self.processed_image is None:
@@ -786,7 +774,7 @@ class ImageLab(QtWidgets.QMainWindow):
         if file_path:
             try:
                 # Create QImage from processed image data
-                q_image = self.processed_q_image()
+                q_image = self.image_processor.convert_cv_image(self.processed_image, output_format="qimage")
                 if q_image:
                     # Save using QImage
                     success = q_image.save(file_path)

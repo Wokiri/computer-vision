@@ -50,7 +50,6 @@ class ResizeWidget(QtWidgets.QWidget):
         # Aspect ratio options
         self.ui.resize_algorithm_comboBox.clear()
         self.ui.resize_algorithm_comboBox.addItems([
-            "Open CV", 
             "Hubble 001",
             "Hubble 002",
         ])

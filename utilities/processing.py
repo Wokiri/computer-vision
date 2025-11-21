@@ -121,27 +121,21 @@ class ImageProcessor:
                     self.current_image = self._seam_carving_resize(new_width, new_height, algorithm=content_aware_alg)
                 else:
                     # Standard resizing
-                    resized_image_bgr = cv.resize(self.current_image, (new_width, new_height), interpolation=cv.INTER_AREA)
-                    # Convert BGR to RGB
-                    self.current_image = cv.cvtColor(resized_image_bgr, cv.COLOR_BGR2RGB)
+                    self.current_image = cv.resize(self.current_image, (new_width, new_height), interpolation=cv.INTER_AREA)
                 
                 return True
         except Exception as e:
             print(f"Error resizing image: {e}")
             return False
     
-    def _seam_carving_resize(self, new_width, new_height, algorithm=None):
+    def _seam_carving_resize(self, new_width, new_height, algorithm="Hubble 001"):
         """Content-aware resizing using seam carving"""
-        if not algorithm:
+        if algorithm == "Hubble 001":
             # This is a simplified implementation - you might want to use a proper seam carving library
             # For now, we'll use standard resizing as a placeholder
-            resized_image_bgr = cv.resize(self.current_image, (new_width, new_height), interpolation=cv.INTER_AREA)
-            # Convert BGR to RGB
-            return cv.cvtColor(resized_image_bgr, cv.COLOR_BGR2RGB)
+            return cv.resize(self.current_image, (new_width, new_height), interpolation=cv.INTER_AREA)
         else:
-            resized_image_bgr = cv.resize(self.current_image, (new_width, new_height), interpolation=cv.INTER_AREA)
-            # Convert BGR to RGB
-            return cv.cvtColor(resized_image_bgr, cv.COLOR_BGR2RGB)
+            return cv.resize(self.current_image, (new_width, new_height), interpolation=cv.INTER_AREA)
     
     def apply_filter(self, filter_type, **kwargs):
         """Apply various filters to the image"""
@@ -235,18 +229,27 @@ class ImageProcessor:
                 print(f"Error saving image: {e}")
                 return False
         return False
-    
-    def cv_to_qpixmap(self, image=None):
-        """Convert OpenCV image to QPixmap"""
+
+    def convert_cv_image(self, image=None, output_format="qpixmap"):
+        """
+        Convert OpenCV image to QImage or QPixmap
+        
+        Args:
+            image: OpenCV image (if None, uses self.current_image)
+            output_format: "qimage" or "qpixmap"
+        
+        Returns:
+            QImage or QPixmap object, or empty object if conversion fails
+        """
         if image is None:
             image = self.current_image
             
         if image is None:
-            return QPixmap()
+            return QImage() if output_format.lower() == "qimage" else QPixmap()
         
         try:
-            # Convert BGR to RGB
-            if len(image.shape) == 3:
+            # Convert BGR to RGB for color images
+            if len(image.shape) == 3 and image.shape[2] == 3:
                 rgb_image = cv.cvtColor(image, cv.COLOR_BGR2RGB)
             else:
                 rgb_image = image
@@ -254,13 +257,19 @@ class ImageProcessor:
             h, w = rgb_image.shape[:2]
             bytes_per_line = 3 * w if len(rgb_image.shape) == 3 else w
             
+            # Create QImage
             if len(rgb_image.shape) == 3:
                 q_img = QImage(rgb_image.data, w, h, bytes_per_line, QImage.Format_RGB888)
             else:
                 q_img = QImage(rgb_image.data, w, h, bytes_per_line, QImage.Format_Grayscale8)
+            
+            # Return based on requested format
+            if output_format.lower() == "qimage":
+                return q_img
+            else:  # qpixmap
+                return QPixmap.fromImage(q_img)
                 
-            return QPixmap.fromImage(q_img)
         except Exception as e:
-            print(f"Error converting image to QPixmap: {e}")
-            return QPixmap()
+            print(f"Error converting image: {e}")
+            return QImage() if output_format.lower() == "qimage" else QPixmap()
         

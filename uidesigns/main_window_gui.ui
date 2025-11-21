@@ -478,7 +478,7 @@ QLineEdit:disabled {
              <item>
               <widget class="QPushButton" name="resizeBtn">
                <property name="text">
-                <string>Resize/Aspect Ratios</string>
+                <string>Image Resizing</string>
                </property>
               </widget>
              </item>

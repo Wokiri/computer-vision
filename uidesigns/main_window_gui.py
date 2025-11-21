@@ -535,7 +535,7 @@ class Ui_ImageLab(object):
         self.save_pushButton.setText(_translate("ImageLab", "Save"))
         self.save_as_pushButton.setText(_translate("ImageLab", "Save As"))
         self.processingToolsLabel.setText(_translate("ImageLab", "Processing Tools"))
-        self.resizeBtn.setText(_translate("ImageLab", "Resize/Aspect Ratios"))
+        self.resizeBtn.setText(_translate("ImageLab", "Image Resizing"))
         self.obj_detectionBtn.setText(_translate("ImageLab", "Object Detection"))
         self.filtersBtn.setText(_translate("ImageLab", "Filters/Enhancements"))
         self.dimsLabel.setText(_translate("ImageLab", "Image dimensions:"))
