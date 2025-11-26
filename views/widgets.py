@@ -1,4 +1,5 @@
 from PyQt5 import QtWidgets, QtCore, QtGui
+from uidesigns.main_window_gui import Ui_ImageLab
 from uidesigns.filters_tools_gui import Ui_FiltersTool
 from uidesigns.resize_tools_gui import Ui_ResizeTool
 from uidesigns.object_detection_tools_gui import Ui_ObjectDetectionTool
@@ -11,6 +12,81 @@ from uidesigns.object_detection_tools_gui import Ui_ObjectDetectionTool
 # regex = QRegExp("^[1-9][0-9]*$")
 # validator = QRegExpValidator(regex)
 # self.resize_widget.ui.width_resize_lineEdit.setValidator(validator)
+
+
+class ImageLabMainWindow(QtWidgets.QMainWindow):
+    def __init__(self):
+        super().__init__()
+
+        self.ui = Ui_ImageLab()
+        self.ui.setupUi(self)
+
+        self.initialize_ui()
+
+    def initialize_ui(self):
+        """Initialize UI settings for QGraphicsView and zoom controls"""
+
+        self.ui.progressBar.setVisible(False)
+        self.ui.progressBar.setValue(0)
+
+
+        # Set up the QGraphicsView and QGraphicsScene
+        self.scene = QtWidgets.QGraphicsScene()
+        self.ui.ImagePreview.setScene(self.scene)
+        
+        # Set view properties
+        self.ui.ImagePreview.setRenderHint(QtGui.QPainter.Antialiasing)
+        self.ui.ImagePreview.setRenderHint(QtGui.QPainter.SmoothPixmapTransform)
+        self.ui.ImagePreview.setDragMode(QtWidgets.QGraphicsView.ScrollHandDrag)
+        
+        # Set alignment and background
+        self.ui.ImagePreview.setAlignment(QtCore.Qt.AlignCenter)
+        self.ui.ImagePreview.setBackgroundBrush(QtGui.QBrush(QtGui.QColor(240, 240, 240)))
+        
+        # Initialize zoom combo box
+        self.initialize_zoom_combo_box()
+        
+        # Add placeholder text
+        self.show_placeholder_text()
+        
+    
+    def initialize_zoom_combo_box(self):
+        """Initialize the zoom combo box with standard options"""
+        zoom_options = [
+            "Fit to View",
+            "Actual Size", 
+            "25%",
+            "50%", 
+            "75%",
+            "100%",
+            "125%",
+            "150%",
+            "200%",
+            "300%",
+            "400%",
+            "Custom..."
+        ]
+        
+        self.ui.selectStandardZoomComboBox.clear()
+        self.ui.selectStandardZoomComboBox.addItems(zoom_options)
+        self.ui.selectStandardZoomComboBox.setCurrentText("Fit to View")
+
+    def show_placeholder_text(self):
+        """Show placeholder text in the graphics view"""
+        self.scene.clear()
+        text_item = self.scene.addText("No Image Selected")
+        text_item.setDefaultTextColor(QtGui.QColor(100, 100, 100))
+        font = text_item.font()
+        font.setPointSize(14)
+        text_item.setFont(font)
+        
+        # Center the text
+        self.center_content()
+
+    def center_content(self):
+        """Center the content in the graphics view"""
+        self.ui.ImagePreview.fitInView(self.scene.itemsBoundingRect(), QtCore.Qt.KeepAspectRatio)
+        
 
 
 class ResizeWidget(QtWidgets.QWidget):
@@ -36,6 +112,7 @@ class ResizeWidget(QtWidgets.QWidget):
         # Aspect ratio options
         self.ui.resize_image_comboBox.clear()
         self.ui.resize_image_comboBox.addItems([
+            "Custom",
             "Original", 
             "1:1", 
             "4:3", 
@@ -43,8 +120,7 @@ class ResizeWidget(QtWidgets.QWidget):
             "16:9", 
             "9:16", 
             "3:2", 
-            "2:3", 
-            "Custom"
+            "2:3",
         ])
 
         # Aspect ratio options

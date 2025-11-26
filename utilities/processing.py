@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import List
 import cv2 as cv
 import numpy as np
 from PyQt5.QtGui import QImage, QPixmap
@@ -98,27 +99,20 @@ class ImageProcessor:
             return width, height
         return 0, 0
     
-    def resize_image(self, new_width, new_height, maintain_aspect_ratio=False, content_aware=False, content_aware_alg=None):
+    def resize_image(self, new_width, new_height, content_aware=False, content_aware_alg=None, progress_callback=None):
         """Resize the current image"""
         if self.current_image is None:
             return False
             
         try:
             if all([new_width > 0, new_height > 0]):
-                if maintain_aspect_ratio:
-                    # Calculate aspect ratio
-                    h, w = self.original_image.shape[:2]
-                    aspect_ratio = w / h
 
-                    if new_width / new_height == aspect_ratio:
-                        pass
-                    elif new_width / new_height > aspect_ratio:
-                        new_height = int(new_width / aspect_ratio)
-                    else:
-                        new_width = int(new_height * aspect_ratio)
-            
                 if content_aware:
-                    self.current_image = self._seam_carving_resize(new_width, new_height, algorithm=content_aware_alg)
+                    self.current_image = self._seam_carving_resize(
+                    new_width, new_height, 
+                    algorithm=content_aware_alg,
+                    progress_callback=progress_callback
+                )
                 else:
                     # Standard resizing
                     self.current_image = cv.resize(self.current_image, (new_width, new_height), interpolation=cv.INTER_AREA)
@@ -127,15 +121,198 @@ class ImageProcessor:
         except Exception as e:
             print(f"Error resizing image: {e}")
             return False
-    
-    def _seam_carving_resize(self, new_width, new_height, algorithm="Hubble 001"):
+        
+    def _seam_carving_resize(self, new_width, new_height, algorithm="Hubble 001", progress_callback=None):
         """Content-aware resizing using seam carving"""
         if algorithm == "Hubble 001":
-            # This is a simplified implementation - you might want to use a proper seam carving library
-            # For now, we'll use standard resizing as a placeholder
-            return cv.resize(self.current_image, (new_width, new_height), interpolation=cv.INTER_AREA)
+            current_img = self.current_image.copy()
+            
+            # Calculate differences
+            width_diff = current_img.shape[1] - new_width
+            height_diff = current_img.shape[0] - new_height
+            
+            # Handle width adjustment
+            if width_diff != 0:
+                current_img = self._adjust_width(current_img, width_diff, progress_callback)
+            
+            # Handle height adjustment
+            if height_diff != 0:
+                current_img = self._adjust_height(current_img, height_diff, progress_callback)
+            
+            # Return result
+            self.current_image = current_img
+            return current_img
         else:
-            return cv.resize(self.current_image, (new_width, new_height), interpolation=cv.INTER_AREA)
+            raise ValueError(f"Unknown algorithm: {algorithm}")
+        
+    def _find_vertical_seam(self, energy:np.ndarray):
+        """Use dynamic programming to find the vertical seam with minimum energy"""
+        h, w = energy.shape
+        M = energy.copy().astype(np.float64)
+        backtrack = np.zeros_like(M, dtype=np.int32)
+        
+        # Build cumulative energy matrix
+        for i in range(1, h):
+            for j in range(0, w):
+                # Handle boundary cases
+                left = M[i-1, j-1] if j > 0 else float('inf')
+                middle = M[i-1, j]
+                right = M[i-1, j+1] if j < w-1 else float('inf')
+                
+                # Find minimum energy path
+                min_energy = min(left, middle, right)
+                M[i, j] += min_energy
+                
+                # Store backtracking information
+                if min_energy == left:
+                    backtrack[i, j] = -1  # come from left
+                elif min_energy == middle:
+                    backtrack[i, j] = 0   # come from middle
+                else:
+                    backtrack[i, j] = 1   # come from right
+        
+        # Find the starting point of the seam (minimum energy in last row)
+        seam = []
+        j = np.argmin(M[-1])
+        seam.append(j)
+        
+        # Backtrack to find the complete seam
+        for i in range(h-1, 0, -1):
+            j = j + backtrack[i, j]
+            seam.append(j)
+        
+        return seam[::-1]  # reverse to go from top to bottom
+
+    def _remove_vertical_seam(self, img:np.ndarray, seam:List[np.int64]):
+        """Remove vertical seam from image"""
+        h, w, c = img.shape
+        new_img = np.zeros((h, w-1, c), dtype=img.dtype)
+        
+        for i in range(h):
+            j = seam[i]
+            new_img[i, :, :] = np.delete(img[i, :, :], j, axis=0)
+        
+        return new_img
+
+    def _insert_vertical_seam(self, img:np.ndarray, seam:List[np.int64]):
+        """Insert vertical seam by duplicating pixel and averaging with neighbors"""
+        h, w, c = img.shape
+        new_img = np.zeros((h, w + 1, c), dtype=img.dtype)
+        
+        for i in range(h):
+            j = seam[i]
+            
+            # Copy all pixels before the seam position
+            new_img[i, :j, :] = img[i, :j, :]
+            
+            # Create new pixel at seam position by averaging neighbors
+            if j == 0:
+                # Left edge case - average with right neighbor only
+                new_pixel = (img[i, j, :] + img[i, j+1, :]) // 2
+            elif j == w - 1:
+                # Right edge case - average with left neighbor only  
+                new_pixel = (img[i, j-1, :] + img[i, j, :]) // 2
+            else:
+                # General case - average left and right neighbors
+                new_pixel = (img[i, j-1, :] + img[i, j, :] + img[i, j+1, :]) // 3
+            
+            # Insert the new pixel and copy the original
+            new_img[i, j, :] = new_pixel
+            new_img[i, j+1, :] = img[i, j, :]
+            
+            # Copy all pixels after the seam position (shifted by 1)
+            new_img[i, j+2:, :] = img[i, j+1:, :]
+        
+        return new_img
+
+    def _calculate_energy(self, img):
+        """Calculate energy map using Sobel operators"""
+        gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+        grad_x = cv.Sobel(gray, cv.CV_64F, 1, 0, ksize=3)
+        grad_y = cv.Sobel(gray, cv.CV_64F, 0, 1, ksize=3)
+        energy = np.abs(grad_x) + np.abs(grad_y)
+        return energy
+
+    def _reduce_width(self, img, num_seams, progress_callback=None):
+        """Reduce image width by removing vertical seams"""
+        current_img = img.copy()
+        
+        for seam_num in range(num_seams):
+            energy = self._calculate_energy(current_img)
+            seam = self._find_vertical_seam(energy)
+            current_img = self._remove_vertical_seam(current_img, seam)
+
+            if progress_callback:
+                progress_callback(seam_num + 1)
+        
+        return current_img
+
+    def _enlarge_width(self, img, num_seams, progress_callback=None):
+        """Enlarge image width by inserting vertical seams"""
+        current_img = img.copy()
+        
+        if progress_callback:
+            progress_callback(0, num_seams * 2)
+        
+        # First, find all the seams we would remove (in order of importance)
+        seams_to_duplicate = []
+        temp_img = current_img.copy()
+        
+        for i in range(num_seams):
+            energy = self._calculate_energy(temp_img)
+            seam = self._find_vertical_seam(energy)
+            seams_to_duplicate.append(seam)
+            temp_img = self._remove_vertical_seam(temp_img, seam)
+
+            if progress_callback:
+                progress_callback(i + 1)
+        
+        # Now insert the seams in reverse order (least important first)
+        for i, seam in enumerate(reversed(seams_to_duplicate)):
+            current_img = self._insert_vertical_seam(current_img, seam)
+            if progress_callback:
+                progress_callback(num_seams + i + 1)
+        
+        return current_img
+
+    def _adjust_width(self, img, width_diff, progress_callback=None):
+        """Adjust image width by removing or adding seams"""
+        if width_diff > 0:
+            # Width reduction
+            return self._reduce_width(img, width_diff, progress_callback)
+        else:
+            # Width enlargement
+            return self._enlarge_width(img, abs(width_diff), progress_callback)
+
+    def _adjust_height(self, img, height_diff, progress_callback=None):
+        """Adjust image height by removing or adding horizontal seams"""
+        if height_diff > 0:
+            # Height reduction
+            return self._reduce_height(img, height_diff, progress_callback)
+        else:
+            # Height enlargement  
+            return self._enlarge_height(img, abs(height_diff), progress_callback)
+
+    def _reduce_height(self, img, num_seams, progress_callback=None):
+        """Reduce image height by removing horizontal seams (using rotation)"""
+        # Rotate to treat height as width
+        current_img = np.rot90(img, 1)
+        
+        current_img = self._reduce_width(current_img, num_seams, progress_callback)
+        
+        # Rotate back
+        return np.rot90(current_img, 3)
+
+    def _enlarge_height(self, img, num_seams, progress_callback=None):
+        """Enlarge image height by inserting horizontal seams (using rotation)"""
+        # Rotate to work with horizontal seams as vertical
+        current_img = np.rot90(img, 1)
+        
+        current_img = self._enlarge_width(current_img, num_seams, progress_callback)
+        
+        # Rotate back
+        return np.rot90(current_img, 3)
+    
     
     def apply_filter(self, filter_type, **kwargs):
         """Apply various filters to the image"""

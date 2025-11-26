@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>870</width>
-    <height>706</height>
+    <width>981</width>
+    <height>769</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -760,71 +760,30 @@ QLineEdit:disabled {
       </item>
       <item>
        <widget class="QFrame" name="horizontalFrame_6">
-        <layout class="QHBoxLayout" name="horizontalLayout_9">
-         <property name="leftMargin">
-          <number>4</number>
-         </property>
-         <property name="topMargin">
-          <number>4</number>
-         </property>
-         <property name="rightMargin">
-          <number>4</number>
-         </property>
-         <property name="bottomMargin">
-          <number>4</number>
-         </property>
-         <item>
-          <layout class="QVBoxLayout" name="verticalLayout_6">
-           <property name="leftMargin">
-            <number>4</number>
-           </property>
+        <layout class="QGridLayout" name="gridLayout_3">
+         <item row="0" column="0">
+          <layout class="QHBoxLayout" name="horizontalLayout_6">
            <property name="topMargin">
-            <number>4</number>
-           </property>
-           <property name="rightMargin">
-            <number>4</number>
+            <number>2</number>
            </property>
            <property name="bottomMargin">
-            <number>4</number>
+            <number>2</number>
            </property>
            <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_6">
-             <property name="topMargin">
-              <number>2</number>
+            <widget class="QLabel" name="label_4">
+             <property name="text">
+              <string>Status:</string>
              </property>
-             <property name="bottomMargin">
-              <number>2</number>
+            </widget>
+           </item>
+           <item>
+            <widget class="QProgressBar" name="progressBar">
+             <property name="value">
+              <number>24</number>
              </property>
-             <item>
-              <widget class="QLabel" name="label_4">
-               <property name="text">
-                <string>Status:</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLabel" name="statusLabel">
-               <property name="text">
-                <string/>
-               </property>
-              </widget>
-             </item>
-            </layout>
+            </widget>
            </item>
           </layout>
-         </item>
-         <item>
-          <spacer name="horizontalSpacer_3">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
          </item>
         </layout>
        </widget>
@@ -838,7 +797,7 @@ QLineEdit:disabled {
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>870</width>
+     <width>981</width>
      <height>31</height>
     </rect>
    </property>

@@ -1,26 +1,23 @@
 from pathlib import Path
-from typing import Dict, List, Union
+from typing import Dict, Union
 import numpy as np
 import re
-from uidesigns.main_window_gui import Ui_ImageLab
 from utilities.processing import ImageProcessor
-from views.widgets import FilterWidget, ObjectDetectionWidget, ResizeWidget
+from views.widgets import FilterWidget, ImageLabMainWindow, ObjectDetectionWidget, ResizeWidget
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 
-class ImageLab(QtWidgets.QMainWindow):
+class ImageLab(ImageLabMainWindow):
     def __init__(self):
         super().__init__()
 
-        self.ui = Ui_ImageLab()
-        self.ui.setupUi(self)
+        # Enable mouse wheel zoom
+        self.ui.ImagePreview.wheelEvent = self.graphics_view_wheel_event
 
         self.resize_widget = ResizeWidget(self)
         self.filter_widget = FilterWidget(self)
         self.object_detection_widget = ObjectDetectionWidget(self)
-
-        self.initialize_ui()
 
         self.image_processor = None
 
@@ -81,53 +78,9 @@ class ImageLab(QtWidgets.QMainWindow):
 
         self.close_shortcut = QtWidgets.QShortcut(QtGui.QKeySequence("Esc"), self)
         self.close_shortcut.activated.connect(self.close_active_tool)
+ 
 
-    def initialize_ui(self):
-        """Initialize UI settings for QGraphicsView and zoom controls"""
-        # Set up the QGraphicsView and QGraphicsScene
-        self.scene = QtWidgets.QGraphicsScene()
-        self.ui.ImagePreview.setScene(self.scene)
-        
-        # Set view properties
-        self.ui.ImagePreview.setRenderHint(QtGui.QPainter.Antialiasing)
-        self.ui.ImagePreview.setRenderHint(QtGui.QPainter.SmoothPixmapTransform)
-        self.ui.ImagePreview.setDragMode(QtWidgets.QGraphicsView.ScrollHandDrag)
-        
-        # Set alignment and background
-        self.ui.ImagePreview.setAlignment(QtCore.Qt.AlignCenter)
-        self.ui.ImagePreview.setBackgroundBrush(QtGui.QBrush(QtGui.QColor(240, 240, 240)))
-        
-        # Initialize zoom combo box
-        self.initialize_zoom_combo_box()
-        
-        # Add placeholder text
-        self.show_placeholder_text()
-        
-        # Enable mouse wheel zoom
-        self.ui.ImagePreview.wheelEvent = self.graphics_view_wheel_event
-
-    def initialize_zoom_combo_box(self):
-        """Initialize the zoom combo box with standard options"""
-        zoom_options = [
-            "Fit to View",
-            "Actual Size", 
-            "25%",
-            "50%", 
-            "75%",
-            "100%",
-            "125%",
-            "150%",
-            "200%",
-            "300%",
-            "400%",
-            "Custom..."
-        ]
-        
-        self.ui.selectStandardZoomComboBox.clear()
-        self.ui.selectStandardZoomComboBox.addItems(zoom_options)
-        self.ui.selectStandardZoomComboBox.setCurrentText("Fit to View")
-
-    def apply_standard_zoom(self, zoom_option):
+    def apply_standard_zoom(self, zoom_option: str):
         """Apply standard zoom level based on combo box selection"""
         if not self.original_pixmap_item:
             return
@@ -288,8 +241,11 @@ class ImageLab(QtWidgets.QMainWindow):
             zoom_level = zoom_value / 100.0
             self.apply_zoom_level(zoom_level)
 
-    def graphics_view_wheel_event(self, event):
+    def graphics_view_wheel_event(self, event:QtGui.QWheelEvent):
         """Handle mouse wheel events for zooming"""
+        if not self.has_image_loaded():
+            return
+        
         if event.modifiers() & QtCore.Qt.ControlModifier:
             # Zoom with Ctrl + Mouse Wheel
             zoom_factor = 1.15  # 15% zoom per step
@@ -314,21 +270,6 @@ class ImageLab(QtWidgets.QMainWindow):
             # Default wheel behavior (scroll)
             QtWidgets.QGraphicsView.wheelEvent(self.ui.ImagePreview, event)
 
-    def show_placeholder_text(self):
-        """Show placeholder text in the graphics view"""
-        self.scene.clear()
-        text_item = self.scene.addText("No Image Selected")
-        text_item.setDefaultTextColor(QtGui.QColor(100, 100, 100))
-        font = text_item.font()
-        font.setPointSize(14)
-        text_item.setFont(font)
-        
-        # Center the text
-        self.center_content()
-
-    def center_content(self):
-        """Center the content in the graphics view"""
-        self.ui.ImagePreview.fitInView(self.scene.itemsBoundingRect(), QtCore.Qt.KeepAspectRatio)
 
     def select_and_display_image(self):
         """Select an image file and display it in the preview"""
@@ -678,17 +619,32 @@ class ImageLab(QtWidgets.QMainWindow):
             
             # Determine if we should maintain aspect ratio
             aspect_ratio_mode = self.resize_widget.ui.resize_image_comboBox.currentText()
-            maintain_aspect_ratio = re.search(r'original', aspect_ratio_mode, re.IGNORECASE)
             content_aware_alg = self.resize_widget.ui.resize_algorithm_comboBox.currentText()
+
+            # Setup progress bar for content-aware resizing
+            if content_aware:
+                self.ui.progressBar.setVisible(True)
+                self.ui.progressBar.setValue(0)
+                QtWidgets.QApplication.processEvents()  # Force UI update
             
-            # Perform the resize operation
-            success = self.image_processor.resize_image(
-                new_width=new_width,
-                new_height=new_height,
-                maintain_aspect_ratio=maintain_aspect_ratio,
-                content_aware=content_aware,
-                content_aware_alg=content_aware_alg
-            )
+                # Perform content-aware resize operation
+                success = self.image_processor.resize_image(
+                    new_width=new_width,
+                    new_height=new_height,
+                    content_aware=content_aware,
+                    content_aware_alg=content_aware_alg,
+                    progress_callback=self.update_progress
+                )
+            else:
+                # Perform the traditional resize operation
+                success = self.image_processor.resize_image(
+                    new_width=new_width,
+                    new_height=new_height,
+                )
+
+            # Hide progress bar when done
+            if content_aware:
+                self.ui.progressBar.setVisible(False)
             
             if success:
                 self.processed_image = self.image_processor.current_image
@@ -739,6 +695,13 @@ class ImageLab(QtWidgets.QMainWindow):
                 "Resize Error",
                 f"An unexpected error occurred: {str(e)}"
             )
+
+    def update_progress(self, value, maximum=None):
+        """Update progress bar with current value"""
+        if maximum is not None:
+            self.ui.progressBar.setMaximum(maximum)
+        self.ui.progressBar.setValue(value)
+        QtWidgets.QApplication.processEvents()  # Force UI update
 
     def save_resized_image(self):
         """Save the processed image to a file"""
