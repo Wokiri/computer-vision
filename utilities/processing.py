@@ -99,25 +99,51 @@ class ImageProcessor:
             return width, height
         return 0, 0
     
-    def resize_image(self, new_width, new_height, content_aware=False, content_aware_alg=None, progress_callback=None):
-        """Resize the current image"""
+    def resize_image(self, new_width=None, new_height=None, **kwargs):
+        """Resize the current image
+        
+        Args:
+            new_width: Target width (required)
+            new_height: Target height (required)
+            **kwargs: Additional options:
+                - content_aware: Use content-aware resizing (default: False)
+                - content_aware_alg: Algorithm for content-aware resizing
+                - progress_callback: Callback for progress updates
+        """
         if self.current_image is None:
             return False
-            
+        
+        # We need target dimensions
+        if new_width is None or new_height is None:
+            raise ValueError("Width and height are required for content-aware resize")
+        
+        # Convert to integers and validate
         try:
-            if all([new_width > 0, new_height > 0]):
-
-                if content_aware:
-                    self.current_image = self._seam_carving_resize(
+            new_width = int(new_width)
+            new_height = int(new_height)
+        except (ValueError, TypeError) as e:
+            raise ValueError(f"Width and height must be numeric values: {e}")
+        
+        # We need target dimensions
+        if new_width <= 0 or new_height  <= 0:
+            raise ValueError("Width and height values must be greator than 0")
+        
+        # Extract kwargs with default values
+        content_aware = kwargs.get('content_aware', False)
+        content_aware_alg = kwargs.get('content_aware_alg', None)
+        progress_callback = kwargs.get('progress_callback', None)
+        
+        try:
+            if content_aware:
+                self.current_image = self._seam_carving_resize(
                     new_width, new_height, 
                     algorithm=content_aware_alg,
                     progress_callback=progress_callback
                 )
-                else:
-                    # Standard resizing
-                    self.current_image = cv.resize(self.current_image, (new_width, new_height), interpolation=cv.INTER_AREA)
-                
-                return True
+            else:
+                self.current_image = cv.resize(self.current_image, (new_width, new_height), interpolation=cv.INTER_AREA)
+            
+            return True
         except Exception as e:
             print(f"Error resizing image: {e}")
             return False
@@ -233,7 +259,7 @@ class ImageProcessor:
         energy = np.abs(grad_x) + np.abs(grad_y)
         return energy
 
-    def _reduce_width(self, img, num_seams, progress_callback=None):
+    def _reduce_width(self, img:np.ndarray, num_seams:int, progress_callback=None):
         """Reduce image width by removing vertical seams"""
         current_img = img.copy()
         
@@ -247,7 +273,7 @@ class ImageProcessor:
         
         return current_img
 
-    def _enlarge_width(self, img, num_seams, progress_callback=None):
+    def _enlarge_width(self, img:np.ndarray, num_seams, progress_callback=None):
         """Enlarge image width by inserting vertical seams"""
         current_img = img.copy()
         
@@ -275,7 +301,7 @@ class ImageProcessor:
         
         return current_img
 
-    def _adjust_width(self, img, width_diff, progress_callback=None):
+    def _adjust_width(self, img:np.ndarray, width_diff:int, progress_callback=None):
         """Adjust image width by removing or adding seams"""
         if width_diff > 0:
             # Width reduction
@@ -284,7 +310,7 @@ class ImageProcessor:
             # Width enlargement
             return self._enlarge_width(img, abs(width_diff), progress_callback)
 
-    def _adjust_height(self, img, height_diff, progress_callback=None):
+    def _adjust_height(self, img:np.ndarray, height_diff:int, progress_callback=None):
         """Adjust image height by removing or adding horizontal seams"""
         if height_diff > 0:
             # Height reduction
@@ -293,7 +319,7 @@ class ImageProcessor:
             # Height enlargement  
             return self._enlarge_height(img, abs(height_diff), progress_callback)
 
-    def _reduce_height(self, img, num_seams, progress_callback=None):
+    def _reduce_height(self, img:np.ndarray, num_seams:int, progress_callback=None):
         """Reduce image height by removing horizontal seams (using rotation)"""
         # Rotate to treat height as width
         current_img = np.rot90(img, 1)
@@ -303,7 +329,7 @@ class ImageProcessor:
         # Rotate back
         return np.rot90(current_img, 3)
 
-    def _enlarge_height(self, img, num_seams, progress_callback=None):
+    def _enlarge_height(self, img:np.ndarray, num_seams:int, progress_callback=None):
         """Enlarge image height by inserting horizontal seams (using rotation)"""
         # Rotate to work with horizontal seams as vertical
         current_img = np.rot90(img, 1)

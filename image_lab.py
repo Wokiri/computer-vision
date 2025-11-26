@@ -618,7 +618,6 @@ class ImageLab(ImageLabMainWindow):
             content_aware = self.resize_widget.ui.content_aware_checkBox.isChecked()
             
             # Determine if we should maintain aspect ratio
-            aspect_ratio_mode = self.resize_widget.ui.resize_image_comboBox.currentText()
             content_aware_alg = self.resize_widget.ui.resize_algorithm_comboBox.currentText()
 
             # Setup progress bar for content-aware resizing
