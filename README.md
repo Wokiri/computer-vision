@@ -32,13 +32,51 @@ Use a virtual environment to manage dependencies:
 python -m venv .venv
 
 # Activate virtual environment
+
 # On Windows:
 .\.venv\Scripts\activate
+
 # On macOS/Linux:
 source ./.venv/bin/activate
 ```
 
 ## To run the program:
+
+### If running on linux distros:
+
+
+```bash
+
+# Make the script executable:
+chmod +x convert-ui.sh
+
+# With default path
+./convert-ui.sh
+
+# With custom path
+./convert-ui.sh --uipath /path/to/your/uidesigns
+
+# Show help
+./convert-ui.sh --help
+
+```
+
+### If windows:
+
+```bash
+
+# Navigate to script directory then run:
+.\convert-ui.ps1
+
+# With parameters:
+.\convert-ui.ps1 -UiPath "C:\my\uidesigns"
+.\convert-ui.ps1 -Help
+.\convert-ui.ps1 -UiPath "C:\my\uidesigns" -Help
+
+```
+
+
+### Then
 
 
 ```bash
