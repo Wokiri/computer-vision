@@ -3,6 +3,7 @@ from typing import List
 import cv2 as cv
 import numpy as np
 from PyQt5.QtGui import QImage, QPixmap
+from utilities.hubble002 import seam_carving_resize_hubble002
 
 class ImageProcessor:
     def __init__(self, file_path):
@@ -149,7 +150,7 @@ class ImageProcessor:
             print(f"Error resizing image: {e}")
             return False
         
-    def _seam_carving_resize(self, new_width, new_height, algorithm="Hubble 001", progress_callback=None):
+    def _seam_carving_resize(self, new_width, new_height, algorithm, progress_callback=None):
         """Content-aware resizing using seam carving"""
         if algorithm == "Hubble 001":
             current_img = self.current_image.copy()
@@ -169,6 +170,11 @@ class ImageProcessor:
             # Return result
             self.current_image = current_img
             return current_img
+        
+        # ttttttttttt
+        #Alternative seam carving (hubble 002)
+        elif algorithm == "Hubble 002":
+            return seam_carving_resize_hubble002(self, new_width, new_height, algorithm, progress_callback)
         else:
             raise ValueError(f"Unknown algorithm: {algorithm}")
         
