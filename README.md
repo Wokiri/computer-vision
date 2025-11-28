@@ -38,6 +38,15 @@ python -m venv .venv
 
 # On macOS/Linux:
 source ./.venv/bin/activate
+
+
+# Install Dependencies from requirements.txt
+python -m pip install -r requirements.txt
+
+
+# Verify Installation
+pyuic5 --version
+
 ```
 
 ## To run the program:
