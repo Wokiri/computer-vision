@@ -6,9 +6,10 @@ from PyQt5.QtGui import QImage, QPixmap
 
 class ImageProcessor:
     def __init__(self, file_path):
+        self.image_path = Path(file_path)
         self.current_image = None
         self.original_image = None
-        self.image_path = Path(file_path)
+        
         self.load_image()
         
     def load_image(self):

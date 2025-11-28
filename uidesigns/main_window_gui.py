@@ -14,13 +14,31 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_ImageLab(object):
     def setupUi(self, ImageLab):
         ImageLab.setObjectName("ImageLab")
-        ImageLab.resize(981, 769)
+        ImageLab.resize(996, 777)
         ImageLab.setStyleSheet("/* --- GLOBAL STYLES (QApplication and Main Window) --- */\n"
 "QMainWindow, QWidget {\n"
 "    background-color: #f0f0f0; /* Light background */\n"
 "    color: #1e1e1e; /* Dark text color */\n"
 "    font-family: \"Segoe UI\", \"Helvetica Neue\", Helvetica, Arial, sans-serif;\n"
 "    font-size: 10pt;\n"
+"}\n"
+"\n"
+"/* --- PROGRESS BAR STYLES --- */\n"
+"QProgressBar {\n"
+"    border: 1px solid #cccccc;\n"
+"    border-radius: 4px;\n"
+"    background-color: #ffffff;\n"
+"    text-align: center;\n"
+"    color: #1e1e1e;\n"
+"}\n"
+"\n"
+"QProgressBar::chunk {\n"
+"    background-color: #0078d4;\n"
+"    border-radius: 3px;\n"
+"}\n"
+"\n"
+"QProgressBar::chunk:disabled {\n"
+"    background-color: #a0a0a0;\n"
 "}\n"
 "\n"
 "/* --- HEADER BAR (If using a QToolBar) --- */\n"
@@ -90,7 +108,7 @@ class Ui_ImageLab(object):
 "\n"
 "/* --- MAIN VIEWER & STATUS BAR (Viewport and Footer) --- */\n"
 "/* Central widget where the image is displayed */\n"
-"QGraphicsView, QLabel#ImagePreview {\n"
+"QGraphicsView, QLabel#originalImagePreview {\n"
 "    background-color: #e6e6e6; /* Light gray for viewing area */\n"
 "    border: 1px dashed #cccccc; /* Light border for the drag and drop box */\n"
 "}\n"
@@ -275,7 +293,7 @@ class Ui_ImageLab(object):
 "    padding: 5px 0;\n"
 "}\n"
 "\n"
-"#dimsLabel, #imageDimensionsLabel {\n"
+"#dimsLabel, #imageDimensionsLabel, #processedDimsLabel, #processedDimensionsLabel {\n"
 "    font-size: 7.5pt;\n"
 "    padding: 2px;\n"
 "    color: #6c757d;\n"
@@ -377,14 +395,32 @@ class Ui_ImageLab(object):
         self.stackedWidget.setObjectName("stackedWidget")
         self.processed_image_page = QtWidgets.QWidget()
         self.processed_image_page.setObjectName("processed_image_page")
+        self.gridLayout_4 = QtWidgets.QGridLayout(self.processed_image_page)
+        self.gridLayout_4.setObjectName("gridLayout_4")
+        self.processedImageView = QtWidgets.QGraphicsView(self.processed_image_page)
+        self.processedImageView.setObjectName("processedImageView")
+        self.gridLayout_4.addWidget(self.processedImageView, 0, 0, 1, 1)
+        self.horizontalLayout_7 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_7.setContentsMargins(-1, 2, -1, 2)
+        self.horizontalLayout_7.setObjectName("horizontalLayout_7")
+        self.processedDimsLabel = QtWidgets.QLabel(self.processed_image_page)
+        self.processedDimsLabel.setObjectName("processedDimsLabel")
+        self.horizontalLayout_7.addWidget(self.processedDimsLabel)
+        self.processedDimensionsLabel = QtWidgets.QLabel(self.processed_image_page)
+        self.processedDimensionsLabel.setText("")
+        self.processedDimensionsLabel.setObjectName("processedDimensionsLabel")
+        self.horizontalLayout_7.addWidget(self.processedDimensionsLabel)
+        spacerItem3 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_7.addItem(spacerItem3)
+        self.gridLayout_4.addLayout(self.horizontalLayout_7, 1, 0, 1, 1)
         self.stackedWidget.addWidget(self.processed_image_page)
         self.original_image_page = QtWidgets.QWidget()
         self.original_image_page.setObjectName("original_image_page")
         self.gridLayout_2 = QtWidgets.QGridLayout(self.original_image_page)
         self.gridLayout_2.setObjectName("gridLayout_2")
-        self.ImagePreview = QtWidgets.QGraphicsView(self.original_image_page)
-        self.ImagePreview.setObjectName("ImagePreview")
-        self.gridLayout_2.addWidget(self.ImagePreview, 0, 0, 1, 1)
+        self.originalImagePreview = QtWidgets.QGraphicsView(self.original_image_page)
+        self.originalImagePreview.setObjectName("originalImagePreview")
+        self.gridLayout_2.addWidget(self.originalImagePreview, 0, 0, 1, 1)
         self.horizontalLayout_3 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_3.setContentsMargins(-1, 2, -1, 2)
         self.horizontalLayout_3.setObjectName("horizontalLayout_3")
@@ -395,8 +431,8 @@ class Ui_ImageLab(object):
         self.imageDimensionsLabel.setText("")
         self.imageDimensionsLabel.setObjectName("imageDimensionsLabel")
         self.horizontalLayout_3.addWidget(self.imageDimensionsLabel)
-        spacerItem3 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_3.addItem(spacerItem3)
+        spacerItem4 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_3.addItem(spacerItem4)
         self.gridLayout_2.addLayout(self.horizontalLayout_3, 1, 0, 1, 1)
         self.stackedWidget.addWidget(self.original_image_page)
         self.verticalLayout_4.addWidget(self.stackedWidget)
@@ -438,11 +474,14 @@ class Ui_ImageLab(object):
         self.zoomOutButton.setObjectName("zoomOutButton")
         self.horizontalLayout_5.addWidget(self.zoomOutButton)
         self.horizontalLayout_4.addLayout(self.horizontalLayout_5)
-        spacerItem4 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_4.addItem(spacerItem4)
+        spacerItem5 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_4.addItem(spacerItem5)
         self.horizontalLayout_8 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_8.setContentsMargins(4, 4, 4, 4)
         self.horizontalLayout_8.setObjectName("horizontalLayout_8")
+        self.toggleSceneBtn = QtWidgets.QPushButton(self.verticalFrame_4)
+        self.toggleSceneBtn.setObjectName("toggleSceneBtn")
+        self.horizontalLayout_8.addWidget(self.toggleSceneBtn)
         self.pushButton_12 = QtWidgets.QPushButton(self.verticalFrame_4)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
@@ -484,7 +523,7 @@ class Ui_ImageLab(object):
         self.gridLayout.addLayout(self.verticalLayout_5, 0, 0, 1, 1)
         ImageLab.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(ImageLab)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 981, 31))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 996, 31))
         self.menubar.setObjectName("menubar")
         self.menuFile = QtWidgets.QMenu(self.menubar)
         self.menuFile.setObjectName("menuFile")
@@ -531,10 +570,12 @@ class Ui_ImageLab(object):
         self.resizeBtn.setText(_translate("ImageLab", "Image Resizing"))
         self.obj_detectionBtn.setText(_translate("ImageLab", "Object Detection"))
         self.filtersBtn.setText(_translate("ImageLab", "Filters/Enhancements"))
-        self.dimsLabel.setText(_translate("ImageLab", "Image dimensions:"))
+        self.processedDimsLabel.setText(_translate("ImageLab", "Processed image:"))
+        self.dimsLabel.setText(_translate("ImageLab", "Original image:"))
         self.label_3.setText(_translate("ImageLab", "Zoom:"))
         self.zoomInButton.setText(_translate("ImageLab", "+"))
         self.zoomOutButton.setText(_translate("ImageLab", "-"))
+        self.toggleSceneBtn.setText(_translate("ImageLab", "Image"))
         self.pushButton_12.setText(_translate("ImageLab", "Undo"))
         self.pushButton_13.setText(_translate("ImageLab", "Redo"))
         self.label_4.setText(_translate("ImageLab", "Status:"))
