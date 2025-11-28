@@ -1,3 +1,4 @@
+from typing import Union
 from PyQt5 import QtWidgets, QtCore, QtGui
 from uidesigns.main_window_gui import Ui_ImageLab
 from uidesigns.filters_tools_gui import Ui_FiltersTool
@@ -14,6 +15,9 @@ from uidesigns.object_detection_tools_gui import Ui_ObjectDetectionTool
 # self.resize_widget.ui.width_resize_lineEdit.setValidator(validator)
 
 
+from PyQt5 import QtWidgets, QtGui, QtCore
+from typing import Union
+
 class ImageLabMainWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
@@ -29,27 +33,65 @@ class ImageLabMainWindow(QtWidgets.QMainWindow):
         self.ui.progressBar.setVisible(False)
         self.ui.progressBar.setValue(0)
 
+        # Set up the QGraphicsView and QGraphicsScene for original image
+        self.original_scene = QtWidgets.QGraphicsScene()
+        self.ui.originalImagePreview.setScene(self.original_scene)
+        
+        # Set up the QGraphicsView and QGraphicsScene for processed image
+        self.processed_scene = QtWidgets.QGraphicsScene()
+        self.ui.processedImageView.setScene(self.processed_scene)
 
-        # Set up the QGraphicsView and QGraphicsScene
-        self.scene = QtWidgets.QGraphicsScene()
-        self.ui.ImagePreview.setScene(self.scene)
+        self.all_graphics_views = [
+            self.ui.originalImagePreview,
+            self.ui.processedImageView
+        ]
         
-        # Set view properties
-        self.ui.ImagePreview.setRenderHint(QtGui.QPainter.Antialiasing)
-        self.ui.ImagePreview.setRenderHint(QtGui.QPainter.SmoothPixmapTransform)
-        self.ui.ImagePreview.setDragMode(QtWidgets.QGraphicsView.ScrollHandDrag)
-        
-        # Set alignment and background
-        self.ui.ImagePreview.setAlignment(QtCore.Qt.AlignCenter)
-        self.ui.ImagePreview.setBackgroundBrush(QtGui.QBrush(QtGui.QColor(240, 240, 240)))
+        # Set view properties for both views
+        for view in self.all_graphics_views:
+            view.setRenderHint(QtGui.QPainter.Antialiasing)
+            view.setRenderHint(QtGui.QPainter.SmoothPixmapTransform)
+            view.setDragMode(QtWidgets.QGraphicsView.ScrollHandDrag)
+            view.setAlignment(QtCore.Qt.AlignCenter)
+            view.setBackgroundBrush(QtGui.QBrush(QtGui.QColor(240, 240, 240)))
         
         # Initialize zoom combo box
         self.initialize_zoom_combo_box()
         
+        # Connect the toggle scene button
+        self.ui.toggleSceneBtn.clicked.connect(self.toggle_scene)
+        
         # Add placeholder text
         self.show_placeholder_text()
         
-    
+        # Start with processed image view
+        self.current_scene_index = 1  # 0 for processed, 1 for original
+        self.ui.stackedWidget.setCurrentIndex(self.current_scene_index)
+        self.update_toggle_button_text()
+
+    @property
+    def current_scene(self) -> QtWidgets.QGraphicsScene:
+        """Get the current active scene based on current_scene_index"""
+        if self.current_scene_index == 0:  # Processed image view
+            return self.processed_scene
+        else:  # Original image view
+            return self.original_scene
+
+    @property
+    def current_graphics_view(self) -> QtWidgets.QGraphicsView:
+        """Get the current active graphics view based on current_scene_index"""
+        if self.current_scene_index == 0:  # Processed image view
+            return self.ui.processedImageView
+        else:  # Original image view
+            return self.ui.originalImagePreview
+
+    @property
+    def current_dimensions_label(self) -> QtWidgets.QLabel:
+        """Get the current dimensions label based on current_scene_index"""
+        if self.current_scene_index == 0:  # Processed image view
+            return self.ui.processedDimensionsLabel
+        else:  # Original image view
+            return self.ui.imageDimensionsLabel
+
     def initialize_zoom_combo_box(self):
         """Initialize the zoom combo box with standard options"""
         zoom_options = [
@@ -72,20 +114,92 @@ class ImageLabMainWindow(QtWidgets.QMainWindow):
         self.ui.selectStandardZoomComboBox.setCurrentText("Fit to View")
 
     def show_placeholder_text(self):
-        """Show placeholder text in the graphics view"""
-        self.scene.clear()
-        text_item = self.scene.addText("No Image Selected")
-        text_item.setDefaultTextColor(QtGui.QColor(100, 100, 100))
-        font = text_item.font()
+        """Show placeholder text in both graphics views"""
+        # Original image view
+        self.original_scene.clear()
+        original_text_item = self.original_scene.addText("No Original Image Selected")
+        original_text_item.setDefaultTextColor(QtGui.QColor(100, 100, 100))
+        font = original_text_item.font()
         font.setPointSize(14)
-        text_item.setFont(font)
+        original_text_item.setFont(font)
         
-        # Center the text
+        # Processed image view
+        self.processed_scene.clear()
+        processed_text_item = self.processed_scene.addText("No Processed Image Available")
+        processed_text_item.setDefaultTextColor(QtGui.QColor(100, 100, 100))
+        processed_text_item.setFont(font)
+        
+        # Center the content
         self.center_content()
 
     def center_content(self):
-        """Center the content in the graphics view"""
-        self.ui.ImagePreview.fitInView(self.scene.itemsBoundingRect(), QtCore.Qt.KeepAspectRatio)
+        """Center the content in both graphics views"""
+        self.ui.originalImagePreview.fitInView(self.original_scene.itemsBoundingRect(), QtCore.Qt.KeepAspectRatio)
+        self.ui.processedImageView.fitInView(self.processed_scene.itemsBoundingRect(), QtCore.Qt.KeepAspectRatio)
+
+    def toggle_scene(self):
+        """Toggle between original and processed image views"""
+        # Toggle between 0 (processed) and 1 (original)
+        self.current_scene_index = 1 - self.current_scene_index
+        self.ui.stackedWidget.setCurrentIndex(self.current_scene_index)
+        self.update_toggle_button_text()
+
+    def update_toggle_button_text(self):
+        """Update the toggle button text based on current scene"""
+        if self.current_scene_index == 0:  # Currently showing processed image
+            self.ui.toggleSceneBtn.setText("View Original")
+        else:  # Currently showing original image
+            self.ui.toggleSceneBtn.setText("View Processed")
+
+    def show_original_image_page(self):
+        """Switch to original image view when button is pressed"""
+        self.ui.stackedWidget.setCurrentIndex(1)  # original_image_page
+        self.current_scene_index = 1
+        self.update_toggle_button_text()
+
+    def show_processed_image_page(self):
+        """Switch to processed image view when button is released"""
+        self.ui.stackedWidget.setCurrentIndex(0)  # processed_image_page
+        self.current_scene_index = 0
+        self.update_toggle_button_text()
+
+    def display_original_image(self, pixmap: Union[QtGui.QPixmap, None]):
+        """Load and display original image"""
+        if pixmap and not pixmap.isNull():
+            self.original_scene.clear()
+            original_pixmap_item = self.original_scene.addPixmap(pixmap)
+
+            if original_pixmap_item:
+                self.original_scene.setSceneRect(original_pixmap_item.boundingRect())
+            self.ui.originalImagePreview.fitInView(self.original_scene.itemsBoundingRect(), QtCore.Qt.KeepAspectRatio)
+
+    def display_processed_image(self, pixmap: Union[QtGui.QPixmap, None]):
+        """Load and display processed image"""
+        if pixmap and not pixmap.isNull():
+            self.processed_scene.clear()
+            processed_pixmap_item = self.processed_scene.addPixmap(pixmap)
+
+            if processed_pixmap_item:
+                self.processed_scene.setSceneRect(processed_pixmap_item.boundingRect())
+
+            self.ui.processedImageView.fitInView(self.processed_scene.sceneRect(), QtCore.Qt.KeepAspectRatio)
+
+    # Helper methods using the current_scene property
+    def clear_current_scene(self):
+        """Clear the current active scene"""
+        self.current_scene.clear()
+
+    def add_item_to_current_scene(self, item):
+        """Add an item to the current active scene"""
+        return self.current_scene.addItem(item)
+
+    def fit_current_view(self):
+        """Fit the current graphics view to scene contents"""
+        self.current_graphics_view.fitInView(self.current_scene.itemsBoundingRect(), QtCore.Qt.KeepAspectRatio)
+
+    def update_current_dimensions(self, width: int, height: int):
+        """Update the dimensions label for the current view"""
+        self.current_dimensions_label.setText(f"{width} x {height}")
         
 
 
@@ -128,6 +242,7 @@ class ResizeWidget(QtWidgets.QWidget):
         self.ui.resize_algorithm_comboBox.addItems([
             "Hubble 001",
             "Hubble 002",
+            "Hubble 003",
         ])
 
         # Window configuration

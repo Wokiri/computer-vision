@@ -73,7 +73,7 @@ QPushButton#UploadButton:hover {
 /* --- MAIN VIEWER & STATUS BAR (Viewport and Footer) --- */
 /* Central widget where the image is displayed */
 QGraphicsView,
-QLabel#ImagePreview {
+QLabel#originalImagePreview {
     background-color: #e6e6e6;
     /* Light gray for viewing area */
     border: 1px dashed #cccccc;
