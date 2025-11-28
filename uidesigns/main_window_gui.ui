@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>981</width>
-    <height>769</height>
+    <width>996</width>
+    <height>777</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,6 +20,24 @@ QMainWindow, QWidget {
     color: #1e1e1e; /* Dark text color */
     font-family: &quot;Segoe UI&quot;, &quot;Helvetica Neue&quot;, Helvetica, Arial, sans-serif;
     font-size: 10pt;
+}
+
+/* --- PROGRESS BAR STYLES --- */
+QProgressBar {
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+    background-color: #ffffff;
+    text-align: center;
+    color: #1e1e1e;
+}
+
+QProgressBar::chunk {
+    background-color: #0078d4;
+    border-radius: 3px;
+}
+
+QProgressBar::chunk:disabled {
+    background-color: #a0a0a0;
 }
 
 /* --- HEADER BAR (If using a QToolBar) --- */
@@ -89,7 +107,7 @@ QPushButton#UploadButton:hover {
 
 /* --- MAIN VIEWER &amp; STATUS BAR (Viewport and Footer) --- */
 /* Central widget where the image is displayed */
-QGraphicsView, QLabel#ImagePreview {
+QGraphicsView, QLabel#originalImagePreview {
     background-color: #e6e6e6; /* Light gray for viewing area */
     border: 1px dashed #cccccc; /* Light border for the drag and drop box */
 }
@@ -274,7 +292,7 @@ QLineEdit:disabled {
     padding: 5px 0;
 }
 
-#dimsLabel, #imageDimensionsLabel {
+#dimsLabel, #imageDimensionsLabel, #processedDimsLabel, #processedDimensionsLabel {
     font-size: 7.5pt;
     padding: 2px;
     color: #6c757d;
@@ -539,11 +557,54 @@ QLineEdit:disabled {
               <property name="currentIndex">
                <number>1</number>
               </property>
-              <widget class="QWidget" name="processed_image_page"/>
+              <widget class="QWidget" name="processed_image_page">
+               <layout class="QGridLayout" name="gridLayout_4">
+                <item row="0" column="0">
+                 <widget class="QGraphicsView" name="processedImageView"/>
+                </item>
+                <item row="1" column="0">
+                 <layout class="QHBoxLayout" name="horizontalLayout_7">
+                  <property name="topMargin">
+                   <number>2</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>2</number>
+                  </property>
+                  <item>
+                   <widget class="QLabel" name="processedDimsLabel">
+                    <property name="text">
+                     <string>Processed image:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="processedDimensionsLabel">
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <spacer name="horizontalSpacer_3">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                 </layout>
+                </item>
+               </layout>
+              </widget>
               <widget class="QWidget" name="original_image_page">
                <layout class="QGridLayout" name="gridLayout_2">
                 <item row="0" column="0">
-                 <widget class="QGraphicsView" name="ImagePreview"/>
+                 <widget class="QGraphicsView" name="originalImagePreview"/>
                 </item>
                 <item row="1" column="0">
                  <layout class="QHBoxLayout" name="horizontalLayout_3">
@@ -556,7 +617,7 @@ QLineEdit:disabled {
                   <item>
                    <widget class="QLabel" name="dimsLabel">
                     <property name="text">
-                     <string>Image dimensions:</string>
+                     <string>Original image:</string>
                     </property>
                    </widget>
                   </item>
@@ -711,6 +772,13 @@ QLineEdit:disabled {
                  <number>4</number>
                 </property>
                 <item>
+                 <widget class="QPushButton" name="toggleSceneBtn">
+                  <property name="text">
+                   <string>Image</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
                  <widget class="QPushButton" name="pushButton_12">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -797,7 +865,7 @@ QLineEdit:disabled {
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>981</width>
+     <width>996</width>
      <height>31</height>
     </rect>
    </property>
