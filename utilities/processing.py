@@ -3,7 +3,9 @@ from typing import List
 import cv2 as cv
 import numpy as np
 from PyQt5.QtGui import QImage, QPixmap
-from utilities.hubble002 import seam_carving_resize_hubble002
+
+from utilities.seam_carving_algorithms import SeamCarving
+from utilities.utils import calculate_energy, find_vertical_seam
 
 class ImageProcessor:
     def __init__(self, file_path):
@@ -152,69 +154,24 @@ class ImageProcessor:
         
     def _seam_carving_resize(self, new_width, new_height, algorithm, progress_callback=None):
         """Content-aware resizing using seam carving"""
-        if algorithm == "Hubble 001":
-            current_img = self.current_image.copy()
+        if algorithm in ["Hubble 001", "Hubble 002"]:
+            # Create SeamCarving instance with the specified algorithm
+            seam_carver = SeamCarving(algorithm=algorithm)
             
-            # Calculate differences
-            width_diff = current_img.shape[1] - new_width
-            height_diff = current_img.shape[0] - new_height
+            # Use the seam carver to resize the current image
+            result = seam_carver.carve(
+                img=self.current_image.copy(),
+                target_width=new_width,
+                target_height=new_height,
+                progress_callback=progress_callback
+            )
             
-            # Handle width adjustment
-            if width_diff != 0:
-                current_img = self._adjust_width(current_img, width_diff, progress_callback)
-            
-            # Handle height adjustment
-            if height_diff != 0:
-                current_img = self._adjust_height(current_img, height_diff, progress_callback)
-            
-            # Return result
-            self.current_image = current_img
-            return current_img
+            # Update the current image and return
+            self.current_image = result
+            return result
         
-        # ttttttttttt
-        #Alternative seam carving (hubble 002)
-        elif algorithm == "Hubble 002":
-            return seam_carving_resize_hubble002(self, new_width, new_height, algorithm, progress_callback)
         else:
             raise ValueError(f"Unknown algorithm: {algorithm}")
-        
-    def _find_vertical_seam(self, energy:np.ndarray):
-        """Use dynamic programming to find the vertical seam with minimum energy"""
-        h, w = energy.shape
-        M = energy.copy().astype(np.float64)
-        backtrack = np.zeros_like(M, dtype=np.int32)
-        
-        # Build cumulative energy matrix
-        for i in range(1, h):
-            for j in range(0, w):
-                # Handle boundary cases
-                left = M[i-1, j-1] if j > 0 else float('inf')
-                middle = M[i-1, j]
-                right = M[i-1, j+1] if j < w-1 else float('inf')
-                
-                # Find minimum energy path
-                min_energy = min(left, middle, right)
-                M[i, j] += min_energy
-                
-                # Store backtracking information
-                if min_energy == left:
-                    backtrack[i, j] = -1  # come from left
-                elif min_energy == middle:
-                    backtrack[i, j] = 0   # come from middle
-                else:
-                    backtrack[i, j] = 1   # come from right
-        
-        # Find the starting point of the seam (minimum energy in last row)
-        seam = []
-        j = np.argmin(M[-1])
-        seam.append(j)
-        
-        # Backtrack to find the complete seam
-        for i in range(h-1, 0, -1):
-            j = j + backtrack[i, j]
-            seam.append(j)
-        
-        return seam[::-1]  # reverse to go from top to bottom
 
     def _remove_vertical_seam(self, img:np.ndarray, seam:List[np.int64]):
         """Remove vertical seam from image"""
@@ -258,21 +215,13 @@ class ImageProcessor:
         
         return new_img
 
-    def _calculate_energy(self, img):
-        """Calculate energy map using Sobel operators"""
-        gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
-        grad_x = cv.Sobel(gray, cv.CV_64F, 1, 0, ksize=3)
-        grad_y = cv.Sobel(gray, cv.CV_64F, 0, 1, ksize=3)
-        energy = np.abs(grad_x) + np.abs(grad_y)
-        return energy
-
     def _reduce_width(self, img:np.ndarray, num_seams:int, progress_callback=None):
         """Reduce image width by removing vertical seams"""
         current_img = img.copy()
         
         for seam_num in range(num_seams):
-            energy = self._calculate_energy(current_img)
-            seam = self._find_vertical_seam(energy)
+            energy = calculate_energy(current_img)
+            seam = find_vertical_seam(energy)
             current_img = self._remove_vertical_seam(current_img, seam)
 
             if progress_callback:
@@ -292,8 +241,8 @@ class ImageProcessor:
         temp_img = current_img.copy()
         
         for i in range(num_seams):
-            energy = self._calculate_energy(temp_img)
-            seam = self._find_vertical_seam(energy)
+            energy = calculate_energy(temp_img)
+            seam = find_vertical_seam(energy)
             seams_to_duplicate.append(seam)
             temp_img = self._remove_vertical_seam(temp_img, seam)
 
@@ -345,82 +294,6 @@ class ImageProcessor:
         
         # Rotate back
         return np.rot90(current_img, 3)
-    
-    
-    def apply_filter(self, filter_type, **kwargs):
-        """Apply various filters to the image"""
-        if self.current_image is None:
-            return False
-            
-        try:
-            if filter_type == "grayscale":
-                self.current_image = cv.cvtColor(self.current_image, cv.COLOR_BGR2GRAY)
-                self.current_image = cv.cvtColor(self.current_image, cv.COLOR_GRAY2BGR)
-                
-            elif filter_type == "blur":
-                kernel_size = kwargs.get('kernel_size', 5)
-                self.current_image = cv.GaussianBlur(self.current_image, (kernel_size, kernel_size), 0)
-                
-            elif filter_type == "sharpen":
-                kernel = np.array([[-1,-1,-1], [-1,9,-1], [-1,-1,-1]])
-                self.current_image = cv.filter2D(self.current_image, -1, kernel)
-                
-            elif filter_type == "edge_detection":
-                gray = cv.cvtColor(self.current_image, cv.COLOR_BGR2GRAY)
-                edges = cv.Canny(gray, 100, 200)
-                self.current_image = cv.cvtColor(edges, cv.COLOR_GRAY2BGR)
-                
-            elif filter_type == "sepia":
-                kernel = np.array([[0.272, 0.534, 0.131],
-                                 [0.349, 0.686, 0.168],
-                                 [0.393, 0.769, 0.189]])
-                self.current_image = cv.transform(self.current_image, kernel)
-                self.current_image = np.clip(self.current_image, 0, 255)
-                
-            elif filter_type == "brightness":
-                value = kwargs.get('value', 0)
-                hsv = cv.cvtColor(self.current_image, cv.COLOR_BGR2HSV)
-                h, s, v = cv.split(hsv)
-                v = cv.add(v, value)
-                v = np.clip(v, 0, 255)
-                final_hsv = cv.merge((h, s, v))
-                self.current_image = cv.cvtColor(final_hsv, cv.COLOR_HSV2BGR)
-                
-            elif filter_type == "contrast":
-                alpha = kwargs.get('alpha', 1.0)
-                self.current_image = cv.convertScaleAbs(self.current_image, alpha=alpha, beta=0)
-                
-            return True
-        except Exception as e:
-            print(f"Error applying filter: {e}")
-            return False
-    
-    def detect_objects(self, model_type="default"):
-        """Detect objects in the image"""
-        if self.current_image is None:
-            return None, self.current_image
-            
-        try:
-            # This is a placeholder - you would integrate with actual object detection models
-            # like YOLO, SSD, etc.
-            if model_type == "default":
-                # Simple face detection using Haar cascades as an example
-                gray = cv.cvtColor(self.current_image, cv.COLOR_BGR2GRAY)
-                face_cascade = cv.CascadeClassifier(cv.data.haarcascades + 'haarcascade_frontalface_default.xml')
-                faces = face_cascade.detectMultiScale(gray, 1.1, 4)
-                
-                result_image = self.current_image.copy()
-                for (x, y, w, h) in faces:
-                    cv.rectangle(result_image, (x, y), (x+w, y+h), (255, 0, 0), 2)
-                    cv.putText(result_image, 'Face', (x, y-10), cv.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 2)
-                
-                detection_info = [{"label": "Face", "confidence": 1.0, "bbox": (x, y, w, h)} for (x, y, w, h) in faces]
-                return detection_info, result_image
-                
-            return [], self.current_image
-        except Exception as e:
-            print(f"Error in object detection: {e}")
-            return [], self.current_image
     
     def reset_to_original(self):
         """Reset to original image"""

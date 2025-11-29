@@ -1,6 +1,5 @@
 from pathlib import Path
-from typing import Dict, Union
-import numpy as np
+from typing import Union
 from utilities.processing import ImageProcessor
 from views.widgets import FilterWidget, ImageLabMainWindow, ObjectDetectionWidget, ResizeWidget
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -33,19 +32,6 @@ class ImageLab(ImageLabMainWindow):
         self.current_zoom_level = 1.0
         self.min_zoom = 0.1
         self.max_zoom = 10.0
-
-        # Define aspect ratio presets
-        self.aspect_ratios: Dict[str, Union[float, None]] = {
-            "Original": None,
-            "1:1": 1,
-            "4:3": 4/3,
-            "3:4": 3/4,
-            "16:9": 16/9,
-            "9:16": 9/16,
-            "3:2": 3/2,
-            "2:3": 2/3,
-            "Custom": None
-        }
 
         self.ui.resizeBtn.clicked.connect(self.processing_tool_selection)
         self.ui.obj_detectionBtn.clicked.connect(self.processing_tool_selection)

@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Dict, Union
 from PyQt5 import QtWidgets, QtCore, QtGui
 from uidesigns.main_window_gui import Ui_ImageLab
 from uidesigns.filters_tools_gui import Ui_FiltersTool
@@ -32,6 +32,19 @@ class ImageLabMainWindow(QtWidgets.QMainWindow):
 
         self.ui.progressBar.setVisible(False)
         self.ui.progressBar.setValue(0)
+
+        # Define aspect ratio presets
+        self.aspect_ratios: Dict[str, Union[float, None]] = {
+            "Original": None,
+            "1:1": 1,
+            "4:3": 4/3,
+            "3:4": 3/4,
+            "16:9": 16/9,
+            "9:16": 9/16,
+            "3:2": 3/2,
+            "2:3": 2/3,
+            "Custom": None
+        }
 
         # Set up the QGraphicsView and QGraphicsScene for original image
         self.original_scene = QtWidgets.QGraphicsScene()
