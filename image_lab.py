@@ -1,8 +1,8 @@
 from pathlib import Path
 from typing import Dict, Union
+import numpy as np
 from utilities.processing import ImageProcessor
 from views.widgets import FilterWidget, ImageLabMainWindow, ObjectDetectionWidget, ResizeWidget
-
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 class ImageLab(ImageLabMainWindow):
