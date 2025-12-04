@@ -178,16 +178,19 @@ class ImageProcessor:
             return True
         return False
     
-    def save_image(self, save_path):
-        """Save current image to file"""
-        if self.current_image is not None:
-            try:
-                cv.imwrite(save_path, self.current_image)
-                return True
-            except Exception as e:
-                print(f"Error saving image: {e}")
+    def save_image(self, save_path, img = None):
+        """Save image to file"""
+        if img is None:
+            if self.current_image is None:
                 return False
-        return False
+            img = self.current_image
+        
+        try:
+            cv.imwrite(save_path, img)
+            return True
+        except Exception as e:
+            print(f"Error saving image: {e}")
+            return False
 
     def convert_cv_image(self, image=None, output_format="qpixmap"):
         """

@@ -744,18 +744,12 @@ class ImageLab(ImageLabMainWindow):
         
         if file_path:
             try:
-                # Create QImage from processed image data
-                q_image = self.image_processor.convert_cv_image(self.processed_image, output_format="qimage")
-                if q_image:
-                    # Save using QImage
-                    success = q_image.save(file_path)
-                    if success:
-                        message = f'Image saved successfully!<br><br>Location: <a href="file:///{file_path}">{file_path}</a>'
-                        QtWidgets.QMessageBox.information(self, "Success", message)
-                    else:
-                        QtWidgets.QMessageBox.critical(self, "Error", "Failed to save image!")
+                image_saved = self.image_processor.save_image(file_path, self.processed_image)
+                if image_saved:
+                    message = f'Image saved successfully!<br><br>Location: <a href="file:///{file_path}">{file_path}</a>'
+                    QtWidgets.QMessageBox.information(self, "Success", message)
                 else:
-                    QtWidgets.QMessageBox.critical(self, "Error", "Failed to create processed image!")
+                    QtWidgets.QMessageBox.critical(self, "Error", "Failed to save processed image!")
             except Exception as e:
                 QtWidgets.QMessageBox.critical(self, "Error", f"Error saving image: {str(e)}")
 
