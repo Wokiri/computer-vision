@@ -10,6 +10,7 @@ class ImageLab(ImageLabMainWindow):
 
         # Enable mouse wheel zoom
         self.ui.originalImagePreview.wheelEvent = self.graphics_view_wheel_event
+        self.ui.processedImageView.wheelEvent = self.graphics_view_wheel_event
 
         self.resize_widget = ResizeWidget(self)
         self.filter_widget = FilterWidget(self)
@@ -261,7 +262,7 @@ class ImageLab(ImageLabMainWindow):
         
         if event.modifiers() & QtCore.Qt.ControlModifier:
             # Zoom with Ctrl + Mouse Wheel
-            zoom_factor = 1.15  # 15% zoom per step
+            zoom_factor = 1.0  # 10% zoom per step
             if event.angleDelta().y() > 0:
                 # Zoom in
                 new_zoom = self.current_zoom_level * zoom_factor
@@ -282,6 +283,7 @@ class ImageLab(ImageLabMainWindow):
         else:
             # Default wheel behavior (scroll)
             QtWidgets.QGraphicsView.wheelEvent(self.ui.originalImagePreview, event)
+            QtWidgets.QGraphicsView.wheelEvent(self.ui.processedImageView, event)
 
 
     def select_and_display_image(self):
@@ -659,7 +661,7 @@ class ImageLab(ImageLabMainWindow):
                     # Update the display
                     self.show_processed_image_page()
                     self.display_processed_image(pixmap)
-                    self.apply_standard_zoom(self.ui.selectStandardZoomComboBox.currentText())
+                    self.ui.selectStandardZoomComboBox.setCurrentText("100%")
                     self.current_image = pixmap
                     
                     # Update dimensions label
