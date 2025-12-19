@@ -154,7 +154,7 @@ class ImageProcessor:
         
     def _seam_carving_resize(self, new_width, new_height, algorithm, progress_callback=None):
         """Content-aware resizing using seam carving"""
-        if algorithm in ["Hubble 001", "Hubble 002"]:
+        if algorithm in ["Hubble 001", "Hubble 002", "Hubble 003"]:
             # Create SeamCarving instance with the specified algorithm
             seam_carver = SeamCarving(algorithm=algorithm)
             
