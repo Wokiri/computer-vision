@@ -101,6 +101,9 @@ class ImageLabMainWindow(QtWidgets.QMainWindow):
         self.current_seams_mode = "All Seams"  # Default to all seams
         self.seam_visualizations = None
         
+        # Initialize timing info
+        self.timing_info = None
+        
         # Initialize button states - all disabled initially
         self.ui.toggleSceneBtn.setEnabled(False)
         self.ui.seamsViewBtn.setEnabled(False)
@@ -217,6 +220,8 @@ class ImageLabMainWindow(QtWidgets.QMainWindow):
             self.ui.seamsViewBtn.setVisible(False)
             self.ui.seamsModeComboBox.setVisible(False)
         
+        # Update timing labels based on current page
+        self.update_timing_display()
         self.update_toggle_button_text()
 
     def toggle_seams_view(self):
@@ -245,6 +250,8 @@ class ImageLabMainWindow(QtWidgets.QMainWindow):
             self.ui.seamsModeComboBox.setVisible(False)
             self.show_processed_normal()
         
+        # Update timing labels based on current page
+        self.update_timing_display()
         self.update_toggle_button_text()
 
     def on_seams_mode_changed(self, mode_text):
@@ -351,6 +358,9 @@ class ImageLabMainWindow(QtWidgets.QMainWindow):
         # Update button states
         self.update_toggle_button_text()
         self.update_button_states()
+        
+        # Clear timing display for original page
+        self.ui.timingLabel.setText("")
 
     def show_processed_image_page(self):
         """Switch to processed image view without seams"""
@@ -370,6 +380,9 @@ class ImageLabMainWindow(QtWidgets.QMainWindow):
         # Update button states
         self.update_toggle_button_text()
         self.update_button_states()
+        
+        # Update timing display for processed page
+        self.update_timing_display()
 
     def show_processed_with_seams_page(self):
         """Switch to processed image view with seams"""
@@ -388,6 +401,9 @@ class ImageLabMainWindow(QtWidgets.QMainWindow):
         # Update button states
         self.update_toggle_button_text()
         self.update_button_states()
+        
+        # Update timing display for seams page
+        self.update_timing_display()
 
     def display_original_image(self, pixmap: Union[QtGui.QPixmap, None]):
         """Load and display original image"""
@@ -409,6 +425,10 @@ class ImageLabMainWindow(QtWidgets.QMainWindow):
             # Update button states
             self.update_toggle_button_text()
             self.update_button_states()
+            
+            # Clear timing for original image
+            self.ui.timingLabel.setText("")
+            self.ui.seamsTimingLabel.setText("")
 
     def display_processed_image(self, pixmap: Union[QtGui.QPixmap, None]):
         """Load and display processed image without seams"""
@@ -430,6 +450,9 @@ class ImageLabMainWindow(QtWidgets.QMainWindow):
             # Update button states
             self.update_toggle_button_text()
             self.update_button_states()
+            
+            # Update timing display
+            self.update_timing_display()
 
     def display_processed_with_seams_image(self, pixmap: Union[QtGui.QPixmap, None]):
         """Load and display processed image with seams visualization"""
@@ -507,15 +530,37 @@ class ImageLabMainWindow(QtWidgets.QMainWindow):
 
     def update_timing_label(self, timing_info: Dict):
         """Update timing display label"""
-        if timing_info and 'algorithm' in timing_info:
-            algorithm_time = timing_info['algorithm']
-            algorithm_name = timing_info.get('algorithm_name', 'Algorithm')
-            
-            # Update appropriate timing label based on current page
-            if self.current_page_index == 1:  # Processed without seams
-                self.ui.timingLabel.setText(f"{algorithm_name}: {algorithm_time:.3f}s")
-            elif self.current_page_index == 2:  # Processed with seams
-                self.ui.seamsTimingLabel.setText(f"{algorithm_name}: {algorithm_time:.3f}s")
+        if timing_info:
+            self.timing_info = timing_info
+            self.update_timing_display()
+        else:
+            self.timing_info = None
+            self.ui.timingLabel.setText("")
+            self.ui.seamsTimingLabel.setText("")
+
+    def update_timing_display(self):
+        """Update timing display based on current page"""
+        if not self.timing_info:
+            self.ui.timingLabel.setText("")
+            self.ui.seamsTimingLabel.setText("")
+            return
+        
+        # Format timing information
+        algorithm_time = self.timing_info.get('algorithm', 0.0)
+        algorithm_name = self.timing_info.get('algorithm_name', 'Algorithm')
+        
+        timing_text = f"{algorithm_name}: {algorithm_time:.3f}s"
+        
+        # Update appropriate timing label based on current page
+        if self.current_page_index == 1:  # Processed without seams page
+            self.ui.timingLabel.setText(timing_text)
+            self.ui.seamsTimingLabel.setText("")
+        elif self.current_page_index == 2:  # Processed with seams page
+            self.ui.seamsTimingLabel.setText(timing_text)
+            self.ui.timingLabel.setText("")
+        else:  # Original page (0) or other
+            self.ui.timingLabel.setText("")
+            self.ui.seamsTimingLabel.setText("")
 
     def update_dimension_labels(self):
         """Update dimension labels for all views"""
@@ -539,6 +584,7 @@ class ImageLabMainWindow(QtWidgets.QMainWindow):
         self.processed_pixmap = None
         self.seams_pixmap = None
         self.seam_visualizations = None
+        self.timing_info = None
         
         # Clear processed scenes
         self.processed_scene.clear()
