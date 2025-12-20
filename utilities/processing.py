@@ -1,21 +1,29 @@
+"""
+utilities/processing.py
+Image processing utilities for loading, resizing, and saving images
+"""
+
 from pathlib import Path
 import cv2 as cv
 from PyQt5.QtGui import QImage, QPixmap
+import numpy as np
 
-from utilities.seam_carving_algorithms import SeamCarving
+from utilities.seam_carving_algorithms import SeamCarver, SeamCarverHubble001, SeamCarverHubble002
 
 class ImageProcessor:
     def __init__(self, file_path):
         self.image_path = Path(file_path)
         self.current_image = None
         self.original_image = None
+        self.last_timing_info = None
+        self.last_seam_info = None
+        self.last_algorithm_used = None
         
         self.load_image()
         
     def load_image(self):
         """Load an image from file path"""
         try:
-            # Convert to Path object and validate
             image_path = self.image_path
             if not self._is_valid_image_path(image_path):
                 return False
@@ -43,14 +51,6 @@ class ImageProcessor:
         if not image_path.is_file():
             print(f"Error: Path is not a file: {image_path}")
             return False
-            
-        # Check for common image file extensions
-        valid_extensions = {'.jpg', '.jpeg', '.png', '.bmp', '.tiff', '.tif', '.webp'}
-        file_extension = image_path.suffix.lower()
-        
-        if file_extension not in valid_extensions:
-            print(f"Warning: File extension {file_extension} may not be supported")
-            # Don't return False here as OpenCV might still be able to read it
             
         return True
     
@@ -110,6 +110,9 @@ class ImageProcessor:
                 - content_aware: Use content-aware resizing (default: False)
                 - content_aware_alg: Algorithm for content-aware resizing
                 - progress_callback: Callback for progress updates
+        
+        Returns:
+            success: Boolean indicating if resize was successful
         """
         if self.current_image is None:
             return False
@@ -126,8 +129,8 @@ class ImageProcessor:
             raise ValueError(f"Width and height must be numeric values: {e}")
         
         # We need target dimensions
-        if new_width <= 0 or new_height  <= 0:
-            raise ValueError("Width and height values must be greator than 0")
+        if new_width <= 0 or new_height <= 0:
+            raise ValueError("Width and height values must be greater than 0")
         
         # Extract kwargs with default values
         content_aware = kwargs.get('content_aware', False)
@@ -136,47 +139,111 @@ class ImageProcessor:
         
         try:
             if content_aware:
-                self.current_image = self._seam_carving_resize(
+                # Store the algorithm used
+                self.last_algorithm_used = content_aware_alg
+                
+                # Use seam carving with seam information
+                result = self._seam_carving_resize(
                     new_width, new_height, 
                     algorithm=content_aware_alg,
-                    progress_callback=progress_callback
+                    progress_callback=progress_callback,
+                    return_seams=True
                 )
+                
+                if result:
+                    # result should be (image, seam_info) tuple when return_seams=True
+                    if isinstance(result, tuple) and len(result) == 2:
+                        self.current_image, self.last_seam_info = result
+                    else:
+                        # If not a tuple, just get the image
+                        self.current_image = result
+                        self.last_seam_info = {}
+                    
+                    # Get timing info
+                    self.last_timing_info = self.last_seam_info.get('timing', {}) if self.last_seam_info else {}
+                    
+                    # Create seam visualizations if we have seam info
+                    if self.last_seam_info and self.original_image is not None:
+                        # Create seam carver instance using explicit class
+                        seam_carver = self._create_seam_carver(self.last_algorithm_used)
+                        
+                        # Call the method that returns a tuple of three images
+                        visualizations = seam_carver.create_seam_visualization(
+                            self.original_image,
+                            self.last_seam_info
+                        )
+                        
+                        # Unpack and store the three visualization types
+                        all_seams_img, removed_img, inserted_img = visualizations
+                        self.last_seam_info['all_seams_image'] = all_seams_img
+                        self.last_seam_info['removed_seams_image'] = removed_img
+                        self.last_seam_info['inserted_seams_image'] = inserted_img
+                else:
+                    return False
             else:
+                # Traditional resize
                 self.current_image = cv.resize(self.current_image, (new_width, new_height), interpolation=cv.INTER_AREA)
+                self.last_timing_info = {'algorithm': 0.0, 'total': 0.0, 'algorithm_name': 'Traditional'}
+                self.last_seam_info = None
+                self.last_algorithm_used = None
             
             return True
         except Exception as e:
             print(f"Error resizing image: {e}")
+            import traceback
+            traceback.print_exc()
             return False
-        
-    def _seam_carving_resize(self, new_width, new_height, algorithm, progress_callback=None):
-        """Content-aware resizing using seam carving"""
-        if algorithm in ["Hubble 001", "Hubble 002"]:
-            # Create SeamCarving instance with the specified algorithm
-            seam_carver = SeamCarving(algorithm=algorithm)
-            
-            # Use the seam carver to resize the current image
-            result = seam_carver.carve(
-                img=self.current_image.copy(),
-                target_width=new_width,
-                target_height=new_height,
-                progress_callback=progress_callback
-            )
-            
-            # Update the current image and return
-            self.current_image = result
-            return result
-        
+    
+    def _create_seam_carver(self, algorithm: str) -> SeamCarver:
+        """Helper method to create seam carver instances"""
+        if algorithm == "Hubble 001":
+            return SeamCarverHubble001()
+        elif algorithm == "Hubble 002":
+            return SeamCarverHubble002()
         else:
             raise ValueError(f"Unknown algorithm: {algorithm}")
-
+    
+    def get_seam_visualizations(self):
+        """Get seam visualization images"""
+        if self.last_seam_info and self.last_algorithm_used:
+            return {
+                'all': self.last_seam_info.get('all_seams_image'),
+                'removed': self.last_seam_info.get('removed_seams_image'),
+                'inserted': self.last_seam_info.get('inserted_seams_image')
+            }
+        return None
     
     def reset_to_original(self):
         """Reset to original image"""
         if self.original_image is not None:
             self.current_image = self.original_image.copy()
+            self.last_timing_info = None
+            self.last_seam_info = None
+            self.last_algorithm_used = None
             return True
         return False
+        
+    def _seam_carving_resize(self, new_width, new_height, algorithm, progress_callback=None, return_seams=False):
+        """Content-aware resizing using seam carving"""
+        # Create seam carver instance
+        seam_carver = self._create_seam_carver(algorithm)
+        
+        # Use the seam carver to resize the current image
+        result = seam_carver.carve(
+            img=self.current_image.copy(),
+            target_width=new_width,
+            target_height=new_height,
+            progress_callback=progress_callback,
+            return_seams=return_seams
+        )
+        
+        return result
+    
+    def get_processed_image(self):
+        """Get the current processed image with timing and seam info"""
+        if self.current_image is not None:
+            return self.current_image.copy(), self.last_timing_info, self.last_seam_info
+        return None
     
     def save_image(self, save_path, img = None):
         """Save image to file"""
@@ -234,4 +301,3 @@ class ImageProcessor:
         except Exception as e:
             print(f"Error converting image: {e}")
             return QImage() if output_format.lower() == "qimage" else QPixmap()
-        

@@ -1,0 +1,1960 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ImageLab</class>
+ <widget class="QMainWindow" name="ImageLab">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1188</width>
+    <height>894</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Computer Vision Lab</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">/* --- CLEAN GLOBAL STYLES --- */
+QMainWindow, QWidget {
+    background-color: #f5f7fa;
+    color: #2d3748;
+    font-family: -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, sans-serif;
+    font-size: 10pt;
+}
+
+/* --- CONTAINERS --- */
+QFrame#horizontalFrame, QFrame#verticalFrame_4, QFrame#horizontalFrame_6 {
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 12px;
+}
+
+/* --- BUTTONS --- */
+QPushButton {
+    background-color: #ffffff;
+    border: 1.5px solid #e2e8f0;
+    color: #4a5568;
+    padding: 10px 16px;
+    border-radius: 6px;
+    min-height: 36px;
+    font-size: 10pt;
+    font-weight: 500;
+}
+
+QPushButton:hover {
+    background-color: #f7fafc;
+    border-color: #cbd5e0;
+}
+
+QPushButton:pressed {
+    background-color: #edf2f7;
+}
+
+/* Primary action button */
+QPushButton#UploadButton {
+    background-color: #4299e1;
+    border-color: #4299e1;
+    color: #ffffff;
+    font-weight: 600;
+}
+
+QPushButton#UploadButton:hover {
+    background-color: #3182ce;
+    border-color: #3182ce;
+}
+
+/* Secondary action button */
+QPushButton#save_as_pushButton {
+    background-color: #48bb78;
+    border-color: #48bb78;
+    color: #ffffff;
+}
+
+QPushButton#save_as_pushButton:hover {
+    background-color: #38a169;
+    border-color: #38a169;
+}
+
+/* Tool buttons with accent border */
+QPushButton#resizeBtn, QPushButton#obj_detectionBtn, QPushButton#filtersBtn {
+    background-color: #f7fafc;
+    border-left: 4px solid #4299e1;
+    text-align: left;
+    padding-left: 20px;
+}
+
+QPushButton#resizeBtn:hover, QPushButton#obj_detectionBtn:hover, QPushButton#filtersBtn:hover {
+    background-color: #ebf8ff;
+}
+
+/* --- IMAGE VIEW AREA --- */
+QGraphicsView, QLabel#originalImagePreview {
+    background-color: #f8fafc;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+}
+
+/* --- STATUS and PROGRESS --- */
+QProgressBar {
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    background-color: #f7fafc;
+    text-align: center;
+    color: #4a5568;
+    height: 20px;
+}
+
+QProgressBar::chunk {
+    background-color: #4299e1;
+    border-radius: 3px;
+}
+
+/* --- LABELS --- */
+QLabel {
+    color: #4a5568;
+    padding: 2px 0;
+}
+
+#fileMgtLabel, #processingToolsLabel {
+    font-weight: 700;
+    color: #2d3748;
+    font-size: 12pt;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #4299e1;
+    margin-bottom: 8px;
+}
+
+#dimsLabel, #imageDimensionsLabel, #processedDimsLabel, #processedDimensionsLabel {
+    font-size: 9pt;
+    color: #718096;
+    font-weight: 500;
+}
+
+#timingLabel {
+    font-size: 9pt;
+    color: #718096;
+    font-style: italic;
+    font-weight: 500;
+}
+
+/* --- COMBO BOXES --- */
+QComboBox {
+    background-color: #ffffff;
+    border: 1.5px solid #e2e8f0;
+    padding: 8px 12px;
+    border-radius: 6px;
+    color: #4a5568;
+    min-height: 36px;
+    font-weight: 500;
+}
+
+QComboBox:hover {
+    border-color: #cbd5e0;
+}
+
+QComboBox::drop-down {
+    border: none;
+    padding-right: 8px;
+}
+
+/* --- SEPARATORS --- */
+Line {
+    background-color: #e2e8f0;
+    border: none;
+    height: 1px;
+    margin: 20px 0;
+}
+
+/* --- TOGGLE BUTTONS --- */
+QPushButton#toggleSceneBtn, QPushButton#seamsViewBtn {
+    background-color: #718096;
+    border: none;
+    color: #ffffff;
+    font-size: 9pt;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: 600;
+}
+
+QPushButton#toggleSceneBtn:hover, QPushButton#seamsViewBtn:hover {
+    background-color: #4a5568;
+}
+
+QPushButton#toggleSceneBtn:disabled, QPushButton#seamsViewBtn:disabled {
+    background-color: #cbd5e0;
+    color: #a0aec0;
+}
+
+/* --- ZOOM BUTTONS --- */
+QPushButton#zoomInButton, QPushButton#zoomOutButton {
+    background-color: #4299e1;
+    border: none;
+    color: #ffffff;
+    font-weight: bold;
+    border-radius: 4px;
+    min-width: 36px;
+}
+
+QPushButton#zoomInButton:hover, QPushButton#zoomOutButton:hover {
+    background-color: #3182ce;
+}
+
+/* --- MENU BAR --- */
+QMenuBar {
+    background-color: #2d3748;
+    color: #ffffff;
+    padding: 4px;
+    font-weight: 500;
+}
+
+QMenuBar::item {
+    padding: 6px 12px;
+    border-radius: 4px;
+}
+
+QMenuBar::item:selected {
+    background-color: #4a5568;
+}
+
+QMenu {
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 4px;
+}
+
+QMenu::item {
+    padding: 8px 24px 8px 16px;
+    border-radius: 4px;
+}
+
+QMenu::item:selected {
+    background-color: #ebf8ff;
+    color: #2d3748;
+}
+
+/* --- SCROLLBARS --- */
+QScrollBar:vertical {
+    background: #f7fafc;
+    width: 10px;
+    border-radius: 5px;
+    border: none;
+}
+
+QScrollBar::handle:vertical {
+    background: #cbd5e0;
+    border-radius: 5px;
+    min-height: 20px;
+    margin: 2px;
+}
+
+QScrollBar::handle:vertical:hover {
+    background: #a0aec0;
+}
+
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+    border: none;
+    background: none;
+}</string>
+  </property>
+  <property name="toolButtonStyle">
+   <enum>Qt::ToolButtonTextBesideIcon</enum>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="0" column="0">
+     <layout class="QVBoxLayout" name="verticalLayout_5">
+      <property name="spacing">
+       <number>12</number>
+      </property>
+      <property name="leftMargin">
+       <number>16</number>
+      </property>
+      <property name="topMargin">
+       <number>16</number>
+      </property>
+      <property name="rightMargin">
+       <number>16</number>
+      </property>
+      <property name="bottomMargin">
+       <number>16</number>
+      </property>
+      <item>
+       <widget class="QFrame" name="horizontalFrame">
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <property name="spacing">
+          <number>16</number>
+         </property>
+         <property name="leftMargin">
+          <number>8</number>
+         </property>
+         <property name="topMargin">
+          <number>8</number>
+         </property>
+         <property name="rightMargin">
+          <number>8</number>
+         </property>
+         <property name="bottomMargin">
+          <number>8</number>
+         </property>
+         <item>
+          <layout class="QVBoxLayout" name="verticalLayout">
+           <property name="spacing">
+            <number>10</number>
+           </property>
+           <item>
+            <widget class="QLabel" name="fileMgtLabel">
+             <property name="text">
+              <string>File Management</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="UploadButton">
+             <property name="text">
+              <string>Upload Image</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="save_as_pushButton">
+             <property name="text">
+              <string>Save Processed</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="verticalSpacer_3">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>30</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="Line" name="line_2">
+             <property name="frameShadow">
+              <enum>QFrame::Plain</enum>
+             </property>
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="verticalSpacer">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QLabel" name="processingToolsLabel">
+             <property name="text">
+              <string>Processing Tools</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="resizeBtn">
+             <property name="text">
+              <string>Image Resizing</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="obj_detectionBtn">
+             <property name="text">
+              <string>Object Detection</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="filtersBtn">
+             <property name="text">
+              <string>Filters</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="verticalSpacer_2">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <widget class="QFrame" name="verticalFrame_4">
+           <property name="minimumSize">
+            <size>
+             <width>900</width>
+             <height>0</height>
+            </size>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_4">
+            <property name="spacing">
+             <number>12</number>
+            </property>
+            <property name="leftMargin">
+             <number>12</number>
+            </property>
+            <property name="topMargin">
+             <number>12</number>
+            </property>
+            <property name="rightMargin">
+             <number>12</number>
+            </property>
+            <property name="bottomMargin">
+             <number>12</number>
+            </property>
+            <item>
+             <widget class="QStackedWidget" name="stackedWidget">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                <horstretch>1</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="currentIndex">
+               <number>0</number>
+              </property>
+              <widget class="QWidget" name="originalImagePage">
+               <layout class="QGridLayout" name="gridLayout_2">
+                <item row="0" column="0">
+                 <widget class="QGraphicsView" name="originalImagePreview"/>
+                </item>
+                <item row="1" column="0">
+                 <layout class="QHBoxLayout" name="horizontalLayout_3">
+                  <property name="spacing">
+                   <number>8</number>
+                  </property>
+                  <item>
+                   <widget class="QLabel" name="dimsLabel">
+                    <property name="text">
+                     <string>Original:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="imageDimensionsLabel">
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <spacer name="horizontalSpacer">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                 </layout>
+                </item>
+               </layout>
+              </widget>
+              <widget class="QWidget" name="processedImageWithoutSeamsPage">
+               <layout class="QGridLayout" name="gridLayout_4">
+                <item row="0" column="0">
+                 <widget class="QGraphicsView" name="processedImageView"/>
+                </item>
+                <item row="1" column="0">
+                 <layout class="QHBoxLayout" name="horizontalLayout_7">
+                  <property name="spacing">
+                   <number>8</number>
+                  </property>
+                  <item>
+                   <widget class="QLabel" name="processedDimsLabel">
+                    <property name="text">
+                     <string>Processed:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="processedDimensionsLabel">
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <spacer name="horizontalSpacer_3">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="timingLabel">
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+               </layout>
+              </widget>
+              <widget class="QWidget" name="processedImageWithSeamsPage">
+               <layout class="QGridLayout" name="gridLayout_5">
+                <item row="0" column="0">
+                 <widget class="QGraphicsView" name="processedImageWithSeamsView"/>
+                </item>
+                <item row="1" column="0">
+                 <layout class="QHBoxLayout" name="horizontalLayout_9">
+                  <property name="spacing">
+                   <number>8</number>
+                  </property>
+                  <item>
+                   <widget class="QLabel" name="processedWithSeamsDimsLabel">
+                    <property name="text">
+                     <string>Processed (with seams):</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="processedWithSeamsDimensionsLabel">
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <spacer name="horizontalSpacer_4">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="seamsTimingLabel">
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+               </layout>
+              </widget>
+             </widget>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_4">
+              <property name="spacing">
+               <number>16</number>
+              </property>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_5">
+                <property name="spacing">
+                 <number>8</number>
+                </property>
+                <item>
+                 <widget class="QLabel" name="label_3">
+                  <property name="styleSheet">
+                   <string notr="true">font-weight: 600;</string>
+                  </property>
+                  <property name="text">
+                   <string>Zoom:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QComboBox" name="selectStandardZoomComboBox">
+                  <property name="minimumSize">
+                   <size>
+                    <width>140</width>
+                    <height>56</height>
+                   </size>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="zoomInButton">
+                  <property name="maximumSize">
+                   <size>
+                    <width>40</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>+</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="zoomOutButton">
+                  <property name="maximumSize">
+                   <size>
+                    <width>40</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>-</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_2">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_8">
+                <property name="spacing">
+                 <number>10</number>
+                </property>
+                <item>
+                 <widget class="QPushButton" name="toggleSceneBtn">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
+                  <property name="text">
+                   <string>View Processed</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QComboBox" name="seamsModeComboBox">
+                  <property name="minimumSize">
+                   <size>
+                    <width>120</width>
+                    <height>56</height>
+                   </size>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="seamsViewBtn">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
+                  <property name="text">
+                   <string>View Seams</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QFrame" name="horizontalFrame_6">
+        <layout class="QGridLayout" name="gridLayout_3">
+         <item row="0" column="0">
+          <layout class="QHBoxLayout" name="horizontalLayout_6">
+           <property name="spacing">
+            <number>10</number>
+           </property>
+           <item>
+            <widget class="QLabel" name="label_4">
+             <property name="styleSheet">
+              <string notr="true">font-weight: 600; color: #2d3748;</string>
+             </property>
+             <property name="text">
+              <string>Status:</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QProgressBar" name="progressBar">
+             <property name="value">
+              <number>0</number>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </widget>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1188</width>
+     <height>39</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionSave_As"/>
+   </widget>
+   <addaction name="menuFile"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionSave_As">
+   <property name="text">
+    <string>Save As...</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
+
+
+
+"""
+views/widgets.py
+Widgets for ImageLab main window and tools
+"""
+
+from typing import Dict, Union
+from PyQt5 import QtWidgets, QtCore, QtGui
+import cv2
+
+from uidesigns.filters_tools_gui import Ui_FiltersTool
+from uidesigns.main_window_gui import Ui_ImageLab
+from uidesigns.object_detection_tools_gui import Ui_ObjectDetectionTool
+from uidesigns.resize_tools_gui import Ui_ResizeTool
+
+class ImageLabMainWindow(QtWidgets.QMainWindow):
+    def __init__(self):
+        super().__init__()
+
+        self.ui = Ui_ImageLab()
+        self.ui.setupUi(self)
+
+        self.initialize_ui()
+
+    def initialize_ui(self):
+        """Initialize UI settings for QGraphicsView and zoom controls"""
+        self.ui.progressBar.setVisible(False)
+        self.ui.progressBar.setValue(0)
+        
+        # Initialize timing label
+        self.ui.timingLabel.setText("")
+
+        # Define aspect ratio presets
+        self.aspect_ratios: Dict[str, Union[float, None]] = {
+            "Original": None,
+            "1:1": 1,
+            "4:3": 4/3,
+            "3:4": 3/4,
+            "16:9": 16/9,
+            "9:16": 9/16,
+            "3:2": 3/2,
+            "2:3": 2/3,
+            "Custom": None
+        }
+
+        # Set up the QGraphicsView and QGraphicsScene for original image
+        self.original_scene = QtWidgets.QGraphicsScene()
+        self.ui.originalImagePreview.setScene(self.original_scene)
+        
+        # Set up the QGraphicsView and QGraphicsScene for processed image
+        self.processed_scene = QtWidgets.QGraphicsScene()
+        self.ui.processedImageView.setScene(self.processed_scene)
+
+        self.all_graphics_views = [
+            self.ui.originalImagePreview,
+            self.ui.processedImageView
+        ]
+        
+        # Set view properties for both views
+        for view in self.all_graphics_views:
+            view.setRenderHint(QtGui.QPainter.Antialiasing)
+            view.setRenderHint(QtGui.QPainter.SmoothPixmapTransform)
+            view.setDragMode(QtWidgets.QGraphicsView.ScrollHandDrag)
+            view.setAlignment(QtCore.Qt.AlignCenter)
+            view.setBackgroundBrush(QtGui.QBrush(QtGui.QColor(248, 250, 252)))
+        
+        # Initialize zoom combo box
+        self.initialize_zoom_combo_box()
+        
+        # Initialize seams mode combo box
+        self.initialize_seams_mode_combo_box()
+        
+        # Connect the toggle scene button
+        self.ui.toggleSceneBtn.clicked.connect(self.toggle_scene)
+        
+        # Connect the seams view button
+        self.ui.seamsViewBtn.clicked.connect(self.toggle_seams_view)
+        
+        # Connect seams mode combo box
+        self.ui.seamsModeComboBox.currentTextChanged.connect(self.on_seams_mode_changed)
+        
+        # Add placeholder text
+        self.show_placeholder_text()
+        
+        # Start with original image view
+        self.current_scene_index = 1  # 0 for processed, 1 for original
+        self.ui.stackedWidget.setCurrentIndex(self.current_scene_index)
+        self.update_toggle_button_text()
+        
+        # Initialize seam viewing state
+        self.seams_view_active = False
+        self.current_seams_mode = "Added Seams"  # Default to added seams
+        self.seam_visualizations = None  # Will store {'removed': cv_image, 'inserted': cv_image}
+        
+        # Disable toggle buttons initially
+        self.ui.toggleSceneBtn.setEnabled(False)
+        self.ui.seamsViewBtn.setEnabled(False)
+        self.ui.seamsModeComboBox.setVisible(False)
+
+    @property
+    def current_scene(self) -> QtWidgets.QGraphicsScene:
+        """Get the current active scene based on current_scene_index"""
+        if self.current_scene_index == 0:  # Processed image view
+            return self.processed_scene
+        else:  # Original image view
+            return self.original_scene
+
+    @property
+    def current_graphics_view(self) -> QtWidgets.QGraphicsView:
+        """Get the current active graphics view based on current_scene_index"""
+        if self.current_scene_index == 0:  # Processed image view
+            return self.ui.processedImageView
+        else:  # Original image view
+            return self.ui.originalImagePreview
+
+    def initialize_zoom_combo_box(self):
+        """Initialize the zoom combo box with standard options"""
+        zoom_options = [
+            "Fit to View",
+            "Actual Size", 
+            "25%",
+            "50%", 
+            "75%",
+            "100%",
+            "125%",
+            "150%",
+            "200%",
+            "300%",
+            "400%"
+        ]
+        
+        self.ui.selectStandardZoomComboBox.clear()
+        self.ui.selectStandardZoomComboBox.addItems(zoom_options)
+        self.ui.selectStandardZoomComboBox.setCurrentText("Fit to View")
+
+    def initialize_seams_mode_combo_box(self):
+        """Initialize the seams mode combo box"""
+        self.ui.seamsModeComboBox.clear()
+        self.ui.seamsModeComboBox.addItems(["Added Seams", "Removed Seams"])
+
+    def show_placeholder_text(self):
+        """Show placeholder text in both graphics views"""
+        # Original image view
+        self.original_scene.clear()
+        original_text_item = self.original_scene.addText("Upload or drag image here")
+        original_text_item.setDefaultTextColor(QtGui.QColor(108, 117, 125))
+        font = original_text_item.font()
+        font.setPointSize(12)
+        original_text_item.setFont(font)
+        
+        # Processed image view
+        self.processed_scene.clear()
+        processed_text_item = self.processed_scene.addText("Processed image will appear here")
+        processed_text_item.setDefaultTextColor(QtGui.QColor(108, 117, 125))
+        processed_text_item.setFont(font)
+        
+        # Center the content
+        self.center_content()
+
+    def center_content(self):
+        """Center the content in both graphics views"""
+        self.ui.originalImagePreview.fitInView(self.original_scene.itemsBoundingRect(), QtCore.Qt.KeepAspectRatio)
+        self.ui.processedImageView.fitInView(self.processed_scene.itemsBoundingRect(), QtCore.Qt.KeepAspectRatio)
+
+    def toggle_scene(self):
+        """Toggle between original and processed image views"""
+        if not self.has_processed_image():
+            return
+            
+        # Toggle between 0 (processed) and 1 (original)
+        self.current_scene_index = 1 - self.current_scene_index
+        self.ui.stackedWidget.setCurrentIndex(self.current_scene_index)
+        self.update_toggle_button_text()
+        
+        # Update UI controls based on current view
+        if self.current_scene_index == 0:  # Processed view
+            # Show seam controls if we have seam visualizations
+            has_seams = self.seam_visualizations is not None
+            self.ui.seamsViewBtn.setVisible(has_seams)
+            self.ui.seamsModeComboBox.setVisible(has_seams and self.seams_view_active)
+            
+            # Show appropriate image based on seam view state
+            if self.seams_view_active:
+                self.show_processed_with_seams()
+            else:
+                self.show_processed_normal()
+        else:  # Original view
+            # Hide seam controls when viewing original
+            self.ui.seamsViewBtn.setVisible(False)
+            self.ui.seamsModeComboBox.setVisible(False)
+            
+            # Always show original image normally
+            self.show_original_normal()
+
+    def toggle_seams_view(self):
+        """Toggle seam visualization on/off for processed image"""
+        if not self.has_processed_image() or self.seam_visualizations is None:
+            return
+        
+        # Only allow seam viewing in processed image view
+        if self.current_scene_index != 0:
+            return
+            
+        self.seams_view_active = not self.seams_view_active
+        
+        if self.seams_view_active:
+            # Turn ON seam view
+            self.ui.seamsViewBtn.setText("Hide Seams")
+            self.ui.seamsModeComboBox.setVisible(True)
+            self.show_processed_with_seams()
+        else:
+            # Turn OFF seam view
+            self.ui.seamsViewBtn.setText("View Seams")
+            self.ui.seamsModeComboBox.setVisible(False)
+            self.show_processed_normal()
+
+    def on_seams_mode_changed(self, mode_text):
+        """Handle seam view mode change"""
+        if not self.has_processed_image() or not self.seams_view_active or self.seam_visualizations is None:
+            return
+        
+        self.current_seams_mode = mode_text
+        self.show_processed_with_seams()
+
+    def show_processed_normal(self):
+        """Show processed image without seams (blended naturally)"""
+        if hasattr(self, 'processed_pixmap') and self.processed_pixmap:
+            self.display_processed_image(self.processed_pixmap)
+
+    def show_processed_with_seams(self):
+        """Show processed image with seams based on current mode"""
+        if self.seam_visualizations is None or not self.has_processed_image():
+            return
+        
+        if self.current_seams_mode == "All Seams":
+            self.show_all_seams()
+        elif self.current_seams_mode == "Removed Seams":
+            self.show_removed_seams()
+        else:  # "Inserted Seams"
+            self.show_inserted_seams()
+
+    def show_all_seams(self):
+        """Show processed image with ALL seams highlighted"""
+        if self.seam_visualizations is not None and 'all' in self.seam_visualizations:
+            seams_img = self.seam_visualizations['all']
+            if seams_img is not None:
+                q_image = self.convert_cv_to_qimage(seams_img)
+                if q_image:
+                    pixmap = QtGui.QPixmap.fromImage(q_image)
+                    self.display_processed_image(pixmap)
+
+    def show_removed_seams(self):
+        """Show processed image with removed seams highlighted"""
+        if self.seam_visualizations is not None and 'removed' in self.seam_visualizations:
+            seams_img = self.seam_visualizations['removed']
+            if seams_img is not None:
+                q_image = self.convert_cv_to_qimage(seams_img)
+                if q_image:
+                    pixmap = QtGui.QPixmap.fromImage(q_image)
+                    self.display_processed_image(pixmap)
+
+    def show_inserted_seams(self):
+        """Show processed image with inserted seams highlighted"""
+        if self.seam_visualizations is not None and 'inserted' in self.seam_visualizations:
+            seams_img = self.seam_visualizations['inserted']
+            if seams_img is not None:
+                q_image = self.convert_cv_to_qimage(seams_img)
+                if q_image:
+                    pixmap = QtGui.QPixmap.fromImage(q_image)
+                    self.display_processed_image(pixmap)
+
+    def show_original_normal(self):
+        """Show original image without seams"""
+        if hasattr(self, 'original_pixmap') and self.original_pixmap:
+            self.display_original_image(self.original_pixmap)
+
+    def update_toggle_button_text(self):
+        """Update the toggle button text based on current scene"""
+        if self.current_scene_index == 0:  # Currently showing processed image
+            self.ui.toggleSceneBtn.setText("View Original")
+        else:  # Currently showing original image
+            self.ui.toggleSceneBtn.setText("View Processed")
+
+    def show_original_image_page(self):
+        """Switch to original image view"""
+        self.ui.stackedWidget.setCurrentIndex(1)  # original_image_page
+        self.current_scene_index = 1
+        self.update_toggle_button_text()
+        
+        # Reset seam viewing for original image
+        self.ui.seamsViewBtn.setVisible(False)
+        self.ui.seamsModeComboBox.setVisible(False)
+        
+        # Show original image normally
+        self.show_original_normal()
+
+    def show_processed_image_page(self):
+        """Switch to processed image view"""
+        self.ui.stackedWidget.setCurrentIndex(0)  # processed_image_page
+        self.current_scene_index = 0
+        self.update_toggle_button_text()
+        
+        # Show/hide seam controls based on availability
+        has_seams = self.seam_visualizations is not None
+        self.ui.seamsViewBtn.setVisible(has_seams)
+        self.ui.seamsModeComboBox.setVisible(has_seams and self.seams_view_active)
+        
+        # Show appropriate image
+        if self.seams_view_active:
+            self.show_processed_with_seams()
+        else:
+            self.show_processed_normal()
+
+    def display_original_image(self, pixmap: Union[QtGui.QPixmap, None]):
+        """Load and display original image"""
+        if pixmap and not pixmap.isNull():
+            self.original_scene.clear()
+            original_pixmap_item = self.original_scene.addPixmap(pixmap)
+
+            if original_pixmap_item:
+                self.original_scene.setSceneRect(original_pixmap_item.boundingRect())
+            self.ui.originalImagePreview.fitInView(self.original_scene.itemsBoundingRect(), QtCore.Qt.KeepAspectRatio)
+            
+            # Store the pixmap
+            self.original_pixmap = pixmap
+
+    def display_processed_image(self, pixmap: Union[QtGui.QPixmap, None]):
+        """Load and display processed image"""
+        if pixmap and not pixmap.isNull():
+            self.processed_scene.clear()
+            processed_pixmap_item = self.processed_scene.addPixmap(pixmap)
+
+            if processed_pixmap_item:
+                self.processed_scene.setSceneRect(processed_pixmap_item.boundingRect())
+            self.ui.processedImageView.fitInView(self.processed_scene.sceneRect(), QtCore.Qt.KeepAspectRatio)
+            
+            # Store the pixmap
+            self.processed_pixmap = pixmap
+
+    def convert_cv_to_qimage(self, cv_image):
+        """Convert OpenCV image to QImage"""
+        if cv_image is None:
+            return None
+            
+        try:
+            # Convert BGR to RGB for color images
+            if len(cv_image.shape) == 3 and cv_image.shape[2] == 3:
+                rgb_image = cv2.cvtColor(cv_image, cv2.COLOR_BGR2RGB)
+            else:
+                rgb_image = cv_image
+            
+            h, w = rgb_image.shape[:2]
+            bytes_per_line = 3 * w if len(rgb_image.shape) == 3 else w
+            
+            # Create QImage
+            if len(rgb_image.shape) == 3:
+                q_img = QtGui.QImage(rgb_image.data, w, h, bytes_per_line, QtGui.QImage.Format_RGB888)
+            else:
+                q_img = QtGui.QImage(rgb_image.data, w, h, bytes_per_line, QtGui.QImage.Format_Grayscale8)
+            
+            return q_img.copy()  # Make a copy to avoid memory issues
+        except Exception as e:
+            print(f"Error converting CV image: {e}")
+            return None
+
+    def has_processed_image(self):
+        """Check if a processed image exists"""
+        return hasattr(self, 'processed_pixmap') and self.processed_pixmap is not None
+
+    def set_seam_visualizations(self, visualizations: Dict):
+        """Set seam visualizations for viewing"""
+        if visualizations and isinstance(visualizations, dict):
+            # Store all three visualization types
+            self.seam_visualizations = {
+                'all': visualizations.get('all'),      # Combined view
+                'removed': visualizations.get('removed'),  # Removed only
+                'inserted': visualizations.get('inserted') # Inserted only
+            }
+            # Update combo box options
+            self.ui.seamsModeComboBox.clear()
+            self.ui.seamsModeComboBox.addItems(["All Seams", "Removed Seams", "Inserted Seams"])
+            self.ui.seamsModeComboBox.setCurrentText("All Seams")
+            self.current_seams_mode = "All Seams"
+            
+            # Enable seam viewing for processed image
+            self.ui.seamsViewBtn.setEnabled(True)
+        else:
+            self.seam_visualizations = None
+
+    def enable_tool_buttons(self, enabled):
+        """Enable or disable tool buttons based on image availability"""
+        self.ui.resizeBtn.setEnabled(enabled)
+        self.ui.filtersBtn.setEnabled(enabled)
+        self.ui.obj_detectionBtn.setEnabled(enabled)
+        
+        # Only enable toggle buttons if we have a processed image
+        has_processed = self.has_processed_image()
+        self.ui.toggleSceneBtn.setEnabled(enabled and has_processed)
+
+    def update_timing_label(self, timing_info: Dict):
+        """Update timing display label"""
+        if timing_info and 'algorithm' in timing_info:
+            algorithm_time = timing_info['algorithm']
+            algorithm_name = timing_info.get('algorithm_name', 'Algorithm')
+            self.ui.timingLabel.setText(f"{algorithm_name}: {algorithm_time:.3f}s")
+
+
+"""
+image_lab.py
+Main application window for ImageLab with seam viewing
+"""
+
+from pathlib import Path
+from typing import Union
+from utilities.processing import ImageProcessor
+from views.widgets import FilterWidget, ImageLabMainWindow, ObjectDetectionWidget, ResizeWidget
+from PyQt5 import QtCore, QtGui, QtWidgets
+import cv2
+
+class ImageLab(ImageLabMainWindow):
+    def __init__(self):
+        super().__init__()
+
+        # Enable mouse wheel zoom
+        self.ui.originalImagePreview.wheelEvent = self.graphics_view_wheel_event
+        self.ui.processedImageView.wheelEvent = self.graphics_view_wheel_event
+
+        self.resize_widget = ResizeWidget(self)
+        self.filter_widget = FilterWidget(self)
+        self.object_detection_widget = ObjectDetectionWidget(self)
+
+        self.image_processor = None
+
+        # Track the currently active tool
+        self.current_tool = None
+        
+        # Track current image
+        self.original_image = None
+        self.original_image_path = None
+
+        # Track processed image
+        self.processed_image = None
+        self.processed_image_path = None
+        
+        # Seam images
+        self.removed_seams_image = None
+        self.inserted_seams_image = None
+        
+        # Zoom tracking
+        self.current_zoom_level = 1.0
+        self.min_zoom = 0.1
+        self.max_zoom = 10.0
+
+        self.ui.resizeBtn.clicked.connect(self.processing_tool_selection)
+        self.ui.obj_detectionBtn.clicked.connect(self.processing_tool_selection)
+        self.ui.filtersBtn.clicked.connect(self.processing_tool_selection)
+
+        # Connect UploadButton
+        self.ui.UploadButton.clicked.connect(self.select_and_display_image)
+
+        # Connect Save button
+        self.ui.save_as_pushButton.clicked.connect(self.save_resized_image)
+        
+        # Connect Zoom ComboBox
+        self.ui.selectStandardZoomComboBox.currentTextChanged.connect(self.apply_standard_zoom)
+
+        self.ui.zoomInButton.clicked.connect(lambda: self.apply_zoom_in(5))
+        self.ui.zoomOutButton.clicked.connect(lambda: self.apply_zoom_out(5))
+
+        # Connect signals
+        self.resize_widget.ui.width_resize_lineEdit.textChanged.connect(self.on_width_changed)
+        self.resize_widget.ui.height_resize_lineEdit.textChanged.connect(self.on_height_changed)
+        self.resize_widget.ui.resize_image_comboBox.currentTextChanged.connect(self.on_aspect_ratio_changed)
+
+        self.resize_widget.ui.cancel_resize_btn.clicked.connect(self.close_resize_widget)
+        self.resize_widget.ui.apply_resize_btn.clicked.connect(self.resize_image)
+
+        self.close_shortcut = QtWidgets.QShortcut(QtGui.QKeySequence("Esc"), self)
+        self.close_shortcut.activated.connect(self.close_active_tool)
+ 
+
+    def apply_standard_zoom(self, zoom_option: str):
+        """Apply standard zoom level based on combo box selection"""
+        if not self.has_current_scene_content():
+            return
+            
+        if zoom_option == "Fit to View":
+            self.zoom_fit_to_view()
+        elif zoom_option == "Actual Size":
+            self.zoom_actual_size()
+        elif zoom_option.endswith('%'):
+            self.zoom_by_percentage(zoom_option)
+        elif "custom" in zoom_option.lower():
+            self.show_custom_zoom_dialog()
+
+    def zoom_fit_to_view(self):
+        """Zoom to fit the entire image in all views"""
+        if self.has_current_scene_content():
+            # Apply fit to view for all graphics views
+            for graphics_view in self.all_graphics_views:
+                if graphics_view.scene() and not graphics_view.scene().sceneRect().isEmpty():
+                    graphics_view.fitInView(graphics_view.scene().sceneRect(), QtCore.Qt.KeepAspectRatio)
+            
+            self.current_zoom_level = self.calculate_current_zoom_level()
+            self.update_zoom_combo_box_display()
+
+    def zoom_actual_size(self):
+        """Zoom to 100% (actual pixel size) for all views"""
+        if self.has_current_scene_content():
+            self.apply_zoom_level(1.0)
+
+    def zoom_by_percentage(self, percentage_text):
+        """Zoom by percentage value for all views"""
+        if not self.has_current_scene_content():
+            return
+            
+        try:
+            # Extract percentage number from text (remove % sign)
+            percentage = float(percentage_text.rstrip('%'))
+            zoom_level = percentage / 100.0
+            
+            if self.min_zoom <= zoom_level <= self.max_zoom:
+                self.apply_zoom_level(zoom_level)
+                
+        except ValueError:
+            print(f"Invalid percentage format: {percentage_text}")
+
+    def apply_zoom_in(self, zoom_factor=5):
+        if self.has_current_scene_content():
+            current_zoom = self.calculate_current_zoom_level()
+            
+            # Convert to percentage for easier calculation
+            current_percent = current_zoom * 100
+            
+            # Find the next multiple of zoom_factor
+            next_multiple = ((current_percent + zoom_factor - 1) // zoom_factor) * zoom_factor
+            
+            # Ensure we're moving forward by at least one step
+            if next_multiple <= current_percent:
+                next_multiple += zoom_factor
+                
+            zoom_level = next_multiple / 100.0
+            
+            zoom_level = max(self.min_zoom, min(self.max_zoom, zoom_level))
+            self.apply_zoom_level(zoom_level)
+
+    def apply_zoom_out(self, zoom_factor=5):
+        if self.has_current_scene_content():
+            current_zoom = self.calculate_current_zoom_level()
+            
+            # Convert to percentage for easier calculation
+            current_percent = current_zoom * 100
+            
+            # Find the previous multiple of zoom_factor
+            prev_multiple = ((current_percent - 1) // zoom_factor) * zoom_factor
+            
+            # Ensure we're moving backward by at least one step
+            if prev_multiple >= current_percent:
+                prev_multiple -= zoom_factor
+                
+            zoom_level = prev_multiple / 100.0
+            
+            zoom_level = max(self.min_zoom, min(self.max_zoom, zoom_level))
+            self.apply_zoom_level(zoom_level)
+
+    def apply_zoom_level(self, zoom_level):
+        """Apply specific zoom level to all views"""
+        if not self.has_current_scene_content():
+            return
+            
+        # Clamp zoom level to min/max values
+        zoom_level = max(self.min_zoom, min(self.max_zoom, zoom_level))
+        
+        # Apply zoom to all graphics views
+        for graphics_view in self.all_graphics_views:
+            # Reset transformation
+            transform = QtGui.QTransform()
+            # Apply zoom
+            transform.scale(zoom_level, zoom_level)
+            graphics_view.setTransform(transform)
+        
+        self.current_zoom_level = zoom_level
+        self.update_zoom_combo_box_display()
+
+    def calculate_current_zoom_level(self):
+        """Calculate current zoom level based on current view transformation"""
+        if not self.has_current_scene_content():
+            return 1.0
+            
+        # Get the transform and extract scale from current view
+        transform = self.current_graphics_view.transform()
+        return transform.m11()  # Horizontal scale component
+
+    def has_current_scene_content(self) -> bool:
+        """Check if the current scene has any content to display"""
+        if not self.current_scene:
+            return False
+            
+        # Check if scene has any items
+        if not self.current_scene.items():
+            return False
+            
+        # Check if scene has a valid rect (not empty)
+        scene_rect = self.current_scene.sceneRect()
+        if scene_rect.isNull() or scene_rect.isEmpty():
+            return False
+            
+        # Additional check based on current scene type
+        if self.current_scene_index == 0:  # Processed image view
+            # Check if processed scene has content
+            return hasattr(self, 'processed_scene') and self.processed_scene.items()
+        else:  # Original image view
+            # Check if original image exists
+            return hasattr(self, 'original_image') and self.original_image is not None
+        
+
+    def get_zoom_combo_box_items(self):
+        combo = self.ui.selectStandardZoomComboBox
+        return [combo.itemText(i) for i in range(combo.count())]
+
+    def update_zoom_combo_box_display(self):
+        """Update combo box to reflect current zoom level, without triggering events"""
+        # Block signals to prevent infinite loop
+        self.ui.selectStandardZoomComboBox.blockSignals(True)
+        
+        # Calculate percentage
+        percentage = int(self.current_zoom_level * 100)
+        
+        # Check if it matches any standard option
+        standard_option = f"{percentage}%"
+        index = self.ui.selectStandardZoomComboBox.findText(standard_option)
+        
+        if index >= 0:
+            self.ui.selectStandardZoomComboBox.setCurrentText(standard_option)
+        else:
+            custom_index = self.ui.selectStandardZoomComboBox.findText(
+                "^Custom", QtCore.Qt.MatchRegularExpression
+            )
+            if custom_index >= 0:
+                # Use the existing custom item
+                self.ui.selectStandardZoomComboBox.setCurrentIndex(custom_index)
+                # Update it to show the current percentage
+                self.ui.selectStandardZoomComboBox.setItemText(
+                    custom_index, 
+                    f"Custom ({percentage}%)"
+                )
+            else:
+                # Fallback: just set text directly
+                self.ui.selectStandardZoomComboBox.setCurrentText(f"Custom ({percentage}%)")
+        
+        # Restore signals
+        self.ui.selectStandardZoomComboBox.blockSignals(False)
+
+    def show_custom_zoom_dialog(self):
+        """Show dialog for custom zoom input"""
+        if not self.original_image:
+            return
+            
+        current_percentage = int(self.current_zoom_level * 100)
+        
+        zoom_value, ok = QtWidgets.QInputDialog.getInt(
+            self,
+            "Custom Zoom",
+            "Enter zoom percentage:",
+            value=current_percentage,
+            min=10,   # 10%
+            max=1000, # 1000%
+            step=10
+        )
+        
+        if ok:
+            zoom_level = zoom_value / 100.0
+            self.apply_zoom_level(zoom_level)
+
+    def graphics_view_wheel_event(self, event:QtGui.QWheelEvent):
+        """Handle mouse wheel events for zooming"""
+        if not self.has_image_loaded():
+            return
+        
+        if event.modifiers() & QtCore.Qt.ControlModifier:
+            # Zoom with Ctrl + Mouse Wheel
+            zoom_factor = 1.0  # 10% zoom per step
+            if event.angleDelta().y() > 0:
+                # Zoom in
+                new_zoom = self.current_zoom_level * zoom_factor
+            else:
+                # Zoom out
+                new_zoom = self.current_zoom_level / zoom_factor
+            
+            # Clamp zoom level
+            new_zoom = max(self.min_zoom, min(self.max_zoom, new_zoom))
+            
+            # Apply zoom
+            self.apply_zoom_level(new_zoom)
+            
+            # Update combo box
+            self.update_zoom_combo_box_display()
+            
+            event.accept()
+        else:
+            # Default wheel behavior (scroll)
+            QtWidgets.QGraphicsView.wheelEvent(self.ui.originalImagePreview, event)
+            QtWidgets.QGraphicsView.wheelEvent(self.ui.processedImageView, event)
+
+
+    def select_and_display_image(self):
+        """Select an image file and display it in the preview"""
+        # Supported image formats
+        file_filter = "Image Files (*.png *.jpg *.jpeg *.bmp *.gif *.tiff *.webp);;All Files (*)"
+        
+        # Open file dialog
+        file_path, _ = QtWidgets.QFileDialog.getOpenFileName(
+            self,
+            "Choose an Image",
+            str(Path.home()),  # Start from home directory
+            file_filter
+        )
+        
+        if file_path:
+            self.load_and_display_image(file_path)
+
+    def load_and_display_image(self, file_path):
+        """Load image from file path and display in preview"""
+        try:
+            
+            # Load image
+            pixmap = QtGui.QPixmap(file_path)
+            
+            if pixmap.isNull():
+                QtWidgets.QMessageBox.warning(self, "Error", "Unable to load image file.")
+                return
+            
+            # Store image data
+            self.original_image_path = file_path
+            self.original_image = pixmap
+            
+            # Display image in QGraphicsView
+            self.display_original_image(pixmap)
+            
+            # Reset to "Fit to View" when new image is loaded
+            self.ui.selectStandardZoomComboBox.setCurrentText("Fit to View")
+            self.zoom_fit_to_view()
+            
+            # Update window title with filename
+            filename = Path(file_path).name
+            self.setWindowTitle(f"ImageLab - {filename}")
+            
+            # Enable tool buttons if they were disabled
+            self.enable_tool_buttons(True)
+
+            self.image_processor = ImageProcessor(file_path)
+            
+            if self.image_processor.is_image_loaded():
+                self.statusBar().showMessage(f"Successfully loaded image: {file_path}", 5000)
+
+                self.show_original_image_page()
+                w, h = self.image_processor.get_image_dimensions()
+
+                # Store original dimensions and aspect ratio
+                self.original_width = w
+                self.original_height = h
+                self.aspect_ratio = w / h if h != 0 else 1
+
+                self.aspect_ratios.update({
+                    "Original": self.aspect_ratio
+                })
+
+                # Set initial values
+                self.ui.imageDimensionsLabel.setText(f"Width: {w} × Height: {h}")
+                self.resize_widget.ui.width_resize_lineEdit.setText(str(w))
+                self.resize_widget.ui.height_resize_lineEdit.setText(str(h))
+            
+        except Exception as e:
+            QtWidgets.QMessageBox.critical(self, "Error", f"Failed to load image: {str(e)}")
+
+    def on_aspect_ratio_changed(self, ratio_name):
+        """When aspect ratio selection changes"""
+        if ratio_name == "Custom":
+            return  # Don't auto-adjust in custom mode
+        
+        aspect_ratio = self.aspect_ratios[ratio_name]
+        
+        try:
+            current_width = int(self.resize_widget.ui.width_resize_lineEdit.text())
+            current_height = int(self.resize_widget.ui.height_resize_lineEdit.text())
+            
+            
+            if all([current_width > 0, current_height > 0, aspect_ratio > 0]):
+                if current_width / current_height > aspect_ratio:
+                    new_height = int(current_width / aspect_ratio)
+                    self.resize_widget.ui.height_resize_lineEdit.blockSignals(True)
+                    self.resize_widget.ui.height_resize_lineEdit.setText(str(new_height))
+                    self.resize_widget.ui.height_resize_lineEdit.blockSignals(False)
+                else:
+                    new_width = int(current_height * aspect_ratio)
+                    self.resize_widget.ui.width_resize_lineEdit.blockSignals(True)
+                    self.resize_widget.ui.width_resize_lineEdit.setText(str(new_width))
+                    self.resize_widget.ui.width_resize_lineEdit.blockSignals(False)
+            
+        except ValueError:
+            pass
+
+    def on_width_changed(self, width_text):
+        """When width line edit changes"""
+        if self.resize_widget.ui.resize_image_comboBox.currentText() == "Custom":
+            return  # Don't auto-adjust in custom mode
+        
+        try:
+            width = int(width_text)
+            ratio_name = self.resize_widget.ui.resize_image_comboBox.currentText()
+            aspect_ratio = self.aspect_ratios[ratio_name]
+            
+            new_height = int(round(width / aspect_ratio))
+            
+            # Block signals to prevent recursive calls
+            self.resize_widget.ui.height_resize_lineEdit.blockSignals(True)
+            self.resize_widget.ui.height_resize_lineEdit.setText(str(new_height))
+            self.resize_widget.ui.height_resize_lineEdit.blockSignals(False)
+            
+        except ValueError:
+            pass  # Invalid input
+
+    def on_height_changed(self, height_text):
+        """When height line edit changes"""
+        if self.resize_widget.ui.resize_image_comboBox.currentText() == "Custom":
+            return  # Don't auto-adjust in custom mode
+        
+        try:
+            height = int(height_text)
+            ratio_name = self.resize_widget.ui.resize_image_comboBox.currentText()
+            aspect_ratio = self.aspect_ratios[ratio_name]
+            
+            new_width = int(round(height * aspect_ratio))
+            
+            # Block signals to prevent recursive calls
+            self.resize_widget.ui.width_resize_lineEdit.blockSignals(True)
+            self.resize_widget.ui.width_resize_lineEdit.setText(str(new_width))
+            self.resize_widget.ui.width_resize_lineEdit.blockSignals(False)
+            
+        except ValueError:
+            pass
+
+    def clear_image_preview(self, scene:QtWidgets.QGraphicsScene):
+        """Clear the image preview and reset to placeholder state"""
+        scene.clear()
+        self.original_image = None
+        self.original_image_path = None
+        self.original_image = None
+        self.current_zoom_level = 1.0
+        
+        # Reset to placeholder state
+        self.show_placeholder_text()
+        
+        # Reset zoom combo box
+        self.ui.selectStandardZoomComboBox.setCurrentText("Fit to View")
+        
+        # Reset window title
+        self.setWindowTitle("ImageLab")
+        
+        # Disable tool buttons when no image is loaded
+        self.enable_tool_buttons(False)
+
+    def enable_tool_buttons(self, enabled):
+        """Enable or disable tool buttons based on image availability"""
+        self.ui.resizeBtn.setEnabled(enabled)
+        self.ui.filtersBtn.setEnabled(enabled)
+        self.ui.obj_detectionBtn.setEnabled(enabled)
+
+    def resize_event(self, event):
+        """Handle window resize to update image preview scaling"""
+        super().resizeEvent(event)
+        if self.original_image and self.ui.selectStandardZoomComboBox.currentText() == "Fit to View":
+            self.zoom_fit_to_view()
+
+    def get_original_image(self):
+        """Get the current loaded image as QPixmap"""
+        return self.original_image
+
+    def get_original_image_path(self):
+        """Get the path of the current loaded image"""
+        return self.original_image_path
+
+    def has_image_loaded(self):
+        """Check if an image is currently loaded"""
+        return self.original_image is not None
+
+    # Add Drag and Drop Support
+    def drag_enter_event(self, event):
+        """Handle drag enter event for file drops"""
+        if event.mimeData().hasUrls():
+            # Check if any of the dragged files are images
+            for url in event.mimeData().urls():
+                file_path = url.toLocalFile()
+                if self.is_image_file(file_path):
+                    event.acceptProposedAction()
+                    return
+        event.ignore()
+
+    def drag_move_event(self, event):
+        """Handle drag move event"""
+        if event.mimeData().hasUrls():
+            for url in event.mimeData().urls():
+                file_path = url.toLocalFile()
+                if self.is_image_file(file_path):
+                    event.acceptProposedAction()
+                    return
+        event.ignore()
+
+    def drop_event(self, event):
+        """Handle drop event for image files"""
+        for url in event.mimeData().urls():
+            file_path = url.toLocalFile()
+            if self.is_image_file(file_path):
+                self.load_and_display_image(file_path)
+                event.acceptProposedAction()
+                return
+        event.ignore()
+
+    def is_image_file(self, file_path:str):
+        """Check if file is a supported image format"""
+        image_extensions = {'.png', '.jpg', '.jpeg', '.bmp', '.gif', '.tiff', '.webp'}
+        file_path = Path(file_path)
+        return file_path.is_file() and file_path.suffix.lower() in image_extensions
+
+    # Enable drag and drop for the main window
+    def set_accept_drops(self, accept):
+        """Override to enable drag and drop for the main window and graphics view"""
+        super().setAcceptDrops(accept)
+        self.ui.originalImagePreview.setAcceptDrops(accept)
+
+    def position_tool_widget(self, widget: Union[FilterWidget, ObjectDetectionWidget, ResizeWidget], side="right", margin=10):
+        """Position tool widget with screen boundary checking"""
+        main_window_geometry = self.geometry()
+        screen_geometry = QtWidgets.QApplication.primaryScreen().availableGeometry()
+        
+        if side == "right":
+            x = main_window_geometry.right() + margin
+            y = main_window_geometry.top()
+            
+            # Check if widget would go off-screen to the right
+            if x + widget.width() > screen_geometry.right():
+                # Position to the left instead
+                x = main_window_geometry.left() - widget.width() - margin
+                
+        elif side == "left":
+            x = main_window_geometry.left() - widget.width() - margin
+            y = main_window_geometry.top()
+            
+            # Check if widget would go off-screen to the left
+            if x < screen_geometry.left():
+                # Position to the right instead
+                x = main_window_geometry.right() + margin
+        
+        # Ensure widget stays within screen vertically
+        if y + widget.height() > screen_geometry.bottom():
+            y = screen_geometry.bottom() - widget.height()
+        if y < screen_geometry.top():
+            y = screen_geometry.top()
+            
+        widget.move(x, y)
+
+    def processing_tool_selection(self):
+        """Handle tool selection with image validation"""
+        # Check if an image is loaded before showing tools
+        if not self.has_image_loaded():
+            QtWidgets.QMessageBox.information(
+                self, 
+                "No Image", 
+                "Please select an image first before using tools."
+            )
+            return
+        
+        self.show_original_image_page()
+
+        sender = self.sender()
+        tool_to_show = None 
+
+        if sender == self.ui.resizeBtn:
+            tool_to_show = self.resize_widget
+        elif sender == self.ui.filtersBtn:
+            tool_to_show = self.filter_widget
+        elif sender == self.ui.obj_detectionBtn:
+            tool_to_show = self.object_detection_widget
+        
+        if tool_to_show:
+            # Always hide the current tool first
+            if self.current_tool:
+                self.current_tool.hide()
+            
+            # If clicking the same tool button, toggle visibility
+            if self.current_tool == tool_to_show:
+                self.current_tool = None
+            else:
+                # Show the new tool and update current_tool
+                self.position_tool_widget(tool_to_show, "right")
+                tool_to_show.show()
+                self.current_tool = tool_to_show
+
+    def close_resize_widget(self):
+        """Close the resize widget"""
+        if self.current_tool == self.resize_widget:
+            self.resize_widget.hide()
+            self.current_tool = None
+
+    def close_active_tool(self):
+        """Close the currently active tool with Escape key"""
+        if self.current_tool:
+            self.current_tool.hide()
+            self.current_tool = None
+
+    def resize_image(self):
+        """Resize the current image with the specified parameters"""
+        if not self.has_image_loaded():
+            QtWidgets.QMessageBox.warning(self, "No Image", "Please load an image first.")
+            return
+        
+        try:
+            # Get width and height from line edits
+            new_width: int = int(self.resize_widget.ui.width_resize_lineEdit.text())
+            new_height: int = int(self.resize_widget.ui.height_resize_lineEdit.text())
+            
+            # Validate dimensions
+            if any([new_width <= 0, new_height <= 0]):
+                QtWidgets.QMessageBox.warning(
+                    self, 
+                    "Invalid Dimensions", 
+                    "Width and height must be positive numbers."
+                )
+                return
+            
+            if any([new_width > 10000, new_height > 10000]):
+                QtWidgets.QMessageBox.warning(
+                    self,
+                    "Dimensions Too Large",
+                    "Width and height cannot exceed 10000 pixels."
+                )
+                return
+            
+            # Get content-aware setting
+            content_aware = self.resize_widget.ui.content_aware_checkBox.isChecked()
+            
+            # Determine algorithm
+            content_aware_alg = self.resize_widget.ui.resize_algorithm_comboBox.currentText()
+
+            # Setup progress bar for content-aware resizing
+            if content_aware:
+                self.ui.progressBar.setVisible(True)
+                self.ui.progressBar.setValue(0)
+                QtWidgets.QApplication.processEvents()  # Force UI update
+            
+                # Perform content-aware resize operation
+                success = self.image_processor.resize_image(
+                    new_width=new_width,
+                    new_height=new_height,
+                    content_aware=content_aware,
+                    content_aware_alg=content_aware_alg,
+                    progress_callback=self.update_progress
+                )
+            else:
+                # Perform the traditional resize operation
+                success = self.image_processor.resize_image(
+                    new_width=new_width,
+                    new_height=new_height,
+                )
+
+            # Hide progress bar when done
+            if content_aware:
+                self.ui.progressBar.setVisible(False)
+            
+            if success:
+                # Get the processed image and timing info
+                result = self.image_processor.get_processed_image()
+                
+                if result:
+                    self.processed_image, timing_info, seam_info = result
+                    
+                    # Update timing display
+                    if timing_info:
+                        self.update_timing_label(timing_info)
+                    
+                    # Get seam visualizations
+                    seam_visualizations = self.image_processor.get_seam_visualizations()
+                    if seam_visualizations:
+                        self.set_seam_visualizations(seam_visualizations)
+                    
+                    # Convert and display the processed image
+                    q_image = self.image_processor.convert_cv_image(self.processed_image, output_format="qimage")
+                    if q_image:
+                        height, width, _ = self.processed_image.shape
+                        pixmap = QtGui.QPixmap.fromImage(q_image)
+                        
+                        # Update the display
+                        self.show_processed_image_page()
+                        self.display_processed_image(pixmap)
+                        self.ui.selectStandardZoomComboBox.setCurrentText("Fit to View")
+                        self.zoom_fit_to_view()
+                        
+                        # Update dimensions label
+                        self.ui.processedDimensionsLabel.setText(f"Width: {width} × Height: {height}")
+                        
+                        # Enable toggle buttons
+                        self.ui.toggleSceneBtn.setEnabled(True)
+                        
+                        # Show success message
+                        self.statusBar().showMessage(
+                            f"Image resized to {width}×{height} pixels", 
+                            3000
+                        )
+                        
+                        # Close the resize widget after successful operation
+                        self.close_resize_widget()
+                    else:
+                        QtWidgets.QMessageBox.critical(
+                            self,
+                            "Resize Error",
+                            "Failed to get resized image from processor."
+                        )
+                else:
+                    QtWidgets.QMessageBox.critical(
+                        self,
+                        "Resize Failed",
+                        "Image processor failed to resize the image."
+                    )
+                    
+                # Reset to original for next operation
+                self.image_processor.reset_to_original()
+                
+        except ValueError as e:
+            print(e)
+            QtWidgets.QMessageBox.warning(
+                self,
+                "Invalid Input",
+                "Please enter valid numeric values for width and height."
+            )
+        except Exception as e:
+            QtWidgets.QMessageBox.critical(
+                self,
+                "Resize Error",
+                f"An unexpected error occurred: {str(e)}"
+            )
+
+    def update_progress(self, value, maximum=None):
+        """Update progress bar with current value"""
+        if maximum is not None:
+            self.ui.progressBar.setMaximum(maximum)
+        self.ui.progressBar.setValue(value)
+        QtWidgets.QApplication.processEvents()  # Force UI update
+
+    def save_resized_image(self):
+        """Save the processed image to a file"""
+        if self.processed_image is None:
+            QtWidgets.QMessageBox.warning(self, "Warning", "No processed image to save!")
+            return
+        
+        # Get image dimensions
+        height, width, _ = self.processed_image.shape
+        
+        # Generate default filename
+        default_filename = (
+            f"{self.image_processor.get_image_filename()}"
+            f"_resized_{width}_{height}"
+            f"{self.image_processor.get_image_extension()}"
+        )
+        
+        # Default directory
+        default_directory = self.image_processor.get_image_directory()
+        default_path = str(Path(default_directory) / default_filename)
+        
+        # Supported image formats for saving
+        file_filter = "Image Files (*.png *.jpg *.jpeg *.bmp *.gif *.tiff *.webp);;All Files (*)"
+        
+        # Open save file dialog
+        file_path, _ = QtWidgets.QFileDialog.getSaveFileName(
+            self,
+            "Save Resized Image",
+            default_path,
+            file_filter
+        )
+        
+        if file_path:
+            try:
+                image_saved = self.image_processor.save_image(file_path, self.processed_image)
+                if image_saved:
+                    message = f'Image saved successfully!<br><br>Location: <a href="file:///{file_path}">{file_path}</a>'
+                    QtWidgets.QMessageBox.information(self, "Success", message)
+                else:
+                    QtWidgets.QMessageBox.critical(self, "Error", "Failed to save processed image!")
+            except Exception as e:
+                QtWidgets.QMessageBox.critical(self, "Error", f"Error saving image: {str(e)}")
+
+
+if __name__ == "__main__":
+    import sys
+    app = QtWidgets.QApplication(sys.argv)
+    image_processor = ImageLab()
+    
+    # Enable drag and drop
+    image_processor.setAcceptDrops(True)
+    image_processor.ui.originalImagePreview.setAcceptDrops(True)
+    
+    image_processor.show()
+    sys.exit(app.exec_())

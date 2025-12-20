@@ -1,8 +1,14 @@
+"""
+image_lab.py
+Main application window for ImageLab with seam viewing
+"""
+
 from pathlib import Path
 from typing import Union
 from utilities.processing import ImageProcessor
 from views.widgets import FilterWidget, ImageLabMainWindow, ObjectDetectionWidget, ResizeWidget
 from PyQt5 import QtCore, QtGui, QtWidgets
+import cv2
 
 class ImageLab(ImageLabMainWindow):
     def __init__(self):
@@ -29,6 +35,10 @@ class ImageLab(ImageLabMainWindow):
         self.processed_image = None
         self.processed_image_path = None
         
+        # Seam images
+        self.removed_seams_image = None
+        self.inserted_seams_image = None
+        
         # Zoom tracking
         self.current_zoom_level = 1.0
         self.min_zoom = 0.1
@@ -41,7 +51,7 @@ class ImageLab(ImageLabMainWindow):
         # Connect UploadButton
         self.ui.UploadButton.clicked.connect(self.select_and_display_image)
 
-        # Connect UploadButton
+        # Connect Save button
         self.ui.save_as_pushButton.clicked.connect(self.save_resized_image)
         
         # Connect Zoom ComboBox
@@ -189,7 +199,7 @@ class ImageLab(ImageLabMainWindow):
             return False
             
         # Additional check based on current scene type
-        if self.current_scene_index == 0:  # Processed image view
+        if self.current_page_index == 0:  # Processed image view
             # Check if processed scene has content
             return hasattr(self, 'processed_scene') and self.processed_scene.items()
         else:  # Original image view
@@ -622,7 +632,7 @@ class ImageLab(ImageLabMainWindow):
             # Get content-aware setting
             content_aware = self.resize_widget.ui.content_aware_checkBox.isChecked()
             
-            # Determine if we should maintain aspect ratio
+            # Determine algorithm
             content_aware_alg = self.resize_widget.ui.resize_algorithm_comboBox.currentText()
 
             # Setup progress bar for content-aware resizing
@@ -651,44 +661,62 @@ class ImageLab(ImageLabMainWindow):
                 self.ui.progressBar.setVisible(False)
             
             if success:
-                self.processed_image = self.image_processor.current_image
-                # Get the resized image and update the display
-                q_image = self.image_processor.convert_cv_image(self.processed_image, output_format="qimage")
-                if q_image:
-                    height, width, _ = self.processed_image.shape
-                    pixmap = QtGui.QPixmap.fromImage(q_image)
+                # Get the processed image and timing info
+                result = self.image_processor.get_processed_image()
+                
+                if result:
+                    self.processed_image, timing_info, seam_info = result
                     
-                    # Update the display
-                    self.show_processed_image_page()
-                    self.display_processed_image(pixmap)
-                    self.ui.selectStandardZoomComboBox.setCurrentText("100%")
-                    self.current_image = pixmap
+                    # Update timing display
+                    if timing_info:
+                        self.update_timing_label(timing_info)
                     
-                    # Update dimensions label
-                    self.ui.processedDimensionsLabel.setText(f"Width: {width} × Height: {height}")
+                    # Get seam visualizations
+                    seam_visualizations = self.image_processor.get_seam_visualizations()
+                    if seam_visualizations:
+                        self.set_seam_visualizations(seam_visualizations)
                     
-                    # Show success message
-                    self.statusBar().showMessage(
-                        f"Image resized to {width}×{height} pixels", 
-                        3000
-                    )
-                    
-                    # Close the resize widget after successful operation
-                    self.close_resize_widget()
+                    # Convert and display the processed image
+                    q_image = self.image_processor.convert_cv_image(self.processed_image, output_format="qimage")
+                    if q_image:
+                        height, width, _ = self.processed_image.shape
+                        pixmap = QtGui.QPixmap.fromImage(q_image)
+                        
+                        # Update the display
+                        self.show_processed_image_page()
+                        self.display_processed_image(pixmap)
+                        self.ui.selectStandardZoomComboBox.setCurrentText("Fit to View")
+                        self.zoom_fit_to_view()
+                        
+                        # Update dimensions label
+                        self.ui.processedDimensionsLabel.setText(f"Width: {width} × Height: {height}")
+                        
+                        # Enable toggle buttons
+                        self.ui.toggleSceneBtn.setEnabled(True)
+                        
+                        # Show success message
+                        self.statusBar().showMessage(
+                            f"Image resized to {width}×{height} pixels", 
+                            3000
+                        )
+                        
+                        # Close the resize widget after successful operation
+                        self.close_resize_widget()
+                    else:
+                        QtWidgets.QMessageBox.critical(
+                            self,
+                            "Resize Error",
+                            "Failed to get resized image from processor."
+                        )
                 else:
                     QtWidgets.QMessageBox.critical(
                         self,
-                        "Resize Error",
-                        "Failed to get resized image from processor."
+                        "Resize Failed",
+                        "Image processor failed to resize the image."
                     )
                     
+                # Reset to original for next operation
                 self.image_processor.reset_to_original()
-            else:
-                QtWidgets.QMessageBox.critical(
-                    self,
-                    "Resize Failed",
-                    "Image processor failed to resize the image."
-                )
                 
         except ValueError as e:
             print(e)

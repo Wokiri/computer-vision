@@ -6,310 +6,257 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>996</width>
-    <height>777</height>
+    <width>1188</width>
+    <height>894</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Compter Vision Lab</string>
+   <string>Computer Vision Lab</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">/* --- GLOBAL STYLES (QApplication and Main Window) --- */
+   <string notr="true">/* --- CLEAN GLOBAL STYLES --- */
 QMainWindow, QWidget {
-    background-color: #f0f0f0; /* Light background */
-    color: #1e1e1e; /* Dark text color */
-    font-family: &quot;Segoe UI&quot;, &quot;Helvetica Neue&quot;, Helvetica, Arial, sans-serif;
+    background-color: #f5f7fa;
+    color: #2d3748;
+    font-family: -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, sans-serif;
     font-size: 10pt;
 }
 
-/* --- PROGRESS BAR STYLES --- */
-QProgressBar {
-    border: 1px solid #cccccc;
-    border-radius: 4px;
+/* --- CONTAINERS --- */
+QFrame#horizontalFrame, QFrame#verticalFrame_4, QFrame#horizontalFrame_6 {
     background-color: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 12px;
+}
+
+/* --- BUTTONS --- */
+QPushButton {
+    background-color: #ffffff;
+    border: 1.5px solid #e2e8f0;
+    color: #4a5568;
+    padding: 10px 16px;
+    border-radius: 6px;
+    min-height: 36px;
+    font-size: 10pt;
+    font-weight: 500;
+}
+
+QPushButton:hover {
+    background-color: #f7fafc;
+    border-color: #cbd5e0;
+}
+
+QPushButton:pressed {
+    background-color: #edf2f7;
+}
+
+/* Primary action button */
+QPushButton#UploadButton {
+    background-color: #4299e1;
+    border-color: #4299e1;
+    color: #ffffff;
+    font-weight: 600;
+}
+
+QPushButton#UploadButton:hover {
+    background-color: #3182ce;
+    border-color: #3182ce;
+}
+
+/* Secondary action button */
+QPushButton#save_as_pushButton {
+    background-color: #48bb78;
+    border-color: #48bb78;
+    color: #ffffff;
+}
+
+QPushButton#save_as_pushButton:hover {
+    background-color: #38a169;
+    border-color: #38a169;
+}
+
+/* Tool buttons with accent border */
+QPushButton#resizeBtn, QPushButton#obj_detectionBtn, QPushButton#filtersBtn {
+    background-color: #f7fafc;
+    border-left: 4px solid #4299e1;
+    text-align: left;
+    padding-left: 20px;
+}
+
+QPushButton#resizeBtn:hover, QPushButton#obj_detectionBtn:hover, QPushButton#filtersBtn:hover {
+    background-color: #ebf8ff;
+}
+
+/* --- IMAGE VIEW AREA --- */
+QGraphicsView, QLabel#originalImagePreview {
+    background-color: #f8fafc;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+}
+
+/* --- STATUS and PROGRESS --- */
+QProgressBar {
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    background-color: #f7fafc;
     text-align: center;
-    color: #1e1e1e;
+    color: #4a5568;
+    height: 20px;
 }
 
 QProgressBar::chunk {
-    background-color: #0078d4;
+    background-color: #4299e1;
     border-radius: 3px;
 }
 
-QProgressBar::chunk:disabled {
-    background-color: #a0a0a0;
-}
-
-/* --- HEADER BAR (If using a QToolBar) --- */
-QToolBar {
-    background-color: #e6e6e6;
-    border: none;
-    spacing: 5px;
-}
-
-QStackedWidget {
-	background-color: #f0f0f0;
-	border: 0.5px solid #e0e0e0;
-    padding: 5px;
-}
-
-QFrame {
-	background-color: #f0f0f0;
-	border: 1px solid #c0c0c0;
-    padding: 10px;
-    border-radius: 2px;
-}
-
-/* --- SIDEBAR &amp; TOOL BUTTONS (Left Panel) --- */
-/* The main sidebar area */
-QDockWidget {
-    background-color: #ffffff; /* White background */
-    border: none;
-}
-QDockWidget::title {
-    padding: 5px;
-    background-color: #f0f0f0;
-}
-
-/* Tool Buttons in the sidebar */
-QPushButton {
-    /* Base style for all buttons */
-    background-color: #e0e0e0;
-    border: 1px solid #cccccc;
-    color: #1e1e1e;
-    padding: 10px 15px;
-    border-radius: 4px;
-    min-height: 25px;
-}
-
-/* Hover and Click effects for buttons */
-QPushButton:hover {
-    background-color: #d4d4d4;
-}
-/* Selected tool/active state in sidebar */
-QPushButton:checked, QPushButton:pressed {
-    background-color: #0078d4; /* Accent color - Royal Blue */
-    border-color: #0078d4;
-    color: #ffffff; /* White text on accent */
-}
-
-/* Specific styling for the large &quot;Upload Image&quot; button */
-QPushButton#UploadButton { 
-    background-color: #009688; /* Teal accent */
-    border-color: #009688;
-    color: #ffffff; /* White text for high visibility */
-    font-weight: bold;
-    padding: 10px 20px;
-}
-QPushButton#UploadButton:hover {
-    background-color: #00bfa5;
-}
-
-/* --- MAIN VIEWER &amp; STATUS BAR (Viewport and Footer) --- */
-/* Central widget where the image is displayed */
-QGraphicsView, QLabel#originalImagePreview {
-    background-color: #e6e6e6; /* Light gray for viewing area */
-    border: 1px dashed #cccccc; /* Light border for the drag and drop box */
-}
-
-/* Footer Bar/Status Bar */
-QStatusBar {
-    background-color: #e6e6e6;
-    color: #555555;
-    border-top: 1px solid #cccccc;
-    padding: 3px;
-}
-
-/* --- SETTINGS PANEL (Right Collapsible Panel) --- */
-/* Assuming the right panel uses QWidget or QScrollArea */
-QScrollArea, QWidget#SettingsPanel {
-    background-color: #ffffff; /* White background */
-    border: none;
-    padding: 10px;
-}
-
+/* --- LABELS --- */
 QLabel {
-    color: #1e1e1e;
-	border: none;
-    padding: 5px 0;
+    color: #4a5568;
+    padding: 2px 0;
 }
 
-/* --- INPUTS (Sliders, Text Fields, Checkboxes) --- */
-QLineEdit {
-    background-color: #ffffff;
-    border: 1px solid #cccccc;
-    padding: 5px;
-    border-radius: 3px;
-    color: #1e1e1e;
+#fileMgtLabel, #processingToolsLabel {
+    font-weight: 700;
+    color: #2d3748;
+    font-size: 12pt;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #4299e1;
+    margin-bottom: 8px;
 }
 
-/* Sliders (e.g., Confidence, Noise Reduction) */
-QSlider::groove:horizontal {
-    border: 1px solid #cccccc;
-    height: 8px; /* height of the groove */
-    background: #e0e0e0;
-    margin: 2px 0;
-    border-radius: 4px;
-}
-QSlider::handle:horizontal {
-    background: #0078d4; /* Accent color */
-    border: 1px solid #0078d4;
-    width: 12px;
-    margin: -3px 0; /* center the handle vertically */
-    border-radius: 6px;
+#dimsLabel, #imageDimensionsLabel, #processedDimsLabel, #processedDimensionsLabel {
+    font-size: 9pt;
+    color: #718096;
+    font-weight: 500;
 }
 
-/* Radio Buttons and Checkboxes */
-QRadioButton::indicator, QCheckBox::indicator {
-    width: 13px;
-    height: 13px;
-    border: 1px solid #999999;
-    background-color: #ffffff;
-}
-QRadioButton::indicator:checked, QCheckBox::indicator:checked {
-    background-color: #0078d4; /* Checked state accent */
-    border: 1px solid #0078d4;
+#timingLabel {
+    font-size: 9pt;
+    color: #718096;
+    font-style: italic;
+    font-weight: 500;
 }
 
-/* --- COMBO BOXES/DROPDOWNS --- */
+/* --- COMBO BOXES --- */
 QComboBox {
     background-color: #ffffff;
-    border: 1px solid #cccccc;
-    padding: 5px;
-    border-radius: 4px;
-    color: #1e1e1e;
-}
-QComboBox::drop-down {
-    subcontrol-origin: padding;
-    subcontrol-position: top right;
-    width: 15px;
+    border: 1.5px solid #e2e8f0;
+    padding: 8px 12px;
+    border-radius: 6px;
+    color: #4a5568;
+    min-height: 36px;
+    font-weight: 500;
 }
 
-/* --- GROUP BOXES (For tool organization) --- */
-QGroupBox {
-    border: 1px solid #cccccc;
-    border-radius: 5px;
-    margin-top: 1ex; /* leave space at the top for the title */
-    background-color: #fcfcfc;
+QComboBox:hover {
+    border-color: #cbd5e0;
 }
-QGroupBox::title {
-    subcontrol-origin: margin;
-    subcontrol-position: top left; 
-    padding: 0 3px;
-    color: #555555;
-    background-color: #fcfcfc;
+
+QComboBox::drop-down {
+    border: none;
+    padding-right: 8px;
+}
+
+/* --- SEPARATORS --- */
+Line {
+    background-color: #e2e8f0;
+    border: none;
+    height: 1px;
+    margin: 20px 0;
+}
+
+/* --- TOGGLE BUTTONS --- */
+QPushButton#toggleSceneBtn, QPushButton#seamsViewBtn {
+    background-color: #718096;
+    border: none;
+    color: #ffffff;
+    font-size: 9pt;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: 600;
+}
+
+QPushButton#toggleSceneBtn:hover, QPushButton#seamsViewBtn:hover {
+    background-color: #4a5568;
+}
+
+QPushButton#toggleSceneBtn:disabled, QPushButton#seamsViewBtn:disabled {
+    background-color: #cbd5e0;
+    color: #a0aec0;
+}
+
+/* --- ZOOM BUTTONS --- */
+QPushButton#zoomInButton, QPushButton#zoomOutButton {
+    background-color: #4299e1;
+    border: none;
+    color: #ffffff;
+    font-weight: bold;
+    border-radius: 4px;
+    min-width: 36px;
+}
+
+QPushButton#zoomInButton:hover, QPushButton#zoomOutButton:hover {
+    background-color: #3182ce;
 }
 
 /* --- MENU BAR --- */
 QMenuBar {
-    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                                stop:0 #ffffff, stop:1 #f8f9fa);
-    border-bottom: 1px solid #dee2e6;
-    padding: 2px;
+    background-color: #2d3748;
+    color: #ffffff;
+    padding: 4px;
+    font-weight: 500;
 }
 
 QMenuBar::item {
-    padding: 4px 8px;
-    background: transparent;
-    border-radius: 3px;
+    padding: 6px 12px;
+    border-radius: 4px;
 }
 
 QMenuBar::item:selected {
-    background-color: #007bff;
-    color: #ffffff;
+    background-color: #4a5568;
 }
 
 QMenu {
     background-color: #ffffff;
-    border: 1px solid #dee2e6;
-    border-radius: 4px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
     padding: 4px;
 }
 
 QMenu::item {
-    padding: 6px 20px;
-    border-radius: 3px;
+    padding: 8px 24px 8px 16px;
+    border-radius: 4px;
 }
 
 QMenu::item:selected {
-    background-color: #007bff;
-    color: #ffffff;
+    background-color: #ebf8ff;
+    color: #2d3748;
 }
 
-/* --- SEPARATOR LINES --- */
-Line {
-    background-color: #dee2e6;
-    border: none;
-    height: 1px;
-    margin: 8px 0;
-}
-
-/* --- SPACERS AND LAYOUT ENHANCEMENTS --- */
-QSpacer {
-    background: transparent;
-}
-
-/* --- SCROLL AREAS --- */
-QScrollArea {
-    border: 1px solid #e9ecef;
-    border-radius: 6px;
-    background-color: #ffffff;
-}
-
+/* --- SCROLLBARS --- */
 QScrollBar:vertical {
+    background: #f7fafc;
+    width: 10px;
+    border-radius: 5px;
     border: none;
-    background: #f8f9fa;
-    width: 12px;
-    margin: 0px;
-    border-radius: 6px;
 }
 
 QScrollBar::handle:vertical {
-    background: #adb5bd;
-    border-radius: 6px;
+    background: #cbd5e0;
+    border-radius: 5px;
     min-height: 20px;
+    margin: 2px;
 }
 
 QScrollBar::handle:vertical:hover {
-    background: #6c757d;
+    background: #a0aec0;
 }
 
-/* --- SPECIFIC WIDGET STATES --- */
-QPushButton:disabled {
-    background-color: #e9ecef;
-    color: #6c757d;
-    border-color: #ced4da;
-}
-
-QLineEdit:disabled {
-    background-color: #f8f9fa;
-    color: #6c757d;
-    border-color: #e9ecef;
-}
-
-#fileMgtLabel, #processingToolsLabel {
-    font-weight: 600;
-    padding: 5px 0;
-}
-
-#dimsLabel, #imageDimensionsLabel, #processedDimsLabel, #processedDimensionsLabel {
-    font-size: 7.5pt;
-    padding: 2px;
-    color: #6c757d;
-    background-color: #f8f9fa;
-    border-radius: 1px;
-}
-
-#statusLabel {
-    font-weight: 600;
-    color: #495057;
-    background-color: #e9ecef;
-    border: 1px solid #dee2e6;
-}
-
-
-
-</string>
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+    border: none;
+    background: none;
+}</string>
   </property>
   <property name="toolButtonStyle">
    <enum>Qt::ToolButtonTextBesideIcon</enum>
@@ -318,130 +265,74 @@ QLineEdit:disabled {
    <layout class="QGridLayout" name="gridLayout">
     <item row="0" column="0">
      <layout class="QVBoxLayout" name="verticalLayout_5">
-      <property name="leftMargin">
+      <property name="spacing">
        <number>12</number>
+      </property>
+      <property name="leftMargin">
+       <number>16</number>
       </property>
       <property name="topMargin">
-       <number>12</number>
+       <number>16</number>
       </property>
       <property name="rightMargin">
-       <number>12</number>
+       <number>16</number>
       </property>
       <property name="bottomMargin">
-       <number>12</number>
+       <number>16</number>
       </property>
       <item>
        <widget class="QFrame" name="horizontalFrame">
         <layout class="QHBoxLayout" name="horizontalLayout">
+         <property name="spacing">
+          <number>16</number>
+         </property>
          <property name="leftMargin">
-          <number>10</number>
+          <number>8</number>
          </property>
          <property name="topMargin">
-          <number>10</number>
+          <number>8</number>
          </property>
          <property name="rightMargin">
-          <number>10</number>
+          <number>8</number>
          </property>
          <property name="bottomMargin">
-          <number>10</number>
+          <number>8</number>
          </property>
          <item>
           <layout class="QVBoxLayout" name="verticalLayout">
-           <property name="leftMargin">
-            <number>5</number>
-           </property>
-           <property name="topMargin">
-            <number>5</number>
-           </property>
-           <property name="rightMargin">
-            <number>5</number>
-           </property>
-           <property name="bottomMargin">
-            <number>5</number>
+           <property name="spacing">
+            <number>10</number>
            </property>
            <item>
-            <layout class="QVBoxLayout" name="verticalLayout_2">
-             <property name="leftMargin">
-              <number>5</number>
+            <widget class="QLabel" name="fileMgtLabel">
+             <property name="text">
+              <string>File Management</string>
              </property>
-             <property name="topMargin">
-              <number>5</number>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="UploadButton">
+             <property name="text">
+              <string>Upload Image</string>
              </property>
-             <property name="rightMargin">
-              <number>5</number>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="save_as_pushButton">
+             <property name="text">
+              <string>Save Processed</string>
              </property>
-             <property name="bottomMargin">
-              <number>5</number>
-             </property>
-             <item>
-              <widget class="QLabel" name="fileMgtLabel">
-               <property name="text">
-                <string>File Management</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPushButton" name="UploadButton">
-               <property name="text">
-                <string>Upload Image</string>
-               </property>
-               <property name="icon">
-                <iconset resource="../resources/resources.qrc">
-                 <normaloff>:/icons/icons/upload.svg</normaloff>:/icons/icons/upload.svg</iconset>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPushButton" name="pushButton">
-               <property name="text">
-                <string>Recent Files</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <layout class="QHBoxLayout" name="horizontalLayout_2">
-               <property name="leftMargin">
-                <number>0</number>
-               </property>
-               <property name="topMargin">
-                <number>5</number>
-               </property>
-               <property name="rightMargin">
-                <number>0</number>
-               </property>
-               <property name="bottomMargin">
-                <number>5</number>
-               </property>
-               <item>
-                <widget class="QPushButton" name="save_pushButton">
-                 <property name="text">
-                  <string>Save</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QPushButton" name="save_as_pushButton">
-                 <property name="text">
-                  <string>Save As</string>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </item>
-            </layout>
+            </widget>
            </item>
            <item>
             <spacer name="verticalSpacer_3">
              <property name="orientation">
               <enum>Qt::Vertical</enum>
              </property>
-             <property name="sizeType">
-              <enum>QSizePolicy::Preferred</enum>
-             </property>
              <property name="sizeHint" stdset="0">
               <size>
                <width>20</width>
-               <height>40</height>
+               <height>30</height>
               </size>
              </property>
             </spacer>
@@ -461,60 +352,41 @@ QLineEdit:disabled {
              <property name="orientation">
               <enum>Qt::Vertical</enum>
              </property>
-             <property name="sizeType">
-              <enum>QSizePolicy::Preferred</enum>
-             </property>
              <property name="sizeHint" stdset="0">
               <size>
                <width>20</width>
-               <height>40</height>
+               <height>20</height>
               </size>
              </property>
             </spacer>
            </item>
            <item>
-            <layout class="QVBoxLayout" name="verticalLayout_3">
-             <property name="leftMargin">
-              <number>5</number>
+            <widget class="QLabel" name="processingToolsLabel">
+             <property name="text">
+              <string>Processing Tools</string>
              </property>
-             <property name="topMargin">
-              <number>5</number>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="resizeBtn">
+             <property name="text">
+              <string>Image Resizing</string>
              </property>
-             <property name="rightMargin">
-              <number>5</number>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="obj_detectionBtn">
+             <property name="text">
+              <string>Object Detection</string>
              </property>
-             <property name="bottomMargin">
-              <number>5</number>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="filtersBtn">
+             <property name="text">
+              <string>Filters</string>
              </property>
-             <item>
-              <widget class="QLabel" name="processingToolsLabel">
-               <property name="text">
-                <string>Processing Tools</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPushButton" name="resizeBtn">
-               <property name="text">
-                <string>Image Resizing</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPushButton" name="obj_detectionBtn">
-               <property name="text">
-                <string>Object Detection</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPushButton" name="filtersBtn">
-               <property name="text">
-                <string>Filters/Enhancements</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
+            </widget>
            </item>
            <item>
             <spacer name="verticalSpacer_2">
@@ -533,18 +405,27 @@ QLineEdit:disabled {
          </item>
          <item>
           <widget class="QFrame" name="verticalFrame_4">
+           <property name="minimumSize">
+            <size>
+             <width>900</width>
+             <height>0</height>
+            </size>
+           </property>
            <layout class="QVBoxLayout" name="verticalLayout_4">
+            <property name="spacing">
+             <number>12</number>
+            </property>
             <property name="leftMargin">
-             <number>2</number>
+             <number>12</number>
             </property>
             <property name="topMargin">
-             <number>2</number>
+             <number>12</number>
             </property>
             <property name="rightMargin">
-             <number>2</number>
+             <number>12</number>
             </property>
             <property name="bottomMargin">
-             <number>2</number>
+             <number>12</number>
             </property>
             <item>
              <widget class="QStackedWidget" name="stackedWidget">
@@ -555,69 +436,22 @@ QLineEdit:disabled {
                </sizepolicy>
               </property>
               <property name="currentIndex">
-               <number>1</number>
+               <number>0</number>
               </property>
-              <widget class="QWidget" name="processed_image_page">
-               <layout class="QGridLayout" name="gridLayout_4">
-                <item row="0" column="0">
-                 <widget class="QGraphicsView" name="processedImageView"/>
-                </item>
-                <item row="1" column="0">
-                 <layout class="QHBoxLayout" name="horizontalLayout_7">
-                  <property name="topMargin">
-                   <number>2</number>
-                  </property>
-                  <property name="bottomMargin">
-                   <number>2</number>
-                  </property>
-                  <item>
-                   <widget class="QLabel" name="processedDimsLabel">
-                    <property name="text">
-                     <string>Processed image:</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QLabel" name="processedDimensionsLabel">
-                    <property name="text">
-                     <string/>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <spacer name="horizontalSpacer_3">
-                    <property name="orientation">
-                     <enum>Qt::Horizontal</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>40</width>
-                      <height>20</height>
-                     </size>
-                    </property>
-                   </spacer>
-                  </item>
-                 </layout>
-                </item>
-               </layout>
-              </widget>
-              <widget class="QWidget" name="original_image_page">
+              <widget class="QWidget" name="originalImagePage">
                <layout class="QGridLayout" name="gridLayout_2">
                 <item row="0" column="0">
                  <widget class="QGraphicsView" name="originalImagePreview"/>
                 </item>
                 <item row="1" column="0">
                  <layout class="QHBoxLayout" name="horizontalLayout_3">
-                  <property name="topMargin">
-                   <number>2</number>
-                  </property>
-                  <property name="bottomMargin">
-                   <number>2</number>
+                  <property name="spacing">
+                   <number>8</number>
                   </property>
                   <item>
                    <widget class="QLabel" name="dimsLabel">
                     <property name="text">
-                     <string>Original image:</string>
+                     <string>Original:</string>
                     </property>
                    </widget>
                   </item>
@@ -645,38 +479,119 @@ QLineEdit:disabled {
                 </item>
                </layout>
               </widget>
+              <widget class="QWidget" name="processedImageWithoutSeamsPage">
+               <layout class="QGridLayout" name="gridLayout_4">
+                <item row="0" column="0">
+                 <widget class="QGraphicsView" name="processedImageView"/>
+                </item>
+                <item row="1" column="0">
+                 <layout class="QHBoxLayout" name="horizontalLayout_7">
+                  <property name="spacing">
+                   <number>8</number>
+                  </property>
+                  <item>
+                   <widget class="QLabel" name="processedDimsLabel">
+                    <property name="text">
+                     <string>Processed:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="processedDimensionsLabel">
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <spacer name="horizontalSpacer_3">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="timingLabel">
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+               </layout>
+              </widget>
+              <widget class="QWidget" name="processedImageWithSeamsPage">
+               <layout class="QGridLayout" name="gridLayout_5">
+                <item row="0" column="0">
+                 <widget class="QGraphicsView" name="processedImageWithSeamsView"/>
+                </item>
+                <item row="1" column="0">
+                 <layout class="QHBoxLayout" name="horizontalLayout_9">
+                  <property name="spacing">
+                   <number>8</number>
+                  </property>
+                  <item>
+                   <widget class="QLabel" name="processedWithSeamsDimsLabel">
+                    <property name="text">
+                     <string>Processed (with seams):</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="processedWithSeamsDimensionsLabel">
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <spacer name="horizontalSpacer_4">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="seamsTimingLabel">
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+               </layout>
+              </widget>
              </widget>
             </item>
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_4">
-              <property name="leftMargin">
-               <number>5</number>
-              </property>
-              <property name="topMargin">
-               <number>5</number>
-              </property>
-              <property name="rightMargin">
-               <number>5</number>
-              </property>
-              <property name="bottomMargin">
-               <number>5</number>
+              <property name="spacing">
+               <number>16</number>
               </property>
               <item>
                <layout class="QHBoxLayout" name="horizontalLayout_5">
-                <property name="leftMargin">
-                 <number>4</number>
-                </property>
-                <property name="topMargin">
-                 <number>4</number>
-                </property>
-                <property name="rightMargin">
-                 <number>4</number>
-                </property>
-                <property name="bottomMargin">
-                 <number>4</number>
+                <property name="spacing">
+                 <number>8</number>
                 </property>
                 <item>
                  <widget class="QLabel" name="label_3">
+                  <property name="styleSheet">
+                   <string notr="true">font-weight: 600;</string>
+                  </property>
                   <property name="text">
                    <string>Zoom:</string>
                   </property>
@@ -684,37 +599,19 @@ QLineEdit:disabled {
                 </item>
                 <item>
                  <widget class="QComboBox" name="selectStandardZoomComboBox">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
                   <property name="minimumSize">
                    <size>
-                    <width>100</width>
-                    <height>0</height>
-                   </size>
-                  </property>
-                  <property name="maximumSize">
-                   <size>
-                    <width>16777215</width>
-                    <height>16777215</height>
+                    <width>140</width>
+                    <height>56</height>
                    </size>
                   </property>
                  </widget>
                 </item>
                 <item>
                  <widget class="QPushButton" name="zoomInButton">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
                   <property name="maximumSize">
                    <size>
-                    <width>16777215</width>
+                    <width>40</width>
                     <height>16777215</height>
                    </size>
                   </property>
@@ -725,15 +622,9 @@ QLineEdit:disabled {
                 </item>
                 <item>
                  <widget class="QPushButton" name="zoomOutButton">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
                   <property name="maximumSize">
                    <size>
-                    <width>16777215</width>
+                    <width>40</width>
                     <height>16777215</height>
                    </size>
                   </property>
@@ -759,38 +650,33 @@ QLineEdit:disabled {
               </item>
               <item>
                <layout class="QHBoxLayout" name="horizontalLayout_8">
-                <property name="leftMargin">
-                 <number>4</number>
-                </property>
-                <property name="topMargin">
-                 <number>4</number>
-                </property>
-                <property name="rightMargin">
-                 <number>4</number>
-                </property>
-                <property name="bottomMargin">
-                 <number>4</number>
+                <property name="spacing">
+                 <number>10</number>
                 </property>
                 <item>
                  <widget class="QPushButton" name="toggleSceneBtn">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
                   <property name="text">
-                   <string>Image</string>
+                   <string>View Processed</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QComboBox" name="seamsModeComboBox">
+                  <property name="minimumSize">
+                   <size>
+                    <width>120</width>
+                    <height>56</height>
+                   </size>
                   </property>
                  </widget>
                 </item>
                 <item>
                  <widget class="QPushButton" name="seamsViewBtn">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="maximumSize">
-                   <size>
-                    <width>16777215</width>
-                    <height>16777215</height>
-                   </size>
+                  <property name="enabled">
+                   <bool>false</bool>
                   </property>
                   <property name="text">
                    <string>View Seams</string>
@@ -812,14 +698,14 @@ QLineEdit:disabled {
         <layout class="QGridLayout" name="gridLayout_3">
          <item row="0" column="0">
           <layout class="QHBoxLayout" name="horizontalLayout_6">
-           <property name="topMargin">
-            <number>2</number>
-           </property>
-           <property name="bottomMargin">
-            <number>2</number>
+           <property name="spacing">
+            <number>10</number>
            </property>
            <item>
             <widget class="QLabel" name="label_4">
+             <property name="styleSheet">
+              <string notr="true">font-weight: 600; color: #2d3748;</string>
+             </property>
              <property name="text">
               <string>Status:</string>
              </property>
@@ -828,7 +714,7 @@ QLineEdit:disabled {
            <item>
             <widget class="QProgressBar" name="progressBar">
              <property name="value">
-              <number>24</number>
+              <number>0</number>
              </property>
             </widget>
            </item>
@@ -846,63 +732,25 @@ QLineEdit:disabled {
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>996</width>
-     <height>31</height>
+     <width>1188</width>
+     <height>39</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
     <property name="title">
      <string>File</string>
     </property>
-    <addaction name="SettingsPanel"/>
-    <addaction name="actionSave"/>
     <addaction name="actionSave_As"/>
    </widget>
-   <widget class="QMenu" name="menuView">
-    <property name="title">
-     <string>View</string>
-    </property>
-    <widget class="QMenu" name="menuTheme">
-     <property name="title">
-      <string>Theme</string>
-     </property>
-     <addaction name="actionDark"/>
-     <addaction name="actionLight"/>
-    </widget>
-    <addaction name="menuTheme"/>
-   </widget>
    <addaction name="menuFile"/>
-   <addaction name="menuView"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
-  <action name="SettingsPanel">
-   <property name="text">
-    <string>Open...</string>
-   </property>
-  </action>
-  <action name="actionSave">
-   <property name="text">
-    <string>Save</string>
-   </property>
-  </action>
   <action name="actionSave_As">
    <property name="text">
     <string>Save As...</string>
    </property>
   </action>
-  <action name="actionDark">
-   <property name="text">
-    <string>Dark</string>
-   </property>
-  </action>
-  <action name="actionLight">
-   <property name="text">
-    <string>Light</string>
-   </property>
-  </action>
  </widget>
- <resources>
-  <include location="../resources/resources.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

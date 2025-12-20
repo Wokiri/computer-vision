@@ -1,26 +1,25 @@
+"""
+views/widgets.py
+Widgets for ImageLab main window and tools
+"""
+
 from typing import Dict, Union
 from PyQt5 import QtWidgets, QtCore, QtGui
-from uidesigns.main_window_gui import Ui_ImageLab
+import cv2
+
 from uidesigns.filters_tools_gui import Ui_FiltersTool
-from uidesigns.resize_tools_gui import Ui_ResizeTool
+from uidesigns.main_window_gui import Ui_ImageLab
 from uidesigns.object_detection_tools_gui import Ui_ObjectDetectionTool
-
-
-# from PyQt5.QtGui import QRegExpValidator
-# from PyQt5.QtCore import QRegExp
-
-# # Only positive integers (no leading zeros)
-# regex = QRegExp("^[1-9][0-9]*$")
-# validator = QRegExpValidator(regex)
-# self.resize_widget.ui.width_resize_lineEdit.setValidator(validator)
-
-
-from PyQt5 import QtWidgets, QtGui, QtCore
-from typing import Union
+from uidesigns.resize_tools_gui import Ui_ResizeTool
 
 class ImageLabMainWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
+        
+        # Initialize image states BEFORE calling UI setup
+        self.original_pixmap = None
+        self.processed_pixmap = None
+        self.seams_pixmap = None
 
         self.ui = Ui_ImageLab()
         self.ui.setupUi(self)
@@ -29,10 +28,13 @@ class ImageLabMainWindow(QtWidgets.QMainWindow):
 
     def initialize_ui(self):
         """Initialize UI settings for QGraphicsView and zoom controls"""
-
         self.ui.progressBar.setVisible(False)
         self.ui.progressBar.setValue(0)
-
+        
+        # Initialize timing labels
+        self.ui.timingLabel.setText("")
+        self.ui.seamsTimingLabel.setText("")
+        
         # Define aspect ratio presets
         self.aspect_ratios: Dict[str, Union[float, None]] = {
             "Original": None,
@@ -50,60 +52,82 @@ class ImageLabMainWindow(QtWidgets.QMainWindow):
         self.original_scene = QtWidgets.QGraphicsScene()
         self.ui.originalImagePreview.setScene(self.original_scene)
         
-        # Set up the QGraphicsView and QGraphicsScene for processed image
+        # Set up the QGraphicsView and QGraphicsScene for processed image without seams
         self.processed_scene = QtWidgets.QGraphicsScene()
         self.ui.processedImageView.setScene(self.processed_scene)
+        
+        # Set up the QGraphicsView and QGraphicsScene for processed image with seams
+        self.processed_with_seams_scene = QtWidgets.QGraphicsScene()
+        self.ui.processedImageWithSeamsView.setScene(self.processed_with_seams_scene)
 
         self.all_graphics_views = [
             self.ui.originalImagePreview,
-            self.ui.processedImageView
+            self.ui.processedImageView,
+            self.ui.processedImageWithSeamsView
         ]
         
-        # Set view properties for both views
+        # Set view properties for all views
         for view in self.all_graphics_views:
             view.setRenderHint(QtGui.QPainter.Antialiasing)
             view.setRenderHint(QtGui.QPainter.SmoothPixmapTransform)
             view.setDragMode(QtWidgets.QGraphicsView.ScrollHandDrag)
             view.setAlignment(QtCore.Qt.AlignCenter)
-            view.setBackgroundBrush(QtGui.QBrush(QtGui.QColor(240, 240, 240)))
+            view.setBackgroundBrush(QtGui.QBrush(QtGui.QColor(248, 250, 252)))
         
         # Initialize zoom combo box
         self.initialize_zoom_combo_box()
         
+        # Initialize seams mode combo box
+        self.initialize_seams_mode_combo_box()
+        
         # Connect the toggle scene button
         self.ui.toggleSceneBtn.clicked.connect(self.toggle_scene)
+        
+        # Connect the seams view button
+        self.ui.seamsViewBtn.clicked.connect(self.toggle_seams_view)
+        
+        # Connect seams mode combo box
+        self.ui.seamsModeComboBox.currentTextChanged.connect(self.on_seams_mode_changed)
         
         # Add placeholder text
         self.show_placeholder_text()
         
-        # Start with processed image view
-        self.current_scene_index = 1  # 0 for processed, 1 for original
-        self.ui.stackedWidget.setCurrentIndex(self.current_scene_index)
+        # Start with original image view (Page 0)
+        self.current_page_index = 0  # 0=original, 1=processedWithoutSeams, 2=processedWithSeams
+        self.ui.stackedWidget.setCurrentIndex(self.current_page_index)
+        
+        # Initialize seam viewing state
+        self.seams_view_active = False
+        self.current_seams_mode = "All Seams"  # Default to all seams
+        self.seam_visualizations = None
+        
+        # Initialize button states - all disabled initially
+        self.ui.toggleSceneBtn.setEnabled(False)
+        self.ui.seamsViewBtn.setEnabled(False)
+        self.ui.seamsModeComboBox.setVisible(False)
+        
+        # Update UI state
         self.update_toggle_button_text()
 
     @property
     def current_scene(self) -> QtWidgets.QGraphicsScene:
-        """Get the current active scene based on current_scene_index"""
-        if self.current_scene_index == 0:  # Processed image view
-            return self.processed_scene
-        else:  # Original image view
+        """Get the current active scene based on current_page_index"""
+        if self.current_page_index == 0:  # Original image
             return self.original_scene
+        elif self.current_page_index == 1:  # Processed image without seams
+            return self.processed_scene
+        else:  # Processed image with seams (page index 2)
+            return self.processed_with_seams_scene
 
     @property
     def current_graphics_view(self) -> QtWidgets.QGraphicsView:
-        """Get the current active graphics view based on current_scene_index"""
-        if self.current_scene_index == 0:  # Processed image view
-            return self.ui.processedImageView
-        else:  # Original image view
+        """Get the current active graphics view based on current_page_index"""
+        if self.current_page_index == 0:  # Original image
             return self.ui.originalImagePreview
-
-    @property
-    def current_dimensions_label(self) -> QtWidgets.QLabel:
-        """Get the current dimensions label based on current_scene_index"""
-        if self.current_scene_index == 0:  # Processed image view
-            return self.ui.processedDimensionsLabel
-        else:  # Original image view
-            return self.ui.imageDimensionsLabel
+        elif self.current_page_index == 1:  # Processed image without seams
+            return self.ui.processedImageView
+        else:  # Processed image with seams (page index 2)
+            return self.ui.processedImageWithSeamsView
 
     def initialize_zoom_combo_box(self):
         """Initialize the zoom combo box with standard options"""
@@ -118,63 +142,252 @@ class ImageLabMainWindow(QtWidgets.QMainWindow):
             "150%",
             "200%",
             "300%",
-            "400%",
-            "Custom..."
+            "400%"
         ]
         
         self.ui.selectStandardZoomComboBox.clear()
         self.ui.selectStandardZoomComboBox.addItems(zoom_options)
         self.ui.selectStandardZoomComboBox.setCurrentText("Fit to View")
 
+    def initialize_seams_mode_combo_box(self):
+        """Initialize the seams mode combo box"""
+        self.ui.seamsModeComboBox.clear()
+        self.ui.seamsModeComboBox.addItems(["All Seams", "Added Seams", "Removed Seams"])
+
     def show_placeholder_text(self):
-        """Show placeholder text in both graphics views"""
+        """Show placeholder text in all graphics views"""
+        font = QtGui.QFont()
+        font.setPointSize(12)
+        
         # Original image view
         self.original_scene.clear()
-        original_text_item = self.original_scene.addText("No Original Image Selected")
-        original_text_item.setDefaultTextColor(QtGui.QColor(100, 100, 100))
-        font = original_text_item.font()
-        font.setPointSize(14)
+        original_text_item = self.original_scene.addText("Upload or drag image here")
+        original_text_item.setDefaultTextColor(QtGui.QColor(108, 117, 125))
         original_text_item.setFont(font)
         
-        # Processed image view
+        # Processed image view without seams
         self.processed_scene.clear()
-        processed_text_item = self.processed_scene.addText("No Processed Image Available")
-        processed_text_item.setDefaultTextColor(QtGui.QColor(100, 100, 100))
+        processed_text_item = self.processed_scene.addText("Processed image will appear here")
+        processed_text_item.setDefaultTextColor(QtGui.QColor(108, 117, 125))
         processed_text_item.setFont(font)
+        
+        # Processed image view with seams
+        self.processed_with_seams_scene.clear()
+        seams_text_item = self.processed_with_seams_scene.addText("Seams visualization will appear here")
+        seams_text_item.setDefaultTextColor(QtGui.QColor(108, 117, 125))
+        seams_text_item.setFont(font)
         
         # Center the content
         self.center_content()
 
     def center_content(self):
-        """Center the content in both graphics views"""
-        self.ui.originalImagePreview.fitInView(self.original_scene.itemsBoundingRect(), QtCore.Qt.KeepAspectRatio)
-        self.ui.processedImageView.fitInView(self.processed_scene.itemsBoundingRect(), QtCore.Qt.KeepAspectRatio)
+        """Center the content in all graphics views"""
+        for view, scene in [(self.ui.originalImagePreview, self.original_scene),
+                           (self.ui.processedImageView, self.processed_scene),
+                           (self.ui.processedImageWithSeamsView, self.processed_with_seams_scene)]:
+            if scene.items():
+                view.fitInView(scene.itemsBoundingRect(), QtCore.Qt.KeepAspectRatio)
 
     def toggle_scene(self):
         """Toggle between original and processed image views"""
-        # Toggle between 0 (processed) and 1 (original)
-        self.current_scene_index = 1 - self.current_scene_index
-        self.ui.stackedWidget.setCurrentIndex(self.current_scene_index)
+        if not self.has_processed_image():
+            return
+            
+        # If currently showing processed image with seams, switch to processed without seams first
+        if self.current_page_index == 2:  # processed with seams
+            self.ui.stackedWidget.setCurrentIndex(1)  # processed without seams (Page 1)
+            self.current_page_index = 1
+            self.seams_view_active = False
+            self.ui.seamsViewBtn.setText("View Seams")
+            self.ui.seamsModeComboBox.setVisible(False)
+            
+        # Toggle between original (0) and processed without seams (1)
+        elif self.current_page_index == 0:  # Currently showing original
+            self.ui.stackedWidget.setCurrentIndex(1)  # Switch to processed without seams
+            self.current_page_index = 1
+            # Show seam controls if available
+            has_seams = self.seam_visualizations is not None
+            self.ui.seamsViewBtn.setVisible(has_seams)
+            self.ui.seamsModeComboBox.setVisible(False)  # Hide in processed without seams view
+            
+        else:  # Currently showing processed without seams (page index 1)
+            self.ui.stackedWidget.setCurrentIndex(0)  # Switch to original
+            self.current_page_index = 0
+            # Hide seam controls when viewing original
+            self.ui.seamsViewBtn.setVisible(False)
+            self.ui.seamsModeComboBox.setVisible(False)
+        
         self.update_toggle_button_text()
+
+    def toggle_seams_view(self):
+        """Toggle seam visualization on/off for processed image"""
+        if not self.has_processed_image() or self.seam_visualizations is None:
+            return
+        
+        # Only allow seam viewing when in processed image view (page 1)
+        if self.current_page_index != 1:
+            return
+            
+        self.seams_view_active = not self.seams_view_active
+        
+        if self.seams_view_active:
+            # Turn ON seam view - switch to processed with seams page
+            self.ui.stackedWidget.setCurrentIndex(2)  # processedImageWithSeamsPage (Page 2)
+            self.current_page_index = 2
+            self.ui.seamsViewBtn.setText("Hide Seams")
+            self.ui.seamsModeComboBox.setVisible(True)
+            self.show_processed_with_seams()
+        else:
+            # Turn OFF seam view - switch back to processed without seams page
+            self.ui.stackedWidget.setCurrentIndex(1)  # processedImageWithoutSeamsPage (Page 1)
+            self.current_page_index = 1
+            self.ui.seamsViewBtn.setText("View Seams")
+            self.ui.seamsModeComboBox.setVisible(False)
+            self.show_processed_normal()
+        
+        self.update_toggle_button_text()
+
+    def on_seams_mode_changed(self, mode_text):
+        """Handle seam view mode change"""
+        if not self.has_processed_image() or not self.seams_view_active or self.seam_visualizations is None:
+            return
+        
+        self.current_seams_mode = mode_text
+        self.show_processed_with_seams()
+
+    def show_processed_normal(self):
+        """Show processed image without seams (blended naturally)"""
+        if self.processed_pixmap is not None:
+            self.display_processed_image(self.processed_pixmap)
+
+    def show_processed_with_seams(self):
+        """Show processed image with seams based on current mode"""
+        if self.seam_visualizations is None or not self.has_processed_image():
+            return
+        
+        if self.current_seams_mode == "All Seams":
+            self.show_all_seams()
+        elif self.current_seams_mode == "Added Seams":
+            self.show_added_seams()
+        else:  # "Removed Seams"
+            self.show_removed_seams()
+
+    def show_all_seams(self):
+        """Show processed image with ALL seams highlighted"""
+        if self.seam_visualizations is not None and 'all' in self.seam_visualizations:
+            seams_img = self.seam_visualizations['all']
+            if seams_img is not None:
+                q_image = self.convert_cv_to_qimage(seams_img)
+                if q_image:
+                    pixmap = QtGui.QPixmap.fromImage(q_image)
+                    self.display_processed_with_seams_image(pixmap)
+
+    def show_removed_seams(self):
+        """Show processed image with removed seams highlighted"""
+        if self.seam_visualizations is not None and 'removed' in self.seam_visualizations:
+            seams_img = self.seam_visualizations['removed']
+            if seams_img is not None:
+                q_image = self.convert_cv_to_qimage(seams_img)
+                if q_image:
+                    pixmap = QtGui.QPixmap.fromImage(q_image)
+                    self.display_processed_with_seams_image(pixmap)
+
+    def show_added_seams(self):
+        """Show processed image with added seams highlighted"""
+        if self.seam_visualizations is not None and 'added' in self.seam_visualizations:
+            seams_img = self.seam_visualizations['added']
+            if seams_img is not None:
+                q_image = self.convert_cv_to_qimage(seams_img)
+                if q_image:
+                    pixmap = QtGui.QPixmap.fromImage(q_image)
+                    self.display_processed_with_seams_image(pixmap)
+
+    def show_original_normal(self):
+        """Show original image without seams"""
+        if self.original_pixmap is not None:
+            self.display_original_image(self.original_pixmap)
 
     def update_toggle_button_text(self):
-        """Update the toggle button text based on current scene"""
-        if self.current_scene_index == 0:  # Currently showing processed image
-            self.ui.toggleSceneBtn.setText("View Original")
-        else:  # Currently showing original image
+        """Update the toggle button text based on current page"""
+        if self.current_page_index == 0:  # Currently showing original
             self.ui.toggleSceneBtn.setText("View Processed")
+        elif self.current_page_index == 1:  # Currently showing processed without seams
+            self.ui.toggleSceneBtn.setText("View Original")
+        else:  # Currently showing processed with seams (page 2)
+            self.ui.toggleSceneBtn.setText("View Original")
+
+    def update_button_states(self):
+        """Update button states based on current state"""
+        has_processed = self.has_processed_image()
+        
+        # Toggle button enabled only if we have processed image
+        self.ui.toggleSceneBtn.setEnabled(has_processed)
+        
+        # Seams view button enabled only if we have processed image AND seam visualizations
+        has_seams = self.seam_visualizations is not None
+        self.ui.seamsViewBtn.setEnabled(has_processed and has_seams)
+        
+        # Show seams button only when in processed pages (1 or 2)
+        in_processed_page = self.current_page_index in [1, 2]
+        self.ui.seamsViewBtn.setVisible(in_processed_page and has_seams)
+        
+        # Show seams mode combo box only when viewing seams (page 2)
+        self.ui.seamsModeComboBox.setVisible(self.current_page_index == 2)
 
     def show_original_image_page(self):
-        """Switch to original image view when button is pressed"""
-        self.ui.stackedWidget.setCurrentIndex(1)  # original_image_page
-        self.current_scene_index = 1
+        """Switch to original image view"""
+        self.ui.stackedWidget.setCurrentIndex(0)  # originalImagePage (Page 0)
+        self.current_page_index = 0
+        
+        # Hide seam controls when viewing original
+        self.ui.seamsViewBtn.setVisible(False)
+        self.ui.seamsModeComboBox.setVisible(False)
+        self.seams_view_active = False
+        self.ui.seamsViewBtn.setText("View Seams")
+        
+        # Show original image normally
+        self.show_original_normal()
+        
+        # Update button states
         self.update_toggle_button_text()
+        self.update_button_states()
 
     def show_processed_image_page(self):
-        """Switch to processed image view when button is released"""
-        self.ui.stackedWidget.setCurrentIndex(0)  # processed_image_page
-        self.current_scene_index = 0
+        """Switch to processed image view without seams"""
+        self.ui.stackedWidget.setCurrentIndex(1)  # processedImageWithoutSeamsPage (Page 1)
+        self.current_page_index = 1
+        
+        # Show seam controls if available
+        has_seams = self.seam_visualizations is not None
+        self.ui.seamsViewBtn.setVisible(has_seams)
+        self.ui.seamsModeComboBox.setVisible(False)  # Hidden in processed without seams view
+        self.seams_view_active = False
+        self.ui.seamsViewBtn.setText("View Seams")
+        
+        # Show processed image without seams
+        self.show_processed_normal()
+        
+        # Update button states
         self.update_toggle_button_text()
+        self.update_button_states()
+
+    def show_processed_with_seams_page(self):
+        """Switch to processed image view with seams"""
+        self.ui.stackedWidget.setCurrentIndex(2)  # processedImageWithSeamsPage (Page 2)
+        self.current_page_index = 2
+        
+        # Show seam controls
+        self.ui.seamsViewBtn.setVisible(True)
+        self.ui.seamsModeComboBox.setVisible(True)
+        self.seams_view_active = True
+        self.ui.seamsViewBtn.setText("Hide Seams")
+        
+        # Show appropriate seam visualization
+        self.show_processed_with_seams()
+        
+        # Update button states
+        self.update_toggle_button_text()
+        self.update_button_states()
 
     def display_original_image(self, pixmap: Union[QtGui.QPixmap, None]):
         """Load and display original image"""
@@ -185,35 +398,185 @@ class ImageLabMainWindow(QtWidgets.QMainWindow):
             if original_pixmap_item:
                 self.original_scene.setSceneRect(original_pixmap_item.boundingRect())
             self.ui.originalImagePreview.fitInView(self.original_scene.itemsBoundingRect(), QtCore.Qt.KeepAspectRatio)
+            
+            # Store the pixmap
+            self.original_pixmap = pixmap
+            
+            # Switch to original image page (Page 0)
+            self.current_page_index = 0
+            self.ui.stackedWidget.setCurrentIndex(self.current_page_index)
+            
+            # Update button states
+            self.update_toggle_button_text()
+            self.update_button_states()
 
     def display_processed_image(self, pixmap: Union[QtGui.QPixmap, None]):
-        """Load and display processed image"""
+        """Load and display processed image without seams"""
         if pixmap and not pixmap.isNull():
             self.processed_scene.clear()
             processed_pixmap_item = self.processed_scene.addPixmap(pixmap)
 
             if processed_pixmap_item:
                 self.processed_scene.setSceneRect(processed_pixmap_item.boundingRect())
-
             self.ui.processedImageView.fitInView(self.processed_scene.sceneRect(), QtCore.Qt.KeepAspectRatio)
+            
+            # Store the pixmap
+            self.processed_pixmap = pixmap
+            
+            # Switch to processed image page (Page 1)
+            self.current_page_index = 1
+            self.ui.stackedWidget.setCurrentIndex(self.current_page_index)
+            
+            # Update button states
+            self.update_toggle_button_text()
+            self.update_button_states()
 
-    # Helper methods using the current_scene property
-    def clear_current_scene(self):
-        """Clear the current active scene"""
-        self.current_scene.clear()
+    def display_processed_with_seams_image(self, pixmap: Union[QtGui.QPixmap, None]):
+        """Load and display processed image with seams visualization"""
+        if pixmap and not pixmap.isNull():
+            self.processed_with_seams_scene.clear()
+            seams_pixmap_item = self.processed_with_seams_scene.addPixmap(pixmap)
 
-    def add_item_to_current_scene(self, item):
-        """Add an item to the current active scene"""
-        return self.current_scene.addItem(item)
+            if seams_pixmap_item:
+                self.processed_with_seams_scene.setSceneRect(seams_pixmap_item.boundingRect())
+            self.ui.processedImageWithSeamsView.fitInView(self.processed_with_seams_scene.sceneRect(), QtCore.Qt.KeepAspectRatio)
+            
+            # Store the seams pixmap
+            self.seams_pixmap = pixmap
 
-    def fit_current_view(self):
-        """Fit the current graphics view to scene contents"""
-        self.current_graphics_view.fitInView(self.current_scene.itemsBoundingRect(), QtCore.Qt.KeepAspectRatio)
+    def convert_cv_to_qimage(self, cv_image):
+        """Convert OpenCV image to QImage"""
+        if cv_image is None:
+            return None
+            
+        try:
+            # Convert BGR to RGB for color images
+            if len(cv_image.shape) == 3 and cv_image.shape[2] == 3:
+                rgb_image = cv2.cvtColor(cv_image, cv2.COLOR_BGR2RGB)
+            else:
+                rgb_image = cv_image
+            
+            h, w = rgb_image.shape[:2]
+            bytes_per_line = 3 * w if len(rgb_image.shape) == 3 else w
+            
+            # Create QImage
+            if len(rgb_image.shape) == 3:
+                q_img = QtGui.QImage(rgb_image.data, w, h, bytes_per_line, QtGui.QImage.Format_RGB888)
+            else:
+                q_img = QtGui.QImage(rgb_image.data, w, h, bytes_per_line, QtGui.QImage.Format_Grayscale8)
+            
+            return q_img.copy()  # Make a copy to avoid memory issues
+        except Exception as e:
+            print(f"Error converting CV image: {e}")
+            return None
 
-    def update_current_dimensions(self, width: int, height: int):
-        """Update the dimensions label for the current view"""
-        self.current_dimensions_label.setText(f"{width} x {height}")
+    def has_processed_image(self):
+        """Check if a processed image exists"""
+        return hasattr(self, 'processed_pixmap') and self.processed_pixmap is not None
+
+    def set_seam_visualizations(self, visualizations: Dict):
+        """Set seam visualizations for viewing"""
+        if visualizations and isinstance(visualizations, dict):
+            # Store all three visualization types
+            self.seam_visualizations = {
+                'all': visualizations.get('all'),      # Combined view
+                'added': visualizations.get('added'),  # Added only
+                'removed': visualizations.get('removed') # Removed only
+            }
+            
+            # Update combo box options
+            self.ui.seamsModeComboBox.clear()
+            self.ui.seamsModeComboBox.addItems(["All Seams", "Added Seams", "Removed Seams"])
+            self.ui.seamsModeComboBox.setCurrentText("All Seams")
+            self.current_seams_mode = "All Seams"
+            
+            # Update button states
+            self.update_button_states()
+        else:
+            self.seam_visualizations = None
+            self.update_button_states()
+
+    def enable_tool_buttons(self, enabled):
+        """Enable or disable tool buttons based on image availability"""
+        self.ui.resizeBtn.setEnabled(enabled)
+        self.ui.filtersBtn.setEnabled(enabled)
+        self.ui.obj_detectionBtn.setEnabled(enabled)
         
+        # Update button states
+        self.update_button_states()
+
+    def update_timing_label(self, timing_info: Dict):
+        """Update timing display label"""
+        if timing_info and 'algorithm' in timing_info:
+            algorithm_time = timing_info['algorithm']
+            algorithm_name = timing_info.get('algorithm_name', 'Algorithm')
+            
+            # Update appropriate timing label based on current page
+            if self.current_page_index == 1:  # Processed without seams
+                self.ui.timingLabel.setText(f"{algorithm_name}: {algorithm_time:.3f}s")
+            elif self.current_page_index == 2:  # Processed with seams
+                self.ui.seamsTimingLabel.setText(f"{algorithm_name}: {algorithm_time:.3f}s")
+
+    def update_dimension_labels(self):
+        """Update dimension labels for all views"""
+        if hasattr(self, 'original_pixmap') and self.original_pixmap is not None:
+            w = self.original_pixmap.width()
+            h = self.original_pixmap.height()
+            self.ui.imageDimensionsLabel.setText(f"Width: {w} × Height: {h}")
+        
+        if hasattr(self, 'processed_pixmap') and self.processed_pixmap is not None:
+            w = self.processed_pixmap.width()
+            h = self.processed_pixmap.height()
+            self.ui.processedDimensionsLabel.setText(f"Width: {w} × Height: {h}")
+        
+        if hasattr(self, 'seams_pixmap') and self.seams_pixmap is not None:
+            w = self.seams_pixmap.width()
+            h = self.seams_pixmap.height()
+            self.ui.processedWithSeamsDimensionsLabel.setText(f"Width: {w} × Height: {h}")
+
+    def reset_processed_state(self):
+        """Reset processed image state"""
+        self.processed_pixmap = None
+        self.seams_pixmap = None
+        self.seam_visualizations = None
+        
+        # Clear processed scenes
+        self.processed_scene.clear()
+        self.processed_with_seams_scene.clear()
+        
+        # Reset seam view state
+        self.seams_view_active = False
+        self.current_seams_mode = "All Seams"
+        
+        # Update UI
+        self.ui.seamsViewBtn.setEnabled(False)
+        self.ui.seamsViewBtn.setVisible(False)
+        self.ui.seamsModeComboBox.setVisible(False)
+        self.ui.seamsViewBtn.setText("View Seams")
+        
+        # Show placeholder for processed views
+        font = QtGui.QFont()
+        font.setPointSize(12)
+        
+        processed_text_item = self.processed_scene.addText("Processed image will appear here")
+        processed_text_item.setDefaultTextColor(QtGui.QColor(108, 117, 125))
+        processed_text_item.setFont(font)
+        
+        seams_text_item = self.processed_with_seams_scene.addText("Seams visualization will appear here")
+        seams_text_item.setDefaultTextColor(QtGui.QColor(108, 117, 125))
+        seams_text_item.setFont(font)
+        
+        # Clear labels
+        self.ui.processedDimensionsLabel.setText("")
+        self.ui.processedWithSeamsDimensionsLabel.setText("")
+        self.ui.timingLabel.setText("")
+        self.ui.seamsTimingLabel.setText("")
+        
+        # Update button states
+        self.update_button_states()
+        self.update_toggle_button_text()
+
+
 
 
 class ResizeWidget(QtWidgets.QWidget):
