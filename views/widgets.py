@@ -3,14 +3,17 @@ views/widgets.py
 Widgets for ImageLab main window and tools
 """
 
-from typing import Dict, Union
+from typing import Dict, Union, Optional, Tuple, List
 from PyQt5 import QtWidgets, QtCore, QtGui
 import cv2
+import numpy as np
 
+from uidesigns.comparison_dialog import Ui_ComparisonDialog
 from uidesigns.filters_tools_gui import Ui_FiltersTool
 from uidesigns.main_window_gui import Ui_ImageLab
 from uidesigns.object_detection_tools_gui import Ui_ObjectDetectionTool
 from uidesigns.resize_tools_gui import Ui_ResizeTool
+
 
 class ImageLabMainWindow(QtWidgets.QMainWindow):
     def __init__(self):
@@ -20,9 +23,18 @@ class ImageLabMainWindow(QtWidgets.QMainWindow):
         self.original_pixmap = None
         self.processed_pixmap = None
         self.seams_pixmap = None
+        self.original_cv_image = None  # Store OpenCV format for processing
 
         self.ui = Ui_ImageLab()
         self.ui.setupUi(self)
+
+        # Add missing UI elements from updated UI
+        if hasattr(self.ui, 'compareAlgorithmsBtn'):
+            self.ui.compareAlgorithmsBtn.setVisible(True)
+        else:
+            # Create if not present in UI
+            self.ui.compareAlgorithmsBtn = QtWidgets.QPushButton("Compare Algorithms")
+            self.ui.compareAlgorithmsBtn.setObjectName("compareAlgorithmsBtn")
 
         self.initialize_ui()
 
@@ -279,7 +291,6 @@ class ImageLabMainWindow(QtWidgets.QMainWindow):
         """Show processed image with ALL seams highlighted"""
         if self.seam_visualizations is not None and 'all' in self.seam_visualizations:
             seams_img = self.seam_visualizations['all']
-            print("all seams_img", seams_img)
             if seams_img is not None:
                 q_image = self.convert_cv_to_qimage(seams_img)
                 if q_image:
@@ -290,7 +301,6 @@ class ImageLabMainWindow(QtWidgets.QMainWindow):
         """Show processed image with removed seams highlighted"""
         if self.seam_visualizations is not None and 'removed' in self.seam_visualizations:
             seams_img = self.seam_visualizations['removed']
-            print("removed seams_img", seams_img)
             if seams_img is not None:
                 q_image = self.convert_cv_to_qimage(seams_img)
                 if q_image:
@@ -301,7 +311,6 @@ class ImageLabMainWindow(QtWidgets.QMainWindow):
         """Show processed image with added seams highlighted"""
         if self.seam_visualizations is not None and 'added' in self.seam_visualizations:
             seams_img = self.seam_visualizations['added']
-            print("added seams_img", seams_img)
             if seams_img is not None:
                 q_image = self.convert_cv_to_qimage(seams_img)
                 if q_image:
@@ -705,6 +714,7 @@ class ResizeWidget(QtWidgets.QWidget):
         """Show/hide algorithm selection based on content-aware checkbox state"""
         self.ui.algorithmWidget.setVisible(checked)
 
+
 class FilterWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -750,3 +760,350 @@ class ObjectDetectionWidget(QtWidgets.QWidget):
         font = self.ui.boundinBoxPreviewCheckbox.font()
         font.setBold(self.ui.boundinBoxPreviewCheckbox.isChecked())
         self.ui.boundinBoxPreviewCheckbox.setFont(font)
+
+
+class ComparativeAnalysisDialog(QtWidgets.QDialog):
+    """Dialog for comparing Hubble 001 vs Hubble 002 algorithms"""
+    
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        
+        # Load UI if available, otherwise create dynamically
+        self.ui = Ui_ComparisonDialog()
+        self.ui.setupUi(self)
+        
+        self.setWindowTitle("Algorithm Comparison - Hubble 001 vs Hubble 002")
+        self.setMinimumSize(1000, 700)
+        
+        # Store results
+        self.comparison_results = {}
+        
+        # Connect signals
+        self.ui.closeBtn.clicked.connect(self.accept)
+        if hasattr(self.ui, 'exportBtn'):
+            self.ui.exportBtn.clicked.connect(self.export_report)
+    
+    def display_comparison_results(self, results: Dict):
+        """Display comparative analysis results"""
+        self.comparison_results = results
+        
+        # Clear previous content
+        if hasattr(self.ui, 'hubble001Scene'):
+            self.ui.hubble001Scene.clear()
+        if hasattr(self.ui, 'hubble002Scene'):
+            self.ui.hubble002Scene.clear()
+        
+        # Create scenes if they don't exist
+        if not hasattr(self, 'hubble001_scene'):
+            self.hubble001_scene = QtWidgets.QGraphicsScene()
+            self.ui.hubble001View.setScene(self.hubble001_scene)
+        if not hasattr(self, 'hubble002_scene'):
+            self.hubble002_scene = QtWidgets.QGraphicsScene()
+            self.ui.hubble002View.setScene(self.hubble002_scene)
+        
+        # Display images and metrics
+        report_text = "=== ALGORITHM COMPARISON RESULTS ===\n\n"
+        
+        for algo_name, data in results.items():
+            # Convert image to QPixmap and display
+            result_image = data.get('result_image')
+            if result_image is not None:
+                q_image = self.convert_cv_to_qimage(result_image)
+                if q_image:
+                    pixmap = QtGui.QPixmap.fromImage(q_image)
+                    
+                    if algo_name == "Hubble 001":
+                        self.hubble001_scene.clear()
+                        self.hubble001_scene.addPixmap(pixmap)
+                        self.ui.hubble001View.fitInView(self.hubble001_scene.sceneRect(), 
+                                                      QtCore.Qt.KeepAspectRatio)
+                        
+                        # Update time label
+                        metrics = data.get('metrics', {})
+                        exec_time = metrics.get('execution_time', 0)
+                        self.ui.hubble001TimeLabel.setText(f"Time: {exec_time:.3f}s")
+                    else:
+                        self.hubble002_scene.clear()
+                        self.hubble002_scene.addPixmap(pixmap)
+                        self.ui.hubble002View.fitInView(self.hubble002_scene.sceneRect(), 
+                                                      QtCore.Qt.KeepAspectRatio)
+                        
+                        # Update time label
+                        metrics = data.get('metrics', {})
+                        exec_time = metrics.get('execution_time', 0)
+                        self.ui.hubble002TimeLabel.setText(f"Time: {exec_time:.3f}s")
+        
+        # Populate metrics table
+        self.populate_metrics_table(results)
+        
+        # Generate analysis report
+        report_text += self.generate_analysis_report(results)
+        self.ui.analysisText.setText(report_text)
+        
+        # Determine overall winner
+        self.determine_overall_winner(results)
+    
+    def populate_metrics_table(self, results: Dict):
+        """Populate the metrics table with comparison data"""
+        if not results:
+            return
+        
+        # Define metrics to compare
+        metrics_to_compare = [
+            ("Execution Time (s)", "execution_time", True),  # Lower is better
+            ("Memory Usage (MB)", "memory_usage_mb", True),  # Lower is better
+            ("PSNR (dB)", "image_quality.psnr", False),     # Higher is better
+            ("SSIM", "image_quality.ssim", False),          # Higher is better
+            ("Seams/sec", "seams_per_second", False)        # Higher is better
+        ]
+        
+        self.ui.metricsTable.setRowCount(len(metrics_to_compare))
+        
+        for row, (metric_name, metric_path, lower_is_better) in enumerate(metrics_to_compare):
+            # Get values for both algorithms
+            hubble001_val = self.get_nested_value(results.get("Hubble 001", {}), metric_path, 0)
+            hubble002_val = self.get_nested_value(results.get("Hubble 002", {}), metric_path, 0)
+            
+            # Calculate difference and winner
+            if hubble001_val is not None and hubble002_val is not None:
+                diff = hubble001_val - hubble002_val
+                
+                if lower_is_better:
+                    winner = "Hubble 001" if hubble001_val < hubble002_val else "Hubble 002"
+                else:
+                    winner = "Hubble 001" if hubble001_val > hubble002_val else "Hubble 002"
+                
+                # Calculate percentage change
+                if hubble002_val != 0:
+                    pct_change = (diff / abs(hubble002_val)) * 100
+                else:
+                    pct_change = 0
+            else:
+                diff = 0
+                winner = "N/A"
+                pct_change = 0
+            
+            # Populate table
+            self.ui.metricsTable.setItem(row, 0, QtWidgets.QTableWidgetItem(metric_name))
+            self.ui.metricsTable.setItem(row, 1, QtWidgets.QTableWidgetItem(f"{hubble001_val:.3f}"))
+            self.ui.metricsTable.setItem(row, 2, QtWidgets.QTableWidgetItem(f"{hubble002_val:.3f}"))
+            self.ui.metricsTable.setItem(row, 3, QtWidgets.QTableWidgetItem(f"{diff:+.3f}"))
+            
+            winner_item = QtWidgets.QTableWidgetItem(winner)
+            if winner == "Hubble 001":
+                winner_item.setForeground(QtGui.QColor(66, 153, 225))  # Blue
+            elif winner == "Hubble 002":
+                winner_item.setForeground(QtGui.QColor(159, 122, 234))  # Purple
+            self.ui.metricsTable.setItem(row, 4, winner_item)
+            
+            pct_item = QtWidgets.QTableWidgetItem(f"{pct_change:+.1f}%")
+            if pct_change > 0:
+                pct_item.setForeground(QtGui.QColor(56, 161, 105))  # Green for positive
+            elif pct_change < 0:
+                pct_item.setForeground(QtGui.QColor(229, 62, 62))  # Red for negative
+            self.ui.metricsTable.setItem(row, 5, pct_item)
+    
+    def get_nested_value(self, obj, path, default=None):
+        """Get nested value from dictionary using dot notation"""
+        keys = path.split('.')
+        value = obj
+        for key in keys:
+            if isinstance(value, dict):
+                value = value.get(key, default)
+            else:
+                return default
+        return value if value is not None else default
+    
+    def generate_analysis_report(self, results: Dict) -> str:
+        """Generate detailed analysis report"""
+        if not results:
+            return "No comparison data available."
+        
+        report = ""
+        
+        for algo_name, data in results.items():
+            metrics = data.get('metrics', {})
+            seam_info = data.get('seam_info', {})
+            
+            report += f"\n{algo_name}:\n"
+            report += "-" * 40 + "\n"
+            
+            # Performance metrics
+            report += f"Performance Metrics:\n"
+            report += f"  • Execution Time: {metrics.get('execution_time', 0):.3f}s\n"
+            report += f"  • Memory Usage: {metrics.get('memory_usage_mb', 0):.1f} MB\n"
+            
+            # Seam statistics
+            seam_stats = metrics.get('seam_count', {})
+            if seam_stats:
+                report += f"  • Seams Processed:\n"
+                report += f"    - Total: {seam_stats.get('total', 0)}\n"
+                report += f"    - Vertical Removed: {seam_stats.get('vertical_removed', 0)}\n"
+                report += f"    - Vertical Inserted: {seam_stats.get('vertical_inserted', 0)}\n"
+                report += f"    - Horizontal Removed: {seam_stats.get('horizontal_removed', 0)}\n"
+                report += f"    - Horizontal Inserted: {seam_stats.get('horizontal_inserted', 0)}\n"
+            
+            # Image quality
+            quality = metrics.get('image_quality', {})
+            if quality:
+                report += f"  • Image Quality:\n"
+                report += f"    - PSNR: {quality.get('psnr', 0):.2f} dB\n"
+                report += f"    - SSIM: {quality.get('ssim', 0):.3f}\n"
+                report += f"    - Combined Score: {quality.get('combined_score', 0):.3f}\n"
+            
+            # Timing details if available
+            if seam_info and 'timing' in seam_info:
+                timing = seam_info['timing']
+                report += f"  • Timing Breakdown:\n"
+                report += f"    - Algorithm: {timing.get('algorithm', 0):.3f}s\n"
+                report += f"    - Total: {timing.get('total', 0):.3f}s\n"
+            
+            report += "\n"
+        
+        return report
+    
+    def determine_overall_winner(self, results: Dict):
+        """Determine overall winner based on multiple metrics"""
+        if not results or len(results) < 2:
+            self.ui.winnerLabel.setText("Overall Winner: Insufficient Data")
+            return
+        
+        hubble001 = results.get("Hubble 001", {}).get('metrics', {})
+        hubble002 = results.get("Hubble 002", {}).get('metrics', {})
+        
+        # Score system
+        hubble001_score = 0
+        hubble002_score = 0
+        
+        # Compare execution time (lower is better)
+        time1 = hubble001.get('execution_time', float('inf'))
+        time2 = hubble002.get('execution_time', float('inf'))
+        if time1 < time2:
+            hubble001_score += 2
+        elif time2 < time1:
+            hubble002_score += 2
+        
+        # Compare memory usage (lower is better)
+        mem1 = hubble001.get('memory_usage_mb', float('inf'))
+        mem2 = hubble002.get('memory_usage_mb', float('inf'))
+        if mem1 < mem2:
+            hubble001_score += 1
+        elif mem2 < mem1:
+            hubble002_score += 1
+        
+        # Compare PSNR (higher is better)
+        psnr1 = hubble001.get('image_quality', {}).get('psnr', 0)
+        psnr2 = hubble002.get('image_quality', {}).get('psnr', 0)
+        if psnr1 > psnr2:
+            hubble001_score += 1
+        elif psnr2 > psnr1:
+            hubble002_score += 1
+        
+        # Compare SSIM (higher is better)
+        ssim1 = hubble001.get('image_quality', {}).get('ssim', 0)
+        ssim2 = hubble002.get('image_quality', {}).get('ssim', 0)
+        if ssim1 > ssim2:
+            hubble001_score += 1
+        elif ssim2 > ssim1:
+            hubble002_score += 1
+        
+        # Determine winner
+        if hubble001_score > hubble002_score:
+            winner = "Hubble 001 (Sequential)"
+            color = "#4299e1"  # Blue
+        elif hubble002_score > hubble001_score:
+            winner = "Hubble 002 (Bulk)"
+            color = "#9f7aea"  # Purple
+        else:
+            winner = "Tie"
+            color = "#d69e2e"  # Yellow
+        
+        self.ui.winnerLabel.setText(f"Overall Winner: {winner}")
+        self.ui.winnerLabel.setStyleSheet(f"""
+            font-size: 13pt; font-weight: 800; color: #2d3748; 
+            padding: 12px; background-color: #f0fff4;
+            border-radius: 8px; border: 3px solid {color};
+        """)
+    
+    def convert_cv_to_qimage(self, cv_image):
+        """Convert OpenCV image to QImage"""
+        if cv_image is None:
+            return None
+            
+        try:
+            # Convert BGR to RGB for color images
+            if len(cv_image.shape) == 3 and cv_image.shape[2] == 3:
+                rgb_image = cv2.cvtColor(cv_image, cv2.COLOR_BGR2RGB)
+            else:
+                rgb_image = cv_image
+            
+            h, w = rgb_image.shape[:2]
+            bytes_per_line = 3 * w if len(rgb_image.shape) == 3 else w
+            
+            # Create QImage
+            if len(rgb_image.shape) == 3:
+                q_img = QtGui.QImage(rgb_image.data, w, h, bytes_per_line, QtGui.QImage.Format_RGB888)
+            else:
+                q_img = QtGui.QImage(rgb_image.data, w, h, bytes_per_line, QtGui.QImage.Format_Grayscale8)
+            
+            return q_img.copy()  # Make a copy to avoid memory issues
+        except Exception as e:
+            print(f"Error converting CV image: {e}")
+            return None
+    
+    def export_report(self):
+        """Export comparison report to file"""
+        if not self.comparison_results:
+            QtWidgets.QMessageBox.warning(self, "No Data", "No comparison data to export.")
+            return
+        
+        file_path, _ = QtWidgets.QFileDialog.getSaveFileName(
+            self,
+            "Export Comparison Report",
+            "algorithm_comparison_report.txt",
+            "Text Files (*.txt);;All Files (*)"
+        )
+        
+        if file_path:
+            try:
+                with open(file_path, 'w') as f:
+                    f.write("=== ALGORITHM COMPARISON REPORT ===\n\n")
+                    f.write("Generated: " + QtCore.QDateTime.currentDateTime().toString() + "\n\n")
+                    
+                    # Write table data
+                    f.write("PERFORMANCE METRICS:\n")
+                    f.write("-" * 80 + "\n")
+                    
+                    # Write table headers
+                    headers = []
+                    for col in range(self.ui.metricsTable.columnCount()):
+                        header = self.ui.metricsTable.horizontalHeaderItem(col)
+                        if header:
+                            headers.append(header.text())
+                    
+                    f.write(" | ".join(headers) + "\n")
+                    f.write("-" * 80 + "\n")
+                    
+                    # Write table rows
+                    for row in range(self.ui.metricsTable.rowCount()):
+                        row_data = []
+                        for col in range(self.ui.metricsTable.columnCount()):
+                            item = self.ui.metricsTable.item(row, col)
+                            row_data.append(item.text() if item else "")
+                        f.write(" | ".join(row_data) + "\n")
+                    
+                    f.write("\n\n")
+                    
+                    # Write analysis text
+                    f.write("DETAILED ANALYSIS:\n")
+                    f.write("-" * 80 + "\n")
+                    f.write(self.ui.analysisText.toPlainText())
+                    
+                    # Write winner
+                    f.write("\n\n" + self.ui.winnerLabel.text())
+                
+                QtWidgets.QMessageBox.information(self, "Export Successful", 
+                                                f"Report exported to:\n{file_path}")
+            except Exception as e:
+                QtWidgets.QMessageBox.critical(self, "Export Error", 
+                                             f"Failed to export report: {str(e)}")

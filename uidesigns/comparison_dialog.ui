@@ -1,0 +1,403 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ComparisonDialog</class>
+ <widget class="QDialog" name="ComparisonDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1217</width>
+    <height>883</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Algorithm Comparison - Hubble 001 vs Hubble 002</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">QDialog {
+    background-color: #f5f7fa;
+}
+
+QGroupBox {
+    font-weight: 600;
+    font-size: 11pt;
+    color: #2d3748;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    margin-top: 12px;
+    padding-top: 10px;
+}
+
+QGroupBox::title {
+    subcontrol-origin: margin;
+    left: 10px;
+    padding: 0 10px 0 10px;
+}
+
+QTextEdit {
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 12px;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 9pt;
+    line-height: 1.4;
+}
+
+QTableWidget {
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    gridline-color: #e2e8f0;
+    font-size: 9pt;
+}
+
+QTableWidget::item {
+    padding: 6px 12px;
+    border: none;
+}
+
+QTableWidget::item:selected {
+    background-color: #ebf8ff;
+    color: #2d3748;
+}
+
+QHeaderView::section {
+    background-color: #f7fafc;
+    border: none;
+    border-bottom: 2px solid #4299e1;
+    padding: 8px 12px;
+    font-weight: 600;
+    color: #4a5568;
+}
+
+QPushButton {
+    background-color: #ffffff;
+    border: 1.5px solid #e2e8f0;
+    color: #4a5568;
+    padding: 10px 16px;
+    border-radius: 6px;
+    min-height: 36px;
+    font-size: 10pt;
+    font-weight: 500;
+}
+
+QPushButton:hover {
+    background-color: #f7fafc;
+    border-color: #cbd5e0;
+}
+
+QPushButton#exportBtn {
+    background-color: #9f7aea;
+    border-color: #9f7aea;
+    color: #ffffff;
+    font-weight: 600;
+}
+
+QPushButton#exportBtn:hover {
+    background-color: #805ad5;
+    border-color: #805ad5;
+}
+
+QLabel#hubble001Label {
+    font-size: 12pt;
+    font-weight: 700;
+    color: #2d3748;
+    padding: 8px;
+    background: linear-gradient(to right, #ebf8ff, #ffffff);
+    border-radius: 6px;
+    border: 2px solid #4299e1;
+}
+
+QLabel#hubble002Label {
+    font-size: 12pt;
+    font-weight: 700;
+    color: #2d3748;
+    padding: 8px;
+    background: linear-gradient(to right, #faf5ff, #ffffff);
+    border-radius: 6px;
+    border: 2px solid #9f7aea;
+}
+
+QLabel#winnerLabel {
+    font-size: 13pt;
+    font-weight: 800;
+    color: #2d3748;
+    padding: 12px;
+    background-color: #f0fff4;
+    border-radius: 8px;
+    border: 3px solid #48bb78;
+}
+
+QSplitter::handle {
+    background-color: #e2e8f0;
+    width: 4px;
+    border-radius: 2px;
+}
+
+QSplitter::handle:hover {
+    background-color: #cbd5e0;
+}</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing">
+    <number>12</number>
+   </property>
+   <property name="leftMargin">
+    <number>16</number>
+   </property>
+   <property name="topMargin">
+    <number>16</number>
+   </property>
+   <property name="rightMargin">
+    <number>16</number>
+   </property>
+   <property name="bottomMargin">
+    <number>16</number>
+   </property>
+   <item>
+    <widget class="QLabel" name="titleLabel">
+     <property name="styleSheet">
+      <string notr="true">font-size: 14pt; font-weight: 700; color: #2d3748; padding-bottom: 8px; border-bottom: 3px solid #9f7aea;</string>
+     </property>
+     <property name="text">
+      <string>Comparative Analysis: Hubble 001 (Sequential) vs Hubble 002 (Bulk)</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QSplitter" name="mainSplitter">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <widget class="QWidget" name="imageComparisonWidget">
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <property name="spacing">
+        <number>10</number>
+       </property>
+       <item>
+        <widget class="QLabel" name="imageComparisonLabel">
+         <property name="styleSheet">
+          <string notr="true">font-size: 11pt; font-weight: 600; color: #4a5568;</string>
+         </property>
+         <property name="text">
+          <string>Visual Comparison</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QSplitter" name="imageSplitter">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <widget class="QWidget" name="hubble001Widget">
+          <layout class="QVBoxLayout" name="verticalLayout_3">
+           <property name="spacing">
+            <number>8</number>
+           </property>
+           <item>
+            <widget class="QLabel" name="hubble001Label">
+             <property name="text">
+              <string>Hubble 001 (Sequential Processing)</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QGraphicsView" name="hubble001View">
+             <property name="minimumSize">
+              <size>
+               <width>400</width>
+               <height>300</height>
+              </size>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="hubble001TimeLabel">
+             <property name="styleSheet">
+              <string notr="true">font-size: 9pt; color: #718096; font-weight: 500;</string>
+             </property>
+             <property name="text">
+              <string>Time: --</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="hubble002Widget">
+          <layout class="QVBoxLayout" name="verticalLayout_4">
+           <property name="spacing">
+            <number>8</number>
+           </property>
+           <item>
+            <widget class="QLabel" name="hubble002Label">
+             <property name="text">
+              <string>Hubble 002 (Bulk Processing)</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QGraphicsView" name="hubble002View">
+             <property name="minimumSize">
+              <size>
+               <width>400</width>
+               <height>300</height>
+              </size>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="hubble002TimeLabel">
+             <property name="styleSheet">
+              <string notr="true">font-size: 9pt; color: #718096; font-weight: 500;</string>
+             </property>
+             <property name="text">
+              <string>Time: --</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="metricsWidget">
+      <layout class="QVBoxLayout" name="verticalLayout_5">
+       <property name="spacing">
+        <number>10</number>
+       </property>
+       <item>
+        <widget class="QSplitter" name="metricsSplitter">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <widget class="QWidget" name="performanceWidget">
+          <layout class="QVBoxLayout" name="verticalLayout_6">
+           <property name="spacing">
+            <number>8</number>
+           </property>
+           <item>
+            <widget class="QLabel" name="performanceLabel">
+             <property name="styleSheet">
+              <string notr="true">font-size: 11pt; font-weight: 600; color: #4a5568;</string>
+             </property>
+             <property name="text">
+              <string>Performance Metrics</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QTableWidget" name="metricsTable">
+             <property name="rowCount">
+              <number>2</number>
+             </property>
+             <property name="columnCount">
+              <number>6</number>
+             </property>
+             <row/>
+             <row/>
+             <column/>
+             <column/>
+             <column/>
+             <column/>
+             <column/>
+             <column/>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="analysisWidget">
+          <layout class="QVBoxLayout" name="verticalLayout_7">
+           <property name="spacing">
+            <number>8</number>
+           </property>
+           <item>
+            <widget class="QLabel" name="analysisReportLabel">
+             <property name="styleSheet">
+              <string notr="true">font-size: 11pt; font-weight: 600; color: #4a5568;</string>
+             </property>
+             <property name="text">
+              <string>Detailed Analysis Report</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QTextEdit" name="analysisText">
+             <property name="readOnly">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="winnerLabel">
+         <property name="text">
+          <string>Overall Winner: --</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="buttonLayout">
+     <property name="spacing">
+      <number>12</number>
+     </property>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="exportBtn">
+       <property name="text">
+        <string>Export Report</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="closeBtn">
+       <property name="text">
+        <string>Close</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

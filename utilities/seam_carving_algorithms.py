@@ -22,6 +22,16 @@ class SeamCarver(ABC):
         """
         self.name = name
         self.default_color_space = 'rgb'
+        self.performance_metrics = {}
+
+    def get_performance_metrics(self):
+        """Get performance metrics for comparative analysis"""
+        return {
+            'name': self.name,
+            'color_space': self.default_color_space,
+            'backtrack_type': 'absolute' if getattr(self, 'use_absolute_backtrack', False) else 'relative',
+            **self.performance_metrics
+        }
         
     def calculate_energy(self, img: np.ndarray, color_space: str = None) -> np.ndarray:
         """
@@ -86,11 +96,21 @@ class SeamCarver(ABC):
         pass
     
     def create_seam_visualization(self, original_img: np.ndarray, seam_info: Dict, 
-                              removed_color: Tuple[int, int, int] = (0, 0, 255),  # Red
-                              inserted_color: Tuple[int, int, int] = (0, 255, 0),  # Green
-                              thickness: int = 1) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+                      removed_color: Tuple[int, int, int] = (0, 0, 255),  # Red
+                      inserted_color: Tuple[int, int, int] = (0, 255, 0),  # Green
+                      thickness: int = 1) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
         """
         Create seam visualizations for removed and inserted seams.
+        
+        Args:
+            original_img: Original image (BGR format)
+            seam_info: Dictionary containing seam information
+            removed_color: Color for removed seams (BGR)
+            inserted_color: Color for inserted seams (BGR)
+            thickness: Thickness of seam lines
+        
+        Returns:
+            Tuple of (all_seams_image, removed_seams_image, inserted_seams_image)
         """
         # Create copies for visualization
         all_seams_img = original_img.copy()
@@ -113,17 +133,31 @@ class SeamCarver(ABC):
         def mark_vertical_seam(img, seam, color):
             """Mark a vertical seam on the image with the given color"""
             marked_img = img.copy()
-            if not seam or len(seam) != h:  # Vertical seam must have h elements
+            if not seam:
                 return marked_img
                 
-            for i in range(h):
+            img_h, img_w = img.shape[:2]
+            
+            # Handle seam length mismatch
+            if len(seam) != img_h:
+                # Create adjusted seam
+                adjusted_seam = []
+                for i in range(img_h):
+                    if i < len(seam):
+                        adjusted_seam.append(seam[i])
+                    else:
+                        # Extend with last value or 0
+                        adjusted_seam.append(seam[-1] if seam else 0)
+                seam = adjusted_seam
+            
+            for i in range(img_h):
                 j = seam[i]
-                if 0 <= j < w:  # Ensure column is within bounds
+                # Ensure j is within bounds and handle edge cases
+                if 0 <= j < img_w:
                     # Draw thicker seam for better visibility
-                    for offset in range(-thickness//2, thickness//2 + 1):
-                        col = j + offset
-                        if 0 <= col < w:
-                            marked_img[i, col] = color
+                    start_col = max(0, j - thickness // 2)
+                    end_col = min(img_w, j + thickness // 2 + 1)
+                    marked_img[i, start_col:end_col] = color
             return marked_img
         
         # Helper function to mark a HORIZONTAL seam on an image
@@ -133,47 +167,95 @@ class SeamCarver(ABC):
             if not seam:
                 return marked_img
             
-            # For horizontal seams in seam_info, they are stored as vertical seams
-            # from the rotated image. So seam length should be w (width).
-            if len(seam) != w:
-                # Try to handle gracefully
-                seam_to_use = seam
-            else:
-                seam_to_use = seam
+            img_h, img_w = img.shape[:2]
             
-            # Mark the horizontal seam
-            for j in range(w):
-                i = seam_to_use[j]
-                if 0 <= i < h:
-                    for offset in range(-thickness//2, thickness//2 + 1):
-                        row = i + offset
-                        if 0 <= row < h:
-                            marked_img[row, j] = color
+            # CRITICAL FIX: Horizontal seams in original space come from 
+            # vertical seams in rotated space. The seam array we have
+            # is actually for the ROTATED image, not the original!
+            
+            # We need to understand what the seam represents:
+            # - In rotated space: seam[i] gives column index at row i
+            # - After rotating back: this becomes a horizontal seam
+            # - But the coordinates need transformation!
+            
+            # For now, let's handle the simple case where seam length = img_w
+            if len(seam) == img_w:
+                # Mark as horizontal line (parallel to x-axis)
+                for j in range(img_w):
+                    i = seam[j]
+                    if 0 <= i < img_h:
+                        start_row = max(0, i - thickness // 2)
+                        end_row = min(img_h, i + thickness // 2 + 1)
+                        marked_img[start_row:end_row, j] = color
+            else:
+                # Try to handle gracefully
+                print(f"WARNING: Horizontal seam length mismatch: {len(seam)} != {img_w}")
+                
+                # If seam is longer than width, truncate
+                if len(seam) > img_w:
+                    seam = seam[:img_w]
+                # If shorter, extend with last value
+                else:
+                    seam = list(seam) + [seam[-1]] * (img_w - len(seam))
+                
+                # Mark the adjusted seam
+                for j in range(img_w):
+                    i = seam[j]
+                    if 0 <= i < img_h:
+                        start_row = max(0, i - thickness // 2)
+                        end_row = min(img_h, i + thickness // 2 + 1)
+                        marked_img[start_row:end_row, j] = color
+            
             return marked_img
         
-        # Mark ALL vertical seams
-        for seam in seam_info['removed_seams'].get('vertical', []):
-            if seam and len(seam) == h:
+        # DEBUG: Print seam information
+        print(f"\n=== Seam Visualization Debug ===")
+        print(f"Image dimensions: {h}x{w}")
+        
+        # Check vertical seams
+        vert_removed = seam_info['removed_seams'].get('vertical', [])
+        vert_inserted = seam_info['inserted_seams'].get('vertical', [])
+        print(f"Vertical removed seams: {len(vert_removed)}")
+        print(f"Vertical inserted seams: {len(vert_inserted)}")
+        
+        # Check horizontal seams
+        horiz_removed = seam_info['removed_seams'].get('horizontal', [])
+        horiz_inserted = seam_info['inserted_seams'].get('horizontal', [])
+        print(f"Horizontal removed seams: {len(horiz_removed)}")
+        print(f"Horizontal inserted seams: {len(horiz_inserted)}")
+        
+        # Mark ALL vertical seams on all images
+        for seam in vert_removed:
+            if seam:
                 removed_img = mark_vertical_seam(removed_img, seam, removed_color)
                 all_seams_img = mark_vertical_seam(all_seams_img, seam, removed_color)
         
-        for seam in seam_info['inserted_seams'].get('vertical', []):
-            if seam and len(seam) == h:
+        for seam in vert_inserted:
+            if seam:
                 inserted_img = mark_vertical_seam(inserted_img, seam, inserted_color)
                 all_seams_img = mark_vertical_seam(all_seams_img, seam, inserted_color)
         
-        # Mark ALL horizontal seams
-        for seam in seam_info['removed_seams'].get('horizontal', []):
-            if seam and len(seam) == w:
+        # Mark ALL horizontal seams on all images
+        for seam in horiz_removed:
+            if seam:
+                # DEBUG: Check this seam
+                print(f"  Horizontal removed seam length: {len(seam)}")
+                
                 removed_img = mark_horizontal_seam(removed_img, seam, removed_color)
                 all_seams_img = mark_horizontal_seam(all_seams_img, seam, removed_color)
         
-        for seam in seam_info['inserted_seams'].get('horizontal', []):
-            if seam and len(seam) == w:
+        for seam in horiz_inserted:
+            if seam:
+                # DEBUG: Check this seam
+                print(f"  Horizontal inserted seam length: {len(seam)}")
+                
                 inserted_img = mark_horizontal_seam(inserted_img, seam, inserted_color)
                 all_seams_img = mark_horizontal_seam(all_seams_img, seam, inserted_color)
         
+        print("=== End Seam Visualization Debug ===\n")
+        
         return all_seams_img, removed_img, inserted_img
+    
 
 
 class SeamCarverHubble001(SeamCarver):
@@ -467,7 +549,7 @@ class SeamCarverHubble002(SeamCarver):
     
     def __init__(self):
         super().__init__("Hubble 002")
-        self.default_color_space = 'bgr'
+        self.default_color_space = 'rgb'
         self.use_absolute_backtrack = True
     
     def _find_vertical_seam(self, energy: np.ndarray) -> List[int]:

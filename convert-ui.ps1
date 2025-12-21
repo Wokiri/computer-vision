@@ -42,7 +42,7 @@ foreach ($uiFile in $uiFiles) {
     
     try {
         pyrcc5 -o .\resources\resources_rc.py .\resources\resources.qrc
-        pyuic5 --import-from=resources -o $outputFile $uiFile.FullName
+        pyuic5 -d --import-from=resources -o $outputFile $uiFile.FullName
         Write-Host "✓ Successfully converted: $($uiFile.Name)" -ForegroundColor Green
     }
     catch {

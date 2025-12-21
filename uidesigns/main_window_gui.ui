@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1188</width>
+    <width>1191</width>
     <height>894</height>
    </rect>
   </property>
@@ -76,6 +76,19 @@ QPushButton#save_as_pushButton:hover {
     border-color: #38a169;
 }
 
+/* Analysis button - Purple accent */
+QPushButton#compareAlgorithmsBtn {
+    background-color: #9f7aea;
+    border-color: #9f7aea;
+    color: #ffffff;
+    font-weight: 600;
+}
+
+QPushButton#compareAlgorithmsBtn:hover {
+    background-color: #805ad5;
+    border-color: #805ad5;
+}
+
 /* Tool buttons with accent border */
 QPushButton#resizeBtn, QPushButton#obj_detectionBtn, QPushButton#filtersBtn {
     background-color: #f7fafc;
@@ -116,13 +129,17 @@ QLabel {
     padding: 2px 0;
 }
 
-#fileMgtLabel, #processingToolsLabel {
+#fileMgtLabel, #processingToolsLabel, #analysisLabel {
     font-weight: 700;
     color: #2d3748;
     font-size: 12pt;
     padding-bottom: 8px;
     border-bottom: 2px solid #4299e1;
     margin-bottom: 8px;
+}
+
+#analysisLabel {
+    border-bottom-color: #9f7aea;
 }
 
 #dimsLabel, #imageDimensionsLabel, #processedDimsLabel, #processedDimensionsLabel {
@@ -136,6 +153,26 @@ QLabel {
     color: #718096;
     font-style: italic;
     font-weight: 500;
+}
+
+/* Comparative labels */
+#hubble001Label, #hubble002Label {
+    font-size: 11pt;
+    font-weight: 700;
+    color: #2d3748;
+    text-align: center;
+    padding: 8px;
+    background-color: #f7fafc;
+    border-radius: 6px;
+    border: 1px solid #e2e8f0;
+}
+
+#hubble001Label {
+    border-left: 4px solid #4299e1;
+}
+
+#hubble002Label {
+    border-left: 4px solid #9f7aea;
 }
 
 /* --- COMBO BOXES --- */
@@ -256,6 +293,75 @@ QScrollBar::handle:vertical:hover {
 QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
     border: none;
     background: none;
+}
+
+/* --- COMPARISON DIALOG --- */
+QDialog#comparisonDialog {
+    background-color: #f5f7fa;
+}
+
+QSplitter::handle {
+    background-color: #e2e8f0;
+    width: 4px;
+    border-radius: 2px;
+}
+
+QSplitter::handle:hover {
+    background-color: #cbd5e0;
+}
+
+QTextEdit#metricsText {
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 12px;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 9pt;
+    line-height: 1.4;
+}
+
+/* --- TABLE WIDGET (for metrics) --- */
+QTableWidget {
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    gridline-color: #e2e8f0;
+    font-size: 9pt;
+}
+
+QTableWidget::item {
+    padding: 6px 12px;
+    border: none;
+}
+
+QTableWidget::item:selected {
+    background-color: #ebf8ff;
+    color: #2d3748;
+}
+
+QHeaderView::section {
+    background-color: #f7fafc;
+    border: none;
+    border-bottom: 2px solid #4299e1;
+    padding: 8px 12px;
+    font-weight: 600;
+    color: #4a5568;
+}
+
+/* Performance indicator colors */
+.performance-good {
+    color: #38a169;
+    font-weight: 600;
+}
+
+.performance-average {
+    color: #d69e2e;
+    font-weight: 600;
+}
+
+.performance-poor {
+    color: #e53e3e;
+    font-weight: 600;
 }</string>
   </property>
   <property name="toolButtonStyle">
@@ -348,19 +454,6 @@ QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
             </widget>
            </item>
            <item>
-            <spacer name="verticalSpacer">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item>
             <widget class="QLabel" name="processingToolsLabel">
              <property name="text">
               <string>Processing Tools</string>
@@ -389,7 +482,17 @@ QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
             </widget>
            </item>
            <item>
-            <spacer name="verticalSpacer_2">
+            <widget class="Line" name="line_3">
+             <property name="frameShadow">
+              <enum>QFrame::Plain</enum>
+             </property>
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="verticalSpacer_4">
              <property name="orientation">
               <enum>Qt::Vertical</enum>
              </property>
@@ -732,7 +835,7 @@ QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1188</width>
+     <width>1191</width>
      <height>39</height>
     </rect>
    </property>
@@ -741,13 +844,37 @@ QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
      <string>File</string>
     </property>
     <addaction name="actionSave_As"/>
+    <addaction name="actionCompare_Algorithms"/>
+   </widget>
+   <widget class="QMenu" name="menuAnalysis">
+    <property name="title">
+     <string>Analysis</string>
+    </property>
+    <addaction name="actionRun_Comparison"/>
+    <addaction name="actionView_Metrics"/>
    </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuAnalysis"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionSave_As">
    <property name="text">
     <string>Save As...</string>
+   </property>
+  </action>
+  <action name="actionCompare_Algorithms">
+   <property name="text">
+    <string>Compare Algorithms</string>
+   </property>
+  </action>
+  <action name="actionRun_Comparison">
+   <property name="text">
+    <string>Run Comparative Analysis</string>
+   </property>
+  </action>
+  <action name="actionView_Metrics">
+   <property name="text">
+    <string>View Performance Metrics</string>
    </property>
   </action>
  </widget>
