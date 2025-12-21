@@ -228,10 +228,6 @@ class ImageLabMainWindow(QtWidgets.QMainWindow):
         """Toggle seam visualization on/off for processed image"""
         if not self.has_processed_image() or self.seam_visualizations is None:
             return
-        
-        # Only allow seam viewing when in processed image view (page 1)
-        if self.current_page_index != 1:
-            return
             
         self.seams_view_active = not self.seams_view_active
         
@@ -276,13 +272,14 @@ class ImageLabMainWindow(QtWidgets.QMainWindow):
             self.show_all_seams()
         elif self.current_seams_mode == "Added Seams":
             self.show_added_seams()
-        else:  # "Removed Seams"
+        elif self.current_seams_mode == "Removed Seams":
             self.show_removed_seams()
 
     def show_all_seams(self):
         """Show processed image with ALL seams highlighted"""
         if self.seam_visualizations is not None and 'all' in self.seam_visualizations:
             seams_img = self.seam_visualizations['all']
+            print("all seams_img", seams_img)
             if seams_img is not None:
                 q_image = self.convert_cv_to_qimage(seams_img)
                 if q_image:
@@ -293,6 +290,7 @@ class ImageLabMainWindow(QtWidgets.QMainWindow):
         """Show processed image with removed seams highlighted"""
         if self.seam_visualizations is not None and 'removed' in self.seam_visualizations:
             seams_img = self.seam_visualizations['removed']
+            print("removed seams_img", seams_img)
             if seams_img is not None:
                 q_image = self.convert_cv_to_qimage(seams_img)
                 if q_image:
@@ -303,6 +301,7 @@ class ImageLabMainWindow(QtWidgets.QMainWindow):
         """Show processed image with added seams highlighted"""
         if self.seam_visualizations is not None and 'added' in self.seam_visualizations:
             seams_img = self.seam_visualizations['added']
+            print("added seams_img", seams_img)
             if seams_img is not None:
                 q_image = self.convert_cv_to_qimage(seams_img)
                 if q_image:
@@ -502,7 +501,7 @@ class ImageLabMainWindow(QtWidgets.QMainWindow):
         if visualizations and isinstance(visualizations, dict):
             # Store all three visualization types
             self.seam_visualizations = {
-                'all': visualizations.get('all'),      # Combined view
+                'all': visualizations.get('all'),  # Combined view
                 'added': visualizations.get('added'),  # Added only
                 'removed': visualizations.get('removed') # Removed only
             }
@@ -621,8 +620,6 @@ class ImageLabMainWindow(QtWidgets.QMainWindow):
         # Update button states
         self.update_button_states()
         self.update_toggle_button_text()
-
-
 
 
 class ResizeWidget(QtWidgets.QWidget):

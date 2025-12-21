@@ -607,6 +607,10 @@ class ImageLab(ImageLabMainWindow):
             QtWidgets.QMessageBox.warning(self, "No Image", "Please load an image first.")
             return
         
+        if not self.image_processor:
+            QtWidgets.QMessageBox.warning(self, "Could not resize", "Image processor not initialized")
+            return
+        
         try:
             # Get width and height from line edits
             new_width: int = int(self.resize_widget.ui.width_resize_lineEdit.text())
@@ -672,7 +676,10 @@ class ImageLab(ImageLabMainWindow):
                         self.update_timing_label(timing_info)
                     
                     # Get seam visualizations
-                    seam_visualizations = self.image_processor.get_seam_visualizations()
+                    seam_visualizations = None
+                    if self.image_processor is not None:
+                        seam_visualizations = self.image_processor.get_seam_visualizations()
+                    
                     if seam_visualizations:
                         self.set_seam_visualizations(seam_visualizations)
                     

@@ -1,762 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<ui version="4.0">
- <class>ImageLab</class>
- <widget class="QMainWindow" name="ImageLab">
-  <property name="geometry">
-   <rect>
-    <x>0</x>
-    <y>0</y>
-    <width>1188</width>
-    <height>894</height>
-   </rect>
-  </property>
-  <property name="windowTitle">
-   <string>Computer Vision Lab</string>
-  </property>
-  <property name="styleSheet">
-   <string notr="true">/* --- CLEAN GLOBAL STYLES --- */
-QMainWindow, QWidget {
-    background-color: #f5f7fa;
-    color: #2d3748;
-    font-family: -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, sans-serif;
-    font-size: 10pt;
-}
-
-/* --- CONTAINERS --- */
-QFrame#horizontalFrame, QFrame#verticalFrame_4, QFrame#horizontalFrame_6 {
-    background-color: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    padding: 12px;
-}
-
-/* --- BUTTONS --- */
-QPushButton {
-    background-color: #ffffff;
-    border: 1.5px solid #e2e8f0;
-    color: #4a5568;
-    padding: 10px 16px;
-    border-radius: 6px;
-    min-height: 36px;
-    font-size: 10pt;
-    font-weight: 500;
-}
-
-QPushButton:hover {
-    background-color: #f7fafc;
-    border-color: #cbd5e0;
-}
-
-QPushButton:pressed {
-    background-color: #edf2f7;
-}
-
-/* Primary action button */
-QPushButton#UploadButton {
-    background-color: #4299e1;
-    border-color: #4299e1;
-    color: #ffffff;
-    font-weight: 600;
-}
-
-QPushButton#UploadButton:hover {
-    background-color: #3182ce;
-    border-color: #3182ce;
-}
-
-/* Secondary action button */
-QPushButton#save_as_pushButton {
-    background-color: #48bb78;
-    border-color: #48bb78;
-    color: #ffffff;
-}
-
-QPushButton#save_as_pushButton:hover {
-    background-color: #38a169;
-    border-color: #38a169;
-}
-
-/* Tool buttons with accent border */
-QPushButton#resizeBtn, QPushButton#obj_detectionBtn, QPushButton#filtersBtn {
-    background-color: #f7fafc;
-    border-left: 4px solid #4299e1;
-    text-align: left;
-    padding-left: 20px;
-}
-
-QPushButton#resizeBtn:hover, QPushButton#obj_detectionBtn:hover, QPushButton#filtersBtn:hover {
-    background-color: #ebf8ff;
-}
-
-/* --- IMAGE VIEW AREA --- */
-QGraphicsView, QLabel#originalImagePreview {
-    background-color: #f8fafc;
-    border: 2px solid #e2e8f0;
-    border-radius: 8px;
-}
-
-/* --- STATUS and PROGRESS --- */
-QProgressBar {
-    border: 1px solid #e2e8f0;
-    border-radius: 4px;
-    background-color: #f7fafc;
-    text-align: center;
-    color: #4a5568;
-    height: 20px;
-}
-
-QProgressBar::chunk {
-    background-color: #4299e1;
-    border-radius: 3px;
-}
-
-/* --- LABELS --- */
-QLabel {
-    color: #4a5568;
-    padding: 2px 0;
-}
-
-#fileMgtLabel, #processingToolsLabel {
-    font-weight: 700;
-    color: #2d3748;
-    font-size: 12pt;
-    padding-bottom: 8px;
-    border-bottom: 2px solid #4299e1;
-    margin-bottom: 8px;
-}
-
-#dimsLabel, #imageDimensionsLabel, #processedDimsLabel, #processedDimensionsLabel {
-    font-size: 9pt;
-    color: #718096;
-    font-weight: 500;
-}
-
-#timingLabel {
-    font-size: 9pt;
-    color: #718096;
-    font-style: italic;
-    font-weight: 500;
-}
-
-/* --- COMBO BOXES --- */
-QComboBox {
-    background-color: #ffffff;
-    border: 1.5px solid #e2e8f0;
-    padding: 8px 12px;
-    border-radius: 6px;
-    color: #4a5568;
-    min-height: 36px;
-    font-weight: 500;
-}
-
-QComboBox:hover {
-    border-color: #cbd5e0;
-}
-
-QComboBox::drop-down {
-    border: none;
-    padding-right: 8px;
-}
-
-/* --- SEPARATORS --- */
-Line {
-    background-color: #e2e8f0;
-    border: none;
-    height: 1px;
-    margin: 20px 0;
-}
-
-/* --- TOGGLE BUTTONS --- */
-QPushButton#toggleSceneBtn, QPushButton#seamsViewBtn {
-    background-color: #718096;
-    border: none;
-    color: #ffffff;
-    font-size: 9pt;
-    padding: 8px 16px;
-    border-radius: 6px;
-    font-weight: 600;
-}
-
-QPushButton#toggleSceneBtn:hover, QPushButton#seamsViewBtn:hover {
-    background-color: #4a5568;
-}
-
-QPushButton#toggleSceneBtn:disabled, QPushButton#seamsViewBtn:disabled {
-    background-color: #cbd5e0;
-    color: #a0aec0;
-}
-
-/* --- ZOOM BUTTONS --- */
-QPushButton#zoomInButton, QPushButton#zoomOutButton {
-    background-color: #4299e1;
-    border: none;
-    color: #ffffff;
-    font-weight: bold;
-    border-radius: 4px;
-    min-width: 36px;
-}
-
-QPushButton#zoomInButton:hover, QPushButton#zoomOutButton:hover {
-    background-color: #3182ce;
-}
-
-/* --- MENU BAR --- */
-QMenuBar {
-    background-color: #2d3748;
-    color: #ffffff;
-    padding: 4px;
-    font-weight: 500;
-}
-
-QMenuBar::item {
-    padding: 6px 12px;
-    border-radius: 4px;
-}
-
-QMenuBar::item:selected {
-    background-color: #4a5568;
-}
-
-QMenu {
-    background-color: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 6px;
-    padding: 4px;
-}
-
-QMenu::item {
-    padding: 8px 24px 8px 16px;
-    border-radius: 4px;
-}
-
-QMenu::item:selected {
-    background-color: #ebf8ff;
-    color: #2d3748;
-}
-
-/* --- SCROLLBARS --- */
-QScrollBar:vertical {
-    background: #f7fafc;
-    width: 10px;
-    border-radius: 5px;
-    border: none;
-}
-
-QScrollBar::handle:vertical {
-    background: #cbd5e0;
-    border-radius: 5px;
-    min-height: 20px;
-    margin: 2px;
-}
-
-QScrollBar::handle:vertical:hover {
-    background: #a0aec0;
-}
-
-QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
-    border: none;
-    background: none;
-}</string>
-  </property>
-  <property name="toolButtonStyle">
-   <enum>Qt::ToolButtonTextBesideIcon</enum>
-  </property>
-  <widget class="QWidget" name="centralwidget">
-   <layout class="QGridLayout" name="gridLayout">
-    <item row="0" column="0">
-     <layout class="QVBoxLayout" name="verticalLayout_5">
-      <property name="spacing">
-       <number>12</number>
-      </property>
-      <property name="leftMargin">
-       <number>16</number>
-      </property>
-      <property name="topMargin">
-       <number>16</number>
-      </property>
-      <property name="rightMargin">
-       <number>16</number>
-      </property>
-      <property name="bottomMargin">
-       <number>16</number>
-      </property>
-      <item>
-       <widget class="QFrame" name="horizontalFrame">
-        <layout class="QHBoxLayout" name="horizontalLayout">
-         <property name="spacing">
-          <number>16</number>
-         </property>
-         <property name="leftMargin">
-          <number>8</number>
-         </property>
-         <property name="topMargin">
-          <number>8</number>
-         </property>
-         <property name="rightMargin">
-          <number>8</number>
-         </property>
-         <property name="bottomMargin">
-          <number>8</number>
-         </property>
-         <item>
-          <layout class="QVBoxLayout" name="verticalLayout">
-           <property name="spacing">
-            <number>10</number>
-           </property>
-           <item>
-            <widget class="QLabel" name="fileMgtLabel">
-             <property name="text">
-              <string>File Management</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="UploadButton">
-             <property name="text">
-              <string>Upload Image</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="save_as_pushButton">
-             <property name="text">
-              <string>Save Processed</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <spacer name="verticalSpacer_3">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>30</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item>
-            <widget class="Line" name="line_2">
-             <property name="frameShadow">
-              <enum>QFrame::Plain</enum>
-             </property>
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <spacer name="verticalSpacer">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item>
-            <widget class="QLabel" name="processingToolsLabel">
-             <property name="text">
-              <string>Processing Tools</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="resizeBtn">
-             <property name="text">
-              <string>Image Resizing</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="obj_detectionBtn">
-             <property name="text">
-              <string>Object Detection</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="filtersBtn">
-             <property name="text">
-              <string>Filters</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <spacer name="verticalSpacer_2">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>40</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
-         </item>
-         <item>
-          <widget class="QFrame" name="verticalFrame_4">
-           <property name="minimumSize">
-            <size>
-             <width>900</width>
-             <height>0</height>
-            </size>
-           </property>
-           <layout class="QVBoxLayout" name="verticalLayout_4">
-            <property name="spacing">
-             <number>12</number>
-            </property>
-            <property name="leftMargin">
-             <number>12</number>
-            </property>
-            <property name="topMargin">
-             <number>12</number>
-            </property>
-            <property name="rightMargin">
-             <number>12</number>
-            </property>
-            <property name="bottomMargin">
-             <number>12</number>
-            </property>
-            <item>
-             <widget class="QStackedWidget" name="stackedWidget">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-                <horstretch>1</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="currentIndex">
-               <number>0</number>
-              </property>
-              <widget class="QWidget" name="originalImagePage">
-               <layout class="QGridLayout" name="gridLayout_2">
-                <item row="0" column="0">
-                 <widget class="QGraphicsView" name="originalImagePreview"/>
-                </item>
-                <item row="1" column="0">
-                 <layout class="QHBoxLayout" name="horizontalLayout_3">
-                  <property name="spacing">
-                   <number>8</number>
-                  </property>
-                  <item>
-                   <widget class="QLabel" name="dimsLabel">
-                    <property name="text">
-                     <string>Original:</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QLabel" name="imageDimensionsLabel">
-                    <property name="text">
-                     <string/>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <spacer name="horizontalSpacer">
-                    <property name="orientation">
-                     <enum>Qt::Horizontal</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>40</width>
-                      <height>20</height>
-                     </size>
-                    </property>
-                   </spacer>
-                  </item>
-                 </layout>
-                </item>
-               </layout>
-              </widget>
-              <widget class="QWidget" name="processedImageWithoutSeamsPage">
-               <layout class="QGridLayout" name="gridLayout_4">
-                <item row="0" column="0">
-                 <widget class="QGraphicsView" name="processedImageView"/>
-                </item>
-                <item row="1" column="0">
-                 <layout class="QHBoxLayout" name="horizontalLayout_7">
-                  <property name="spacing">
-                   <number>8</number>
-                  </property>
-                  <item>
-                   <widget class="QLabel" name="processedDimsLabel">
-                    <property name="text">
-                     <string>Processed:</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QLabel" name="processedDimensionsLabel">
-                    <property name="text">
-                     <string/>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <spacer name="horizontalSpacer_3">
-                    <property name="orientation">
-                     <enum>Qt::Horizontal</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>40</width>
-                      <height>20</height>
-                     </size>
-                    </property>
-                   </spacer>
-                  </item>
-                  <item>
-                   <widget class="QLabel" name="timingLabel">
-                    <property name="text">
-                     <string/>
-                    </property>
-                   </widget>
-                  </item>
-                 </layout>
-                </item>
-               </layout>
-              </widget>
-              <widget class="QWidget" name="processedImageWithSeamsPage">
-               <layout class="QGridLayout" name="gridLayout_5">
-                <item row="0" column="0">
-                 <widget class="QGraphicsView" name="processedImageWithSeamsView"/>
-                </item>
-                <item row="1" column="0">
-                 <layout class="QHBoxLayout" name="horizontalLayout_9">
-                  <property name="spacing">
-                   <number>8</number>
-                  </property>
-                  <item>
-                   <widget class="QLabel" name="processedWithSeamsDimsLabel">
-                    <property name="text">
-                     <string>Processed (with seams):</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QLabel" name="processedWithSeamsDimensionsLabel">
-                    <property name="text">
-                     <string/>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <spacer name="horizontalSpacer_4">
-                    <property name="orientation">
-                     <enum>Qt::Horizontal</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>40</width>
-                      <height>20</height>
-                     </size>
-                    </property>
-                   </spacer>
-                  </item>
-                  <item>
-                   <widget class="QLabel" name="seamsTimingLabel">
-                    <property name="text">
-                     <string/>
-                    </property>
-                   </widget>
-                  </item>
-                 </layout>
-                </item>
-               </layout>
-              </widget>
-             </widget>
-            </item>
-            <item>
-             <layout class="QHBoxLayout" name="horizontalLayout_4">
-              <property name="spacing">
-               <number>16</number>
-              </property>
-              <item>
-               <layout class="QHBoxLayout" name="horizontalLayout_5">
-                <property name="spacing">
-                 <number>8</number>
-                </property>
-                <item>
-                 <widget class="QLabel" name="label_3">
-                  <property name="styleSheet">
-                   <string notr="true">font-weight: 600;</string>
-                  </property>
-                  <property name="text">
-                   <string>Zoom:</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QComboBox" name="selectStandardZoomComboBox">
-                  <property name="minimumSize">
-                   <size>
-                    <width>140</width>
-                    <height>56</height>
-                   </size>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QPushButton" name="zoomInButton">
-                  <property name="maximumSize">
-                   <size>
-                    <width>40</width>
-                    <height>16777215</height>
-                   </size>
-                  </property>
-                  <property name="text">
-                   <string>+</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QPushButton" name="zoomOutButton">
-                  <property name="maximumSize">
-                   <size>
-                    <width>40</width>
-                    <height>16777215</height>
-                   </size>
-                  </property>
-                  <property name="text">
-                   <string>-</string>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
-              </item>
-              <item>
-               <spacer name="horizontalSpacer_2">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>40</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-              <item>
-               <layout class="QHBoxLayout" name="horizontalLayout_8">
-                <property name="spacing">
-                 <number>10</number>
-                </property>
-                <item>
-                 <widget class="QPushButton" name="toggleSceneBtn">
-                  <property name="enabled">
-                   <bool>false</bool>
-                  </property>
-                  <property name="text">
-                   <string>View Processed</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QComboBox" name="seamsModeComboBox">
-                  <property name="minimumSize">
-                   <size>
-                    <width>120</width>
-                    <height>56</height>
-                   </size>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QPushButton" name="seamsViewBtn">
-                  <property name="enabled">
-                   <bool>false</bool>
-                  </property>
-                  <property name="text">
-                   <string>View Seams</string>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
-              </item>
-             </layout>
-            </item>
-           </layout>
-          </widget>
-         </item>
-        </layout>
-       </widget>
-      </item>
-      <item>
-       <widget class="QFrame" name="horizontalFrame_6">
-        <layout class="QGridLayout" name="gridLayout_3">
-         <item row="0" column="0">
-          <layout class="QHBoxLayout" name="horizontalLayout_6">
-           <property name="spacing">
-            <number>10</number>
-           </property>
-           <item>
-            <widget class="QLabel" name="label_4">
-             <property name="styleSheet">
-              <string notr="true">font-weight: 600; color: #2d3748;</string>
-             </property>
-             <property name="text">
-              <string>Status:</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QProgressBar" name="progressBar">
-             <property name="value">
-              <number>0</number>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
-        </layout>
-       </widget>
-      </item>
-     </layout>
-    </item>
-   </layout>
-  </widget>
-  <widget class="QMenuBar" name="menubar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>1188</width>
-     <height>39</height>
-    </rect>
-   </property>
-   <widget class="QMenu" name="menuFile">
-    <property name="title">
-     <string>File</string>
-    </property>
-    <addaction name="actionSave_As"/>
-   </widget>
-   <addaction name="menuFile"/>
-  </widget>
-  <widget class="QStatusBar" name="statusbar"/>
-  <action name="actionSave_As">
-   <property name="text">
-    <string>Save As...</string>
-   </property>
-  </action>
- </widget>
- <resources/>
- <connections/>
-</ui>
-
-
-
 """
 views/widgets.py
 Widgets for ImageLab main window and tools
@@ -774,6 +15,11 @@ from uidesigns.resize_tools_gui import Ui_ResizeTool
 class ImageLabMainWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
+        
+        # Initialize image states BEFORE calling UI setup
+        self.original_pixmap = None
+        self.processed_pixmap = None
+        self.seams_pixmap = None
 
         self.ui = Ui_ImageLab()
         self.ui.setupUi(self)
@@ -785,9 +31,10 @@ class ImageLabMainWindow(QtWidgets.QMainWindow):
         self.ui.progressBar.setVisible(False)
         self.ui.progressBar.setValue(0)
         
-        # Initialize timing label
+        # Initialize timing labels
         self.ui.timingLabel.setText("")
-
+        self.ui.seamsTimingLabel.setText("")
+        
         # Define aspect ratio presets
         self.aspect_ratios: Dict[str, Union[float, None]] = {
             "Original": None,
@@ -805,16 +52,21 @@ class ImageLabMainWindow(QtWidgets.QMainWindow):
         self.original_scene = QtWidgets.QGraphicsScene()
         self.ui.originalImagePreview.setScene(self.original_scene)
         
-        # Set up the QGraphicsView and QGraphicsScene for processed image
+        # Set up the QGraphicsView and QGraphicsScene for processed image without seams
         self.processed_scene = QtWidgets.QGraphicsScene()
         self.ui.processedImageView.setScene(self.processed_scene)
+        
+        # Set up the QGraphicsView and QGraphicsScene for processed image with seams
+        self.processed_with_seams_scene = QtWidgets.QGraphicsScene()
+        self.ui.processedImageWithSeamsView.setScene(self.processed_with_seams_scene)
 
         self.all_graphics_views = [
             self.ui.originalImagePreview,
-            self.ui.processedImageView
+            self.ui.processedImageView,
+            self.ui.processedImageWithSeamsView
         ]
         
-        # Set view properties for both views
+        # Set view properties for all views
         for view in self.all_graphics_views:
             view.setRenderHint(QtGui.QPainter.Antialiasing)
             view.setRenderHint(QtGui.QPainter.SmoothPixmapTransform)
@@ -840,36 +92,45 @@ class ImageLabMainWindow(QtWidgets.QMainWindow):
         # Add placeholder text
         self.show_placeholder_text()
         
-        # Start with original image view
-        self.current_scene_index = 1  # 0 for processed, 1 for original
-        self.ui.stackedWidget.setCurrentIndex(self.current_scene_index)
-        self.update_toggle_button_text()
+        # Start with original image view (Page 0)
+        self.current_page_index = 0  # 0=original, 1=processedWithoutSeams, 2=processedWithSeams
+        self.ui.stackedWidget.setCurrentIndex(self.current_page_index)
         
         # Initialize seam viewing state
         self.seams_view_active = False
-        self.current_seams_mode = "Added Seams"  # Default to added seams
-        self.seam_visualizations = None  # Will store {'removed': cv_image, 'inserted': cv_image}
+        self.current_seams_mode = "All Seams"  # Default to all seams
+        self.seam_visualizations = None
         
-        # Disable toggle buttons initially
+        # Initialize timing info
+        self.timing_info = None
+        
+        # Initialize button states - all disabled initially
         self.ui.toggleSceneBtn.setEnabled(False)
         self.ui.seamsViewBtn.setEnabled(False)
         self.ui.seamsModeComboBox.setVisible(False)
+        
+        # Update UI state
+        self.update_toggle_button_text()
 
     @property
     def current_scene(self) -> QtWidgets.QGraphicsScene:
-        """Get the current active scene based on current_scene_index"""
-        if self.current_scene_index == 0:  # Processed image view
-            return self.processed_scene
-        else:  # Original image view
+        """Get the current active scene based on current_page_index"""
+        if self.current_page_index == 0:  # Original image
             return self.original_scene
+        elif self.current_page_index == 1:  # Processed image without seams
+            return self.processed_scene
+        else:  # Processed image with seams (page index 2)
+            return self.processed_with_seams_scene
 
     @property
     def current_graphics_view(self) -> QtWidgets.QGraphicsView:
-        """Get the current active graphics view based on current_scene_index"""
-        if self.current_scene_index == 0:  # Processed image view
-            return self.ui.processedImageView
-        else:  # Original image view
+        """Get the current active graphics view based on current_page_index"""
+        if self.current_page_index == 0:  # Original image
             return self.ui.originalImagePreview
+        elif self.current_page_index == 1:  # Processed image without seams
+            return self.ui.processedImageView
+        else:  # Processed image with seams (page index 2)
+            return self.ui.processedImageWithSeamsView
 
     def initialize_zoom_combo_box(self):
         """Initialize the zoom combo box with standard options"""
@@ -894,83 +155,100 @@ class ImageLabMainWindow(QtWidgets.QMainWindow):
     def initialize_seams_mode_combo_box(self):
         """Initialize the seams mode combo box"""
         self.ui.seamsModeComboBox.clear()
-        self.ui.seamsModeComboBox.addItems(["Added Seams", "Removed Seams"])
+        self.ui.seamsModeComboBox.addItems(["All Seams", "Added Seams", "Removed Seams"])
 
     def show_placeholder_text(self):
-        """Show placeholder text in both graphics views"""
+        """Show placeholder text in all graphics views"""
+        font = QtGui.QFont()
+        font.setPointSize(12)
+        
         # Original image view
         self.original_scene.clear()
         original_text_item = self.original_scene.addText("Upload or drag image here")
         original_text_item.setDefaultTextColor(QtGui.QColor(108, 117, 125))
-        font = original_text_item.font()
-        font.setPointSize(12)
         original_text_item.setFont(font)
         
-        # Processed image view
+        # Processed image view without seams
         self.processed_scene.clear()
         processed_text_item = self.processed_scene.addText("Processed image will appear here")
         processed_text_item.setDefaultTextColor(QtGui.QColor(108, 117, 125))
         processed_text_item.setFont(font)
         
+        # Processed image view with seams
+        self.processed_with_seams_scene.clear()
+        seams_text_item = self.processed_with_seams_scene.addText("Seams visualization will appear here")
+        seams_text_item.setDefaultTextColor(QtGui.QColor(108, 117, 125))
+        seams_text_item.setFont(font)
+        
         # Center the content
         self.center_content()
 
     def center_content(self):
-        """Center the content in both graphics views"""
-        self.ui.originalImagePreview.fitInView(self.original_scene.itemsBoundingRect(), QtCore.Qt.KeepAspectRatio)
-        self.ui.processedImageView.fitInView(self.processed_scene.itemsBoundingRect(), QtCore.Qt.KeepAspectRatio)
+        """Center the content in all graphics views"""
+        for view, scene in [(self.ui.originalImagePreview, self.original_scene),
+                           (self.ui.processedImageView, self.processed_scene),
+                           (self.ui.processedImageWithSeamsView, self.processed_with_seams_scene)]:
+            if scene.items():
+                view.fitInView(scene.itemsBoundingRect(), QtCore.Qt.KeepAspectRatio)
 
     def toggle_scene(self):
         """Toggle between original and processed image views"""
         if not self.has_processed_image():
             return
             
-        # Toggle between 0 (processed) and 1 (original)
-        self.current_scene_index = 1 - self.current_scene_index
-        self.ui.stackedWidget.setCurrentIndex(self.current_scene_index)
-        self.update_toggle_button_text()
-        
-        # Update UI controls based on current view
-        if self.current_scene_index == 0:  # Processed view
-            # Show seam controls if we have seam visualizations
+        # If currently showing processed image with seams, switch to processed without seams first
+        if self.current_page_index == 2:  # processed with seams
+            self.ui.stackedWidget.setCurrentIndex(1)  # processed without seams (Page 1)
+            self.current_page_index = 1
+            self.seams_view_active = False
+            self.ui.seamsViewBtn.setText("View Seams")
+            self.ui.seamsModeComboBox.setVisible(False)
+            
+        # Toggle between original (0) and processed without seams (1)
+        elif self.current_page_index == 0:  # Currently showing original
+            self.ui.stackedWidget.setCurrentIndex(1)  # Switch to processed without seams
+            self.current_page_index = 1
+            # Show seam controls if available
             has_seams = self.seam_visualizations is not None
             self.ui.seamsViewBtn.setVisible(has_seams)
-            self.ui.seamsModeComboBox.setVisible(has_seams and self.seams_view_active)
+            self.ui.seamsModeComboBox.setVisible(False)  # Hide in processed without seams view
             
-            # Show appropriate image based on seam view state
-            if self.seams_view_active:
-                self.show_processed_with_seams()
-            else:
-                self.show_processed_normal()
-        else:  # Original view
+        else:  # Currently showing processed without seams (page index 1)
+            self.ui.stackedWidget.setCurrentIndex(0)  # Switch to original
+            self.current_page_index = 0
             # Hide seam controls when viewing original
             self.ui.seamsViewBtn.setVisible(False)
             self.ui.seamsModeComboBox.setVisible(False)
-            
-            # Always show original image normally
-            self.show_original_normal()
+        
+        # Update timing labels based on current page
+        self.update_timing_display()
+        self.update_toggle_button_text()
 
     def toggle_seams_view(self):
         """Toggle seam visualization on/off for processed image"""
         if not self.has_processed_image() or self.seam_visualizations is None:
             return
-        
-        # Only allow seam viewing in processed image view
-        if self.current_scene_index != 0:
-            return
             
         self.seams_view_active = not self.seams_view_active
         
         if self.seams_view_active:
-            # Turn ON seam view
+            # Turn ON seam view - switch to processed with seams page
+            self.ui.stackedWidget.setCurrentIndex(2)  # processedImageWithSeamsPage (Page 2)
+            self.current_page_index = 2
             self.ui.seamsViewBtn.setText("Hide Seams")
             self.ui.seamsModeComboBox.setVisible(True)
             self.show_processed_with_seams()
         else:
-            # Turn OFF seam view
+            # Turn OFF seam view - switch back to processed without seams page
+            self.ui.stackedWidget.setCurrentIndex(1)  # processedImageWithoutSeamsPage (Page 1)
+            self.current_page_index = 1
             self.ui.seamsViewBtn.setText("View Seams")
             self.ui.seamsModeComboBox.setVisible(False)
             self.show_processed_normal()
+        
+        # Update timing labels based on current page
+        self.update_timing_display()
+        self.update_toggle_button_text()
 
     def on_seams_mode_changed(self, mode_text):
         """Handle seam view mode change"""
@@ -982,7 +260,7 @@ class ImageLabMainWindow(QtWidgets.QMainWindow):
 
     def show_processed_normal(self):
         """Show processed image without seams (blended naturally)"""
-        if hasattr(self, 'processed_pixmap') and self.processed_pixmap:
+        if self.processed_pixmap is not None:
             self.display_processed_image(self.processed_pixmap)
 
     def show_processed_with_seams(self):
@@ -992,82 +270,139 @@ class ImageLabMainWindow(QtWidgets.QMainWindow):
         
         if self.current_seams_mode == "All Seams":
             self.show_all_seams()
+        elif self.current_seams_mode == "Added Seams":
+            self.show_added_seams()
         elif self.current_seams_mode == "Removed Seams":
             self.show_removed_seams()
-        else:  # "Inserted Seams"
-            self.show_inserted_seams()
 
     def show_all_seams(self):
         """Show processed image with ALL seams highlighted"""
         if self.seam_visualizations is not None and 'all' in self.seam_visualizations:
             seams_img = self.seam_visualizations['all']
+            print("all seams_img", seams_img)
             if seams_img is not None:
                 q_image = self.convert_cv_to_qimage(seams_img)
                 if q_image:
                     pixmap = QtGui.QPixmap.fromImage(q_image)
-                    self.display_processed_image(pixmap)
+                    self.display_processed_with_seams_image(pixmap)
 
     def show_removed_seams(self):
         """Show processed image with removed seams highlighted"""
         if self.seam_visualizations is not None and 'removed' in self.seam_visualizations:
             seams_img = self.seam_visualizations['removed']
+            print("removed seams_img", seams_img)
             if seams_img is not None:
                 q_image = self.convert_cv_to_qimage(seams_img)
                 if q_image:
                     pixmap = QtGui.QPixmap.fromImage(q_image)
-                    self.display_processed_image(pixmap)
+                    self.display_processed_with_seams_image(pixmap)
 
-    def show_inserted_seams(self):
-        """Show processed image with inserted seams highlighted"""
-        if self.seam_visualizations is not None and 'inserted' in self.seam_visualizations:
-            seams_img = self.seam_visualizations['inserted']
+    def show_added_seams(self):
+        """Show processed image with added seams highlighted"""
+        if self.seam_visualizations is not None and 'added' in self.seam_visualizations:
+            seams_img = self.seam_visualizations['added']
+            print("added seams_img", seams_img)
             if seams_img is not None:
                 q_image = self.convert_cv_to_qimage(seams_img)
                 if q_image:
                     pixmap = QtGui.QPixmap.fromImage(q_image)
-                    self.display_processed_image(pixmap)
+                    self.display_processed_with_seams_image(pixmap)
 
     def show_original_normal(self):
         """Show original image without seams"""
-        if hasattr(self, 'original_pixmap') and self.original_pixmap:
+        if self.original_pixmap is not None:
             self.display_original_image(self.original_pixmap)
 
     def update_toggle_button_text(self):
-        """Update the toggle button text based on current scene"""
-        if self.current_scene_index == 0:  # Currently showing processed image
-            self.ui.toggleSceneBtn.setText("View Original")
-        else:  # Currently showing original image
+        """Update the toggle button text based on current page"""
+        if self.current_page_index == 0:  # Currently showing original
             self.ui.toggleSceneBtn.setText("View Processed")
+        elif self.current_page_index == 1:  # Currently showing processed without seams
+            self.ui.toggleSceneBtn.setText("View Original")
+        else:  # Currently showing processed with seams (page 2)
+            self.ui.toggleSceneBtn.setText("View Original")
+
+    def update_button_states(self):
+        """Update button states based on current state"""
+        has_processed = self.has_processed_image()
+        
+        # Toggle button enabled only if we have processed image
+        self.ui.toggleSceneBtn.setEnabled(has_processed)
+        
+        # Seams view button enabled only if we have processed image AND seam visualizations
+        has_seams = self.seam_visualizations is not None
+        self.ui.seamsViewBtn.setEnabled(has_processed and has_seams)
+        
+        # Show seams button only when in processed pages (1 or 2)
+        in_processed_page = self.current_page_index in [1, 2]
+        self.ui.seamsViewBtn.setVisible(in_processed_page and has_seams)
+        
+        # Show seams mode combo box only when viewing seams (page 2)
+        self.ui.seamsModeComboBox.setVisible(self.current_page_index == 2)
 
     def show_original_image_page(self):
         """Switch to original image view"""
-        self.ui.stackedWidget.setCurrentIndex(1)  # original_image_page
-        self.current_scene_index = 1
-        self.update_toggle_button_text()
+        self.ui.stackedWidget.setCurrentIndex(0)  # originalImagePage (Page 0)
+        self.current_page_index = 0
         
-        # Reset seam viewing for original image
+        # Hide seam controls when viewing original
         self.ui.seamsViewBtn.setVisible(False)
         self.ui.seamsModeComboBox.setVisible(False)
+        self.seams_view_active = False
+        self.ui.seamsViewBtn.setText("View Seams")
         
         # Show original image normally
         self.show_original_normal()
+        
+        # Update button states
+        self.update_toggle_button_text()
+        self.update_button_states()
+        
+        # Clear timing display for original page
+        self.ui.timingLabel.setText("")
 
     def show_processed_image_page(self):
-        """Switch to processed image view"""
-        self.ui.stackedWidget.setCurrentIndex(0)  # processed_image_page
-        self.current_scene_index = 0
-        self.update_toggle_button_text()
+        """Switch to processed image view without seams"""
+        self.ui.stackedWidget.setCurrentIndex(1)  # processedImageWithoutSeamsPage (Page 1)
+        self.current_page_index = 1
         
-        # Show/hide seam controls based on availability
+        # Show seam controls if available
         has_seams = self.seam_visualizations is not None
         self.ui.seamsViewBtn.setVisible(has_seams)
-        self.ui.seamsModeComboBox.setVisible(has_seams and self.seams_view_active)
+        self.ui.seamsModeComboBox.setVisible(False)  # Hidden in processed without seams view
+        self.seams_view_active = False
+        self.ui.seamsViewBtn.setText("View Seams")
         
-        # Show appropriate image
-        if self.seams_view_active:
-            self.show_processed_with_seams()
-        else:
-            self.show_processed_normal()
+        # Show processed image without seams
+        self.show_processed_normal()
+        
+        # Update button states
+        self.update_toggle_button_text()
+        self.update_button_states()
+        
+        # Update timing display for processed page
+        self.update_timing_display()
+
+    def show_processed_with_seams_page(self):
+        """Switch to processed image view with seams"""
+        self.ui.stackedWidget.setCurrentIndex(2)  # processedImageWithSeamsPage (Page 2)
+        self.current_page_index = 2
+        
+        # Show seam controls
+        self.ui.seamsViewBtn.setVisible(True)
+        self.ui.seamsModeComboBox.setVisible(True)
+        self.seams_view_active = True
+        self.ui.seamsViewBtn.setText("Hide Seams")
+        
+        # Show appropriate seam visualization
+        self.show_processed_with_seams()
+        
+        # Update button states
+        self.update_toggle_button_text()
+        self.update_button_states()
+        
+        # Update timing display for seams page
+        self.update_timing_display()
 
     def display_original_image(self, pixmap: Union[QtGui.QPixmap, None]):
         """Load and display original image"""
@@ -1081,9 +416,21 @@ class ImageLabMainWindow(QtWidgets.QMainWindow):
             
             # Store the pixmap
             self.original_pixmap = pixmap
+            
+            # Switch to original image page (Page 0)
+            self.current_page_index = 0
+            self.ui.stackedWidget.setCurrentIndex(self.current_page_index)
+            
+            # Update button states
+            self.update_toggle_button_text()
+            self.update_button_states()
+            
+            # Clear timing for original image
+            self.ui.timingLabel.setText("")
+            self.ui.seamsTimingLabel.setText("")
 
     def display_processed_image(self, pixmap: Union[QtGui.QPixmap, None]):
-        """Load and display processed image"""
+        """Load and display processed image without seams"""
         if pixmap and not pixmap.isNull():
             self.processed_scene.clear()
             processed_pixmap_item = self.processed_scene.addPixmap(pixmap)
@@ -1094,6 +441,30 @@ class ImageLabMainWindow(QtWidgets.QMainWindow):
             
             # Store the pixmap
             self.processed_pixmap = pixmap
+            
+            # Switch to processed image page (Page 1)
+            self.current_page_index = 1
+            self.ui.stackedWidget.setCurrentIndex(self.current_page_index)
+            
+            # Update button states
+            self.update_toggle_button_text()
+            self.update_button_states()
+            
+            # Update timing display
+            self.update_timing_display()
+
+    def display_processed_with_seams_image(self, pixmap: Union[QtGui.QPixmap, None]):
+        """Load and display processed image with seams visualization"""
+        if pixmap and not pixmap.isNull():
+            self.processed_with_seams_scene.clear()
+            seams_pixmap_item = self.processed_with_seams_scene.addPixmap(pixmap)
+
+            if seams_pixmap_item:
+                self.processed_with_seams_scene.setSceneRect(seams_pixmap_item.boundingRect())
+            self.ui.processedImageWithSeamsView.fitInView(self.processed_with_seams_scene.sceneRect(), QtCore.Qt.KeepAspectRatio)
+            
+            # Store the seams pixmap
+            self.seams_pixmap = pixmap
 
     def convert_cv_to_qimage(self, cv_image):
         """Convert OpenCV image to QImage"""
@@ -1130,20 +501,22 @@ class ImageLabMainWindow(QtWidgets.QMainWindow):
         if visualizations and isinstance(visualizations, dict):
             # Store all three visualization types
             self.seam_visualizations = {
-                'all': visualizations.get('all'),      # Combined view
-                'removed': visualizations.get('removed'),  # Removed only
-                'inserted': visualizations.get('inserted') # Inserted only
+                'all': visualizations.get('all'),  # Combined view
+                'added': visualizations.get('added'),  # Added only
+                'removed': visualizations.get('removed') # Removed only
             }
+            
             # Update combo box options
             self.ui.seamsModeComboBox.clear()
-            self.ui.seamsModeComboBox.addItems(["All Seams", "Removed Seams", "Inserted Seams"])
+            self.ui.seamsModeComboBox.addItems(["All Seams", "Added Seams", "Removed Seams"])
             self.ui.seamsModeComboBox.setCurrentText("All Seams")
             self.current_seams_mode = "All Seams"
             
-            # Enable seam viewing for processed image
-            self.ui.seamsViewBtn.setEnabled(True)
+            # Update button states
+            self.update_button_states()
         else:
             self.seam_visualizations = None
+            self.update_button_states()
 
     def enable_tool_buttons(self, enabled):
         """Enable or disable tool buttons based on image availability"""
@@ -1151,16 +524,242 @@ class ImageLabMainWindow(QtWidgets.QMainWindow):
         self.ui.filtersBtn.setEnabled(enabled)
         self.ui.obj_detectionBtn.setEnabled(enabled)
         
-        # Only enable toggle buttons if we have a processed image
-        has_processed = self.has_processed_image()
-        self.ui.toggleSceneBtn.setEnabled(enabled and has_processed)
+        # Update button states
+        self.update_button_states()
 
     def update_timing_label(self, timing_info: Dict):
         """Update timing display label"""
-        if timing_info and 'algorithm' in timing_info:
-            algorithm_time = timing_info['algorithm']
-            algorithm_name = timing_info.get('algorithm_name', 'Algorithm')
-            self.ui.timingLabel.setText(f"{algorithm_name}: {algorithm_time:.3f}s")
+        if timing_info:
+            self.timing_info = timing_info
+            self.update_timing_display()
+        else:
+            self.timing_info = None
+            self.ui.timingLabel.setText("")
+            self.ui.seamsTimingLabel.setText("")
+
+    def update_timing_display(self):
+        """Update timing display based on current page"""
+        if not self.timing_info:
+            self.ui.timingLabel.setText("")
+            self.ui.seamsTimingLabel.setText("")
+            return
+        
+        # Format timing information
+        algorithm_time = self.timing_info.get('algorithm', 0.0)
+        algorithm_name = self.timing_info.get('algorithm_name', 'Algorithm')
+        
+        timing_text = f"{algorithm_name}: {algorithm_time:.3f}s"
+        
+        # Update appropriate timing label based on current page
+        if self.current_page_index == 1:  # Processed without seams page
+            self.ui.timingLabel.setText(timing_text)
+            self.ui.seamsTimingLabel.setText("")
+        elif self.current_page_index == 2:  # Processed with seams page
+            self.ui.seamsTimingLabel.setText(timing_text)
+            self.ui.timingLabel.setText("")
+        else:  # Original page (0) or other
+            self.ui.timingLabel.setText("")
+            self.ui.seamsTimingLabel.setText("")
+
+    def update_dimension_labels(self):
+        """Update dimension labels for all views"""
+        if hasattr(self, 'original_pixmap') and self.original_pixmap is not None:
+            w = self.original_pixmap.width()
+            h = self.original_pixmap.height()
+            self.ui.imageDimensionsLabel.setText(f"Width: {w} × Height: {h}")
+        
+        if hasattr(self, 'processed_pixmap') and self.processed_pixmap is not None:
+            w = self.processed_pixmap.width()
+            h = self.processed_pixmap.height()
+            self.ui.processedDimensionsLabel.setText(f"Width: {w} × Height: {h}")
+        
+        if hasattr(self, 'seams_pixmap') and self.seams_pixmap is not None:
+            w = self.seams_pixmap.width()
+            h = self.seams_pixmap.height()
+            self.ui.processedWithSeamsDimensionsLabel.setText(f"Width: {w} × Height: {h}")
+
+    def reset_processed_state(self):
+        """Reset processed image state"""
+        self.processed_pixmap = None
+        self.seams_pixmap = None
+        self.seam_visualizations = None
+        self.timing_info = None
+        
+        # Clear processed scenes
+        self.processed_scene.clear()
+        self.processed_with_seams_scene.clear()
+        
+        # Reset seam view state
+        self.seams_view_active = False
+        self.current_seams_mode = "All Seams"
+        
+        # Update UI
+        self.ui.seamsViewBtn.setEnabled(False)
+        self.ui.seamsViewBtn.setVisible(False)
+        self.ui.seamsModeComboBox.setVisible(False)
+        self.ui.seamsViewBtn.setText("View Seams")
+        
+        # Show placeholder for processed views
+        font = QtGui.QFont()
+        font.setPointSize(12)
+        
+        processed_text_item = self.processed_scene.addText("Processed image will appear here")
+        processed_text_item.setDefaultTextColor(QtGui.QColor(108, 117, 125))
+        processed_text_item.setFont(font)
+        
+        seams_text_item = self.processed_with_seams_scene.addText("Seams visualization will appear here")
+        seams_text_item.setDefaultTextColor(QtGui.QColor(108, 117, 125))
+        seams_text_item.setFont(font)
+        
+        # Clear labels
+        self.ui.processedDimensionsLabel.setText("")
+        self.ui.processedWithSeamsDimensionsLabel.setText("")
+        self.ui.timingLabel.setText("")
+        self.ui.seamsTimingLabel.setText("")
+        
+        # Update button states
+        self.update_button_states()
+        self.update_toggle_button_text()
+
+
+class ResizeWidget(QtWidgets.QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        
+        self.ui = Ui_ResizeTool()
+        self.ui.setupUi(self)
+
+        # Input validation
+        int_validator = QtGui.QIntValidator(1, 100000)  # Add reasonable bounds
+        self.ui.width_resize_lineEdit.setValidator(int_validator)
+        self.ui.height_resize_lineEdit.setValidator(int_validator)
+
+        # Connect signals
+        self.ui.content_aware_checkBox.stateChanged.connect(self.content_aware_check_state)
+        self.ui.content_aware_checkBox.toggled.connect(self.toggle_algorithm_visibility)
+        
+        # Initialize UI state
+        self.content_aware_check_state()
+        self.toggle_algorithm_visibility(self.ui.content_aware_checkBox.isChecked())
+
+        # Aspect ratio options
+        self.ui.resize_image_comboBox.clear()
+        self.ui.resize_image_comboBox.addItems([
+            "Custom",
+            "Original", 
+            "1:1", 
+            "4:3", 
+            "3:4", 
+            "16:9", 
+            "9:16", 
+            "3:2", 
+            "2:3",
+        ])
+
+        # Aspect ratio options
+        self.ui.resize_algorithm_comboBox.clear()
+        self.ui.resize_algorithm_comboBox.addItems([
+            "Hubble 001",
+            "Hubble 002",
+            "Hubble 003",
+        ])
+
+        # Window configuration
+        self.setWindowFlags(
+            QtCore.Qt.Tool | 
+            QtCore.Qt.Dialog | 
+            QtCore.Qt.WindowCloseButtonHint |
+            QtCore.Qt.WindowTitleHint
+        )
+        self.setAttribute(QtCore.Qt.WA_DeleteOnClose, False)
+        self.setWindowModality(QtCore.Qt.NonModal)
+
+    def get_resize_parameters(self):
+        """Get all resize parameters from the UI"""
+        return {
+            'width': int(self.ui.width_resize_lineEdit.text()) if self.ui.width_resize_lineEdit.text() else None,
+            'height': int(self.ui.height_resize_lineEdit.text()) if self.ui.height_resize_lineEdit.text() else None,
+            'content_aware': self.ui.content_aware_checkBox.isChecked(),
+            'algorithm': self.ui.resize_algorithm_comboBox.currentText() if self.ui.content_aware_checkBox.isChecked() else None,
+            'aspect_ratio': self.ui.resize_image_comboBox.currentText()
+        }
+
+    def reset_form(self):
+        """Reset all form fields to default values"""
+        self.ui.width_resize_lineEdit.clear()
+        self.ui.height_resize_lineEdit.clear()
+        self.ui.content_aware_checkBox.setChecked(True)
+        self.ui.resize_algorithm_comboBox.setCurrentIndex(0)
+        self.ui.resize_image_comboBox.setCurrentIndex(0)    
+
+    def content_aware_check_state(self):
+        """
+        Toggle text bold based on checkbox state using QFont
+        """
+        font = self.ui.content_aware_checkBox.font()
+        font.setBold(self.ui.content_aware_checkBox.isChecked())
+        self.ui.content_aware_checkBox.setFont(font)
+
+    # Add this method to your class:
+    def toggle_algorithm_visibility(self, checked):
+        """Show/hide algorithm selection based on content-aware checkbox state"""
+        self.ui.algorithmWidget.setVisible(checked)
+
+class FilterWidget(QtWidgets.QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        
+        self.ui = Ui_FiltersTool()
+        self.ui.setupUi(self)
+
+        # Dialog-like appearance and behavior
+        self.setWindowFlags(
+            QtCore.Qt.Tool | 
+            QtCore.Qt.Dialog | 
+            QtCore.Qt.WindowCloseButtonHint |
+            QtCore.Qt.WindowTitleHint
+        )
+        self.setAttribute(QtCore.Qt.WA_DeleteOnClose, False)
+        self.setWindowModality(QtCore.Qt.NonModal)
+
+
+class ObjectDetectionWidget(QtWidgets.QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        
+        self.ui = Ui_ObjectDetectionTool()
+        self.ui.setupUi(self)
+
+        self.ui.boundinBoxPreviewCheckbox.stateChanged.connect(self.bound_box_preview_state)
+        self.bound_box_preview_state()
+
+        # Dialog-like appearance and behavior
+        self.setWindowFlags(
+            QtCore.Qt.Tool | 
+            QtCore.Qt.Dialog | 
+            QtCore.Qt.WindowCloseButtonHint |
+            QtCore.Qt.WindowTitleHint
+        )
+        self.setAttribute(QtCore.Qt.WA_DeleteOnClose, False)
+        self.setWindowModality(QtCore.Qt.NonModal)
+
+    def bound_box_preview_state(self):
+        """
+        Toggle text bold based on checkbox state using QFont
+        """
+        font = self.ui.boundinBoxPreviewCheckbox.font()
+        font.setBold(self.ui.boundinBoxPreviewCheckbox.isChecked())
+        self.ui.boundinBoxPreviewCheckbox.setFont(font)
+
+
+
+
+
+
+
+
+
+
 
 
 """
@@ -1364,7 +963,7 @@ class ImageLab(ImageLabMainWindow):
             return False
             
         # Additional check based on current scene type
-        if self.current_scene_index == 0:  # Processed image view
+        if self.current_page_index == 0:  # Processed image view
             # Check if processed scene has content
             return hasattr(self, 'processed_scene') and self.processed_scene.items()
         else:  # Original image view
@@ -1772,6 +1371,10 @@ class ImageLab(ImageLabMainWindow):
             QtWidgets.QMessageBox.warning(self, "No Image", "Please load an image first.")
             return
         
+        if not self.image_processor:
+            QtWidgets.QMessageBox.warning(self, "Could not resize", "Image processor not initialized")
+            return
+        
         try:
             # Get width and height from line edits
             new_width: int = int(self.resize_widget.ui.width_resize_lineEdit.text())
@@ -1837,7 +1440,10 @@ class ImageLab(ImageLabMainWindow):
                         self.update_timing_label(timing_info)
                     
                     # Get seam visualizations
-                    seam_visualizations = self.image_processor.get_seam_visualizations()
+                    seam_visualizations = None
+                    if self.image_processor is not None:
+                        seam_visualizations = self.image_processor.get_seam_visualizations()
+                    
                     if seam_visualizations:
                         self.set_seam_visualizations(seam_visualizations)
                     
@@ -1958,3 +1564,1126 @@ if __name__ == "__main__":
     
     image_processor.show()
     sys.exit(app.exec_())
+
+
+
+
+
+"""
+utilities/processing.py
+Image processing utilities for loading, resizing, and saving images
+"""
+
+from pathlib import Path
+import cv2 as cv
+from PyQt5.QtGui import QImage, QPixmap
+import numpy as np
+
+from utilities.seam_carving_algorithms import SeamCarver, SeamCarverHubble001, SeamCarverHubble002
+
+class ImageProcessor:
+    def __init__(self, file_path):
+        self.image_path = Path(file_path)
+        self.current_image = None
+        self.original_image = None
+        self.last_timing_info = None
+        self.last_seam_info = None
+        self.last_algorithm_used = None
+        
+        self.load_image()
+        
+    def load_image(self):
+        """Load an image from file path"""
+        try:
+            image_path = self.image_path
+            if not self._is_valid_image_path(image_path):
+                return False
+            
+            self.original_image = cv.imread(str(image_path))
+            if self.original_image is None:
+                raise ValueError(f"Could not load image from {image_path}")
+            
+            self.current_image = self.original_image.copy()
+            return True
+        except Exception as e:
+            print(f"Error loading image: {e}")
+            return False
+    
+    def _is_valid_image_path(self, image_path):
+        """Validate if the file path exists and is a valid image file"""
+        if not image_path or not isinstance(image_path, Path):
+            print("Error: Invalid file path provided")
+            return False
+            
+        if not image_path.exists():
+            print(f"Error: File does not exist: {image_path}")
+            return False
+            
+        if not image_path.is_file():
+            print(f"Error: Path is not a file: {image_path}")
+            return False
+            
+        return True
+    
+    def is_image_loaded(self):
+        """Check if an image is currently loaded"""
+        return self.current_image is not None and self.original_image is not None
+    
+    def get_image_info(self):
+        """Get information about the currently loaded image"""
+        if not self.is_image_loaded():
+            return "No image loaded"
+        
+        height, width = self.current_image.shape[:2]
+        channels = self.current_image.shape[2] if len(self.current_image.shape) > 2 else 1
+        
+        file_size = self.image_path.stat().st_size if self.image_path and self.image_path.exists() else 0
+        
+        return {
+            'path': str(self.image_path),
+            'dimensions': f"{width}x{height}",
+            'channels': channels,
+            'size': f"{file_size / 1024:.2f} KB"
+        }
+
+    def get_image_directory(self):
+        """Get the directory containing the current image"""
+        if self.image_path:
+            return self.image_path.parent
+        return None
+    
+    def get_image_filename(self):
+        """Get the filename without extension"""
+        if self.image_path:
+            return self.image_path.stem
+        return None
+    
+    def get_image_extension(self):
+        """Get the file extension"""
+        if self.image_path:
+            return self.image_path.suffix
+        return None
+    
+    def get_image_dimensions(self):
+        """Get current image dimensions"""
+        if self.current_image is not None:
+            height, width = self.current_image.shape[:2]
+            return width, height
+        return 0, 0
+    
+    def resize_image(self, new_width=None, new_height=None, **kwargs):
+        """Resize the current image
+        
+        Args:
+            new_width: Target width (required)
+            new_height: Target height (required)
+            **kwargs: Additional options:
+                - content_aware: Use content-aware resizing (default: False)
+                - content_aware_alg: Algorithm for content-aware resizing
+                - progress_callback: Callback for progress updates
+        
+        Returns:
+            success: Boolean indicating if resize was successful
+        """
+        if self.current_image is None:
+            return False
+        
+        # We need target dimensions
+        if new_width is None or new_height is None:
+            raise ValueError("Width and height are required for content-aware resize")
+        
+        # Convert to integers and validate
+        try:
+            new_width = int(new_width)
+            new_height = int(new_height)
+        except (ValueError, TypeError) as e:
+            raise ValueError(f"Width and height must be numeric values: {e}")
+        
+        # We need target dimensions
+        if new_width <= 0 or new_height <= 0:
+            raise ValueError("Width and height values must be greater than 0")
+        
+        # Extract kwargs with default values
+        content_aware = kwargs.get('content_aware', False)
+        content_aware_alg = kwargs.get('content_aware_alg', None)
+        progress_callback = kwargs.get('progress_callback', None)
+        
+        try:
+            if content_aware:
+                # Store the algorithm used
+                self.last_algorithm_used = content_aware_alg
+                
+                # Use seam carving with seam information
+                result = self._seam_carving_resize(
+                    new_width, new_height, 
+                    algorithm=content_aware_alg,
+                    progress_callback=progress_callback,
+                    return_seams=True
+                )
+                
+                if result:
+                    # result should be (image, seam_info) tuple when return_seams=True
+                    if isinstance(result, tuple) and len(result) == 2:
+                        self.current_image, self.last_seam_info = result
+                    else:
+                        # If not a tuple, just get the image
+                        self.current_image = result
+                        self.last_seam_info = {}
+                    
+                    # Get timing info
+                    self.last_timing_info = self.last_seam_info.get('timing', {}) if self.last_seam_info else {}
+                    
+                    # Create seam visualizations if we have seam info
+                    if self.last_seam_info and self.original_image is not None:
+                        # Create seam carver instance using explicit class
+                        seam_carver = None
+                        visualizations = None
+                        if self.last_algorithm_used is not None:
+                            seam_carver = self._create_seam_carver(self.last_algorithm_used)
+                        
+                        # Call the method that returns a tuple of three images
+                        if seam_carver is not None:
+                            visualizations = seam_carver.create_seam_visualization(
+                            self.original_image,
+                            self.last_seam_info
+                        )
+                        
+                        # Unpack and store the three visualization types
+                        if visualizations is not None:
+                            all_seams_img, removed_img, inserted_img = visualizations
+                            self.last_seam_info['all_seams_image'] = all_seams_img
+                            self.last_seam_info['removed_seams_image'] = removed_img
+                            self.last_seam_info['inserted_seams_image'] = inserted_img
+                else:
+                    return False
+            else:
+                # Traditional resize
+                self.current_image = cv.resize(self.current_image, (new_width, new_height), interpolation=cv.INTER_AREA)
+                self.last_timing_info = {'algorithm': 0.0, 'total': 0.0, 'algorithm_name': 'Traditional'}
+                self.last_seam_info = None
+                self.last_algorithm_used = None
+            
+            return True
+        except Exception as e:
+            print(f"Error resizing image: {e}")
+            import traceback
+            traceback.print_exc()
+            return False
+    
+    def _create_seam_carver(self, algorithm: str) -> SeamCarver:
+        """Helper method to create seam carver instances"""
+        if algorithm == "Hubble 001":
+            return SeamCarverHubble001()
+        elif algorithm == "Hubble 002":
+            return SeamCarverHubble002()
+        else:
+            raise ValueError(f"Unknown algorithm: {algorithm}")
+    
+    def get_seam_visualizations(self):
+        """Get seam visualization images"""
+        if self.last_seam_info and self.last_algorithm_used:
+            return {
+                'all': self.last_seam_info.get('all_seams_image'),
+                'removed': self.last_seam_info.get('removed_seams_image'),
+                'inserted': self.last_seam_info.get('inserted_seams_image')
+            }
+        return None
+    
+    def reset_to_original(self):
+        """Reset to original image"""
+        if self.original_image is not None:
+            self.current_image = self.original_image.copy()
+            self.last_timing_info = None
+            self.last_seam_info = None
+            self.last_algorithm_used = None
+            return True
+        return False
+        
+    def _seam_carving_resize(self, new_width, new_height, algorithm, progress_callback=None, return_seams=False):
+        """Content-aware resizing using seam carving"""
+        # Create seam carver instance
+        seam_carver = self._create_seam_carver(algorithm)
+        
+        # Use the seam carver to resize the current image
+        result = seam_carver.carve(
+            img=self.current_image.copy(),
+            target_width=new_width,
+            target_height=new_height,
+            progress_callback=progress_callback,
+            return_seams=return_seams
+        )
+        
+        return result
+    
+    def get_processed_image(self):
+        """Get the current processed image with timing and seam info"""
+        if self.current_image is not None:
+            return self.current_image.copy(), self.last_timing_info, self.last_seam_info
+        return None
+    
+    def save_image(self, save_path, img = None):
+        """Save image to file"""
+        if img is None:
+            if self.current_image is None:
+                return False
+            img = self.current_image
+        
+        try:
+            cv.imwrite(save_path, img)
+            return True
+        except Exception as e:
+            print(f"Error saving image: {e}")
+            return False
+
+    def convert_cv_image(self, image=None, output_format="qpixmap"):
+        """
+        Convert OpenCV image to QImage or QPixmap
+        
+        Args:
+            image: OpenCV image (if None, uses self.current_image)
+            output_format: "qimage" or "qpixmap"
+        
+        Returns:
+            QImage or QPixmap object, or empty object if conversion fails
+        """
+        if image is None:
+            image = self.current_image
+            
+        if image is None:
+            return QImage() if output_format.lower() == "qimage" else QPixmap()
+        
+        try:
+            # Convert BGR to RGB for color images
+            if len(image.shape) == 3 and image.shape[2] == 3:
+                rgb_image = cv.cvtColor(image, cv.COLOR_BGR2RGB)
+            else:
+                rgb_image = image
+            
+            h, w = rgb_image.shape[:2]
+            bytes_per_line = 3 * w if len(rgb_image.shape) == 3 else w
+            
+            # Create QImage
+            if len(rgb_image.shape) == 3:
+                q_img = QImage(rgb_image.data, w, h, bytes_per_line, QImage.Format_RGB888)
+            else:
+                q_img = QImage(rgb_image.data, w, h, bytes_per_line, QImage.Format_Grayscale8)
+            
+            # Return based on requested format
+            if output_format.lower() == "qimage":
+                return q_img
+            else:  # qpixmap
+                return QPixmap.fromImage(q_img)
+                
+        except Exception as e:
+            print(f"Error converting image: {e}")
+            return QImage() if output_format.lower() == "qimage" else QPixmap()
+
+
+
+"""
+utilities/seam_carving_algorithms.py
+Modular seam carving implementations for content-aware image resizing
+"""
+
+import numpy as np
+import cv2 as cv
+import time
+from typing import List, Callable, Optional, Tuple, Dict, Union
+from abc import ABC, abstractmethod
+
+
+class SeamCarver(ABC):
+    """Abstract base class for seam carving algorithms"""
+    
+    def __init__(self, name: str = "Base"):
+        """
+        Initialize SeamCarver with algorithm name.
+        
+        Args:
+            name: Algorithm name/identifier
+        """
+        self.name = name
+        self.default_color_space = 'rgb'
+        
+    def calculate_energy(self, img: np.ndarray, color_space: str = None) -> np.ndarray:
+        """
+        Return energy map (gradient magnitude) for the given image.
+        
+        Args:
+            img: Input image
+            color_space: Override default color space. If None, uses algorithm default.
+        """
+        if color_space is None:
+            color_space = self.default_color_space
+            
+        if color_space.lower() == 'rgb':
+            gray = cv.cvtColor(img, cv.COLOR_RGB2GRAY)
+        elif color_space.lower() == 'bgr':
+            gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+        else:
+            raise ValueError("color_space must be either 'rgb' or 'bgr'")
+        
+        grad_x = cv.Sobel(gray, cv.CV_64F, 1, 0, ksize=3)
+        grad_y = cv.Sobel(gray, cv.CV_64F, 0, 1, ksize=3)
+        energy = np.abs(grad_x) + np.abs(grad_y)
+        return energy
+    
+    def _mark_seam_on_image(self, img: np.ndarray, seam: List[int], 
+                           color: Tuple[int, int, int] = (0, 255, 0), 
+                           thickness: int = 1) -> np.ndarray:
+        """
+        Mark a seam on the image with a colored line (for visualization only).
+        
+        Args:
+            img: Input image (BGR format)
+            seam: List of column indices for the seam (length = height)
+            color: BGR color tuple for the seam (default: green)
+            thickness: Thickness of the seam line
+        
+        Returns:
+            Image with seam marked (BGR format)
+        """
+        marked_img = img.copy()
+        h, w = img.shape[:2]
+        
+        for i in range(h):
+            j = seam[i]
+            # Draw a line for better visibility
+            for offset in range(-thickness // 2, thickness // 2 + 1):
+                col = j + offset
+                if 0 <= col < w:
+                    marked_img[i, col] = color
+        return marked_img
+    
+    @abstractmethod
+    def _find_vertical_seam(self, energy: np.ndarray) -> List[int]:
+        """Find vertical seam using dynamic programming (to be implemented by subclasses)"""
+        pass
+    
+    @abstractmethod
+    def carve(self, img: np.ndarray, target_width: int, target_height: int | None = None, 
+          progress_callback: Optional[Callable] = None,
+          return_seams: bool = False) -> Union[np.ndarray, Tuple[np.ndarray, Dict]]:
+        """Main seam carving function (to be implemented by subclasses)"""
+        pass
+    
+    def create_seam_visualization(self, original_img: np.ndarray, seam_info: Dict, 
+                          removed_color: Tuple[int, int, int] = (0, 0, 255),  # Red
+                          inserted_color: Tuple[int, int, int] = (0, 255, 0),  # Green
+                          thickness: int = 1) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+        """
+        Create seam visualizations for removed and inserted seams.
+        
+        Args:
+            original_img: Original image (BGR format)
+            seam_info: Dictionary containing seam information
+            removed_color: Color for removed seams (BGR)
+            inserted_color: Color for inserted seams (BGR)
+            thickness: Thickness of seam lines
+        
+        Returns:
+            Tuple of (all_seams_image, removed_seams_image, inserted_seams_image)
+            - all_seams_image: Shows ALL seams (both removed and inserted)
+            - removed_seams_image: Shows only removed seams
+            - inserted_seams_image: Shows only inserted seams
+        """
+        # Create copies for visualization
+        all_seams_img = original_img.copy()
+        removed_img = original_img.copy()
+        inserted_img = original_img.copy()
+        
+        h, w = original_img.shape[:2]
+        
+        # Check if seam_info is valid
+        if not seam_info or not isinstance(seam_info, dict):
+            return all_seams_img, removed_img, inserted_img
+        
+        # Initialize default structure if missing
+        if 'removed_seams' not in seam_info:
+            seam_info['removed_seams'] = {'vertical': [], 'horizontal': []}
+        if 'inserted_seams' not in seam_info:
+            seam_info['inserted_seams'] = {'vertical': [], 'horizontal': []}
+        
+        # Helper function to mark a VERTICAL seam on an image
+        def mark_vertical_seam(img, seam, color):
+            """Mark a vertical seam on the image with the given color"""
+            marked_img = img.copy()
+            if not seam or len(seam) != h:  # Vertical seam must have h elements
+                return marked_img
+                
+            for i in range(h):
+                j = seam[i]
+                if 0 <= j < w:  # Ensure column is within bounds
+                    for offset in range(-thickness//2, thickness//2 + 1):
+                        col = j + offset
+                        if 0 <= col < w:
+                            marked_img[i, col] = color
+            return marked_img
+        
+        # Helper function to mark a HORIZONTAL seam on an image
+        def mark_horizontal_seam(img, seam, color):
+            """Mark a horizontal seam on the image with the given color"""
+            marked_img = img.copy()
+            if not seam:
+                return marked_img
+            
+            h, w = img.shape[:2]
+            
+            # For a horizontal seam, we have one value for each column (width)
+            # But the seam array stores row indices for each column
+            if len(seam) != w:
+                print(f"WARNING: Horizontal seam length mismatch: {len(seam)} != {w}")
+                # Try to handle it anyway
+                for j in range(min(len(seam), w)):
+                    i = seam[j]
+                    if 0 <= i < h:
+                        for offset in range(-thickness//2, thickness//2 + 1):
+                            row = i + offset
+                            if 0 <= row < h:
+                                marked_img[row, j] = color
+            else:
+                # Normal case
+                for j in range(w):
+                    i = seam[j]
+                    if 0 <= i < h:
+                        for offset in range(-thickness//2, thickness//2 + 1):
+                            row = i + offset
+                            if 0 <= row < h:
+                                marked_img[row, j] = color
+            return marked_img
+        
+        # DEBUG: Print seam information to understand the structure
+        # print(f"DEBUG: Image dimensions: {h}x{w}")
+        # print(f"DEBUG: Vertical removed seams: {len(seam_info['removed_seams'].get('vertical', []))}")
+        # print(f"DEBUG: Vertical inserted seams: {len(seam_info['inserted_seams'].get('vertical', []))}")
+        # print(f"DEBUG: Horizontal removed seams: {len(seam_info['removed_seams'].get('horizontal', []))}")
+        # print(f"DEBUG: Horizontal inserted seams: {len(seam_info['inserted_seams'].get('horizontal', []))}")
+        
+        # Check and print example seam lengths
+        if seam_info['removed_seams'].get('horizontal'):
+            first_horiz_seam = seam_info['removed_seams']['horizontal'][0] if seam_info['removed_seams']['horizontal'] else None
+            if first_horiz_seam is not None:
+                print(f"DEBUG: First horizontal removed seam length: {len(first_horiz_seam)} (should be {w})")
+        
+        if seam_info['inserted_seams'].get('horizontal'):
+            first_horiz_seam = seam_info['inserted_seams']['horizontal'][0] if seam_info['inserted_seams']['horizontal'] else None
+            if first_horiz_seam is not None:
+                print(f"DEBUG: First horizontal inserted seam length: {len(first_horiz_seam)} (should be {w})")
+        
+        # Mark ALL vertical seams on all images
+        for seam in seam_info['removed_seams'].get('vertical', []):
+            if seam and len(seam) == h:  # Validate seam length
+                # Mark on removed image (red)
+                removed_img = mark_vertical_seam(removed_img, seam, removed_color)
+                # Mark on combined image (red)
+                all_seams_img = mark_vertical_seam(all_seams_img, seam, removed_color)
+        
+        for seam in seam_info['inserted_seams'].get('vertical', []):
+            if seam and len(seam) == h:  # Validate seam length
+                # Mark on inserted image (green)
+                inserted_img = mark_vertical_seam(inserted_img, seam, inserted_color)
+                # Mark on combined image (green)
+                all_seams_img = mark_vertical_seam(all_seams_img, seam, inserted_color)
+        
+        # Mark ALL horizontal seams on all images
+        for seam in seam_info['removed_seams'].get('horizontal', []):
+            if seam and len(seam) == w:  # Validate seam length (horizontal seams have w elements)
+                # Mark on removed image (red)
+                removed_img = mark_horizontal_seam(removed_img, seam, removed_color)
+                # Mark on combined image (red)
+                all_seams_img = mark_horizontal_seam(all_seams_img, seam, removed_color)
+        
+        for seam in seam_info['inserted_seams'].get('horizontal', []):
+            if seam and len(seam) == w:  # Validate seam length (horizontal seams have w elements)
+                # Mark on inserted image (green)
+                inserted_img = mark_horizontal_seam(inserted_img, seam, inserted_color)
+                # Mark on combined image (green)
+                all_seams_img = mark_horizontal_seam(all_seams_img, seam, inserted_color)
+        
+        return all_seams_img, removed_img, inserted_img
+
+
+class SeamCarverHubble001(SeamCarver):
+    """Seam carving algorithm variant 001: Sequential seam processing"""
+    
+    def __init__(self):
+        super().__init__("Hubble 001")
+        self.default_color_space = 'rgb'
+        self.use_absolute_backtrack = False
+    
+    def _find_vertical_seam(self, energy: np.ndarray) -> List[int]:
+        """Hubble 001: Uses relative backtracking offsets"""
+        h, w = energy.shape
+        M = energy.copy().astype(np.float64)
+        backtrack = np.zeros_like(M, dtype=np.int32)
+        
+        # Build cumulative energy matrix
+        for i in range(1, h):
+            for j in range(0, w):
+                # Handle boundary cases
+                left = M[i-1, j-1] if j > 0 else float('inf')
+                middle = M[i-1, j]
+                right = M[i-1, j+1] if j < w-1 else float('inf')
+                
+                # Find minimum energy path
+                min_energy = min(left, middle, right)
+                M[i, j] += min_energy
+                
+                # Store relative backtracking information
+                if min_energy == left:
+                    backtrack[i, j] = -1  # come from left
+                elif min_energy == middle:
+                    backtrack[i, j] = 0   # come from middle
+                else:
+                    backtrack[i, j] = 1   # come from right
+        
+        # Find the starting point of the seam
+        seam = []
+        j = np.argmin(M[-1])
+        seam.append(j)
+        
+        # Backtrack to find the complete seam
+        for i in range(h-1, 0, -1):
+            j = j + backtrack[i, j]
+            seam.append(j)
+        
+        return seam[::-1]  # reverse to go from top to bottom
+    
+    def _remove_vertical_seam(self, img: np.ndarray, seam: List[int]) -> np.ndarray:
+        """Remove vertical seam from image"""
+        h, w, c = img.shape
+        new_img = np.zeros((h, w-1, c), dtype=img.dtype)
+        
+        for i in range(h):
+            j = seam[i]
+            new_img[i, :, :] = np.delete(img[i, :, :], j, axis=0)
+        
+        return new_img
+
+    def _insert_vertical_seam(self, img: np.ndarray, seam: List[int]) -> np.ndarray:
+        """
+        Insert vertical seam by averaging with neighbors.
+        Creates a natural-looking seam that blends with the image.
+        
+        Args:
+            img: Input image (BGR format)
+            seam: Seam to insert
+        
+        Returns:
+            Image with seam inserted (blended naturally)
+        """
+        h, w, c = img.shape
+        new_img = np.zeros((h, w + 1, c), dtype=img.dtype)
+        
+        for i in range(h):
+            j = seam[i]
+            
+            # Copy all pixels before the seam position
+            new_img[i, :j, :] = img[i, :j, :]
+            
+            # Create new pixel at seam position by averaging neighbors
+            if j == 0:
+                # Left edge case - average with right neighbor only
+                new_pixel = (img[i, j, :].astype(np.float32) + img[i, j+1, :].astype(np.float32)) / 2
+            elif j == w - 1:
+                # Right edge case - average with left neighbor only  
+                new_pixel = (img[i, j-1, :].astype(np.float32) + img[i, j, :].astype(np.float32)) / 2
+            else:
+                # General case - average left and right neighbors
+                new_pixel = (img[i, j-1, :].astype(np.float32) + 
+                            img[i, j, :].astype(np.float32) + 
+                            img[i, j+1, :].astype(np.float32)) / 3
+            
+            # Insert the new pixel and copy the original
+            new_img[i, j, :] = new_pixel.astype(img.dtype)
+            new_img[i, j+1, :] = img[i, j, :]
+            
+            # Copy all pixels after the seam position (shifted by 1)
+            new_img[i, j+2:, :] = img[i, j+1:, :]
+        
+        return new_img
+
+    def _reduce_width(self, img: np.ndarray, num_seams: int, 
+                     progress_callback: Optional[Callable] = None,
+                     return_seams: bool = False) -> Tuple[np.ndarray, List[List[int]]]:
+        """
+        Reduce image width by removing vertical seams sequentially.
+        
+        Returns:
+            Tuple of (carved_image, list_of_seams_removed)
+        """
+        current_img = img.copy()
+        seams_removed = []
+        
+        for seam_num in range(num_seams):
+            energy = self.calculate_energy(current_img)
+            seam = self._find_vertical_seam(energy)
+            seams_removed.append(seam)
+            current_img = self._remove_vertical_seam(current_img, seam)
+
+            if progress_callback:
+                progress_callback(seam_num + 1)
+        
+        if return_seams:
+            return current_img, seams_removed
+        return current_img
+
+    def _enlarge_width(self, img: np.ndarray, num_seams: int, 
+                      progress_callback: Optional[Callable] = None,
+                      return_seams: bool = False) -> Tuple[np.ndarray, List[List[int]]]:
+        """
+        Enlarge image width by inserting vertical seams sequentially.
+        
+        Returns:
+            Tuple of (carved_image, list_of_seams_inserted)
+        """
+        current_img = img.copy()
+        seams_inserted = []
+        
+        if progress_callback:
+            progress_callback(0, num_seams * 2)
+        
+        # First, find all the seams we would remove (in order of importance)
+        seams_to_duplicate = []
+        temp_img = current_img.copy()
+        
+        for i in range(num_seams):
+            energy = self.calculate_energy(temp_img)
+            seam = self._find_vertical_seam(energy)
+            seams_to_duplicate.append(seam)
+            temp_img = self._remove_vertical_seam(temp_img, seam)
+
+            if progress_callback:
+                progress_callback(i + 1)
+        
+        # Now insert the seams in reverse order (least important first)
+        for i, seam in enumerate(reversed(seams_to_duplicate)):
+            seams_inserted.append(seam)
+            current_img = self._insert_vertical_seam(current_img, seam)
+            if progress_callback:
+                progress_callback(num_seams + i + 1)
+        
+        if return_seams:
+            return current_img, seams_inserted
+        return current_img
+
+    def carve(self, img: np.ndarray, target_width: int, target_height: int | None = None, 
+              progress_callback: Optional[Callable] = None,
+              return_seams: bool = False):
+        """
+        Main seam carving function to resize image with timing.
+        
+        Args:
+            img: Input image (BGR format)
+            target_width: Target width for output
+            target_height: Target height for output (optional)
+            progress_callback: Callback for progress updates
+            return_seams: If True, returns both carved image and seam information
+        
+        Returns:
+            If return_seams=True: (carved_image, seam_info_dict)
+            If return_seams=False: carved_image only
+        """
+        start_time = time.time()
+        
+        if target_height is None:
+            target_height = img.shape[0]
+
+        # Initialize seam info
+        seam_info = {
+            'removed_seams': {'vertical': [], 'horizontal': []},
+            'inserted_seams': {'vertical': [], 'horizontal': []},
+            'timing': {}
+        }
+
+        # Start algorithm-specific timing
+        algorithm_start = time.time()
+        
+        result = self._seam_carving_resize(
+            img, target_width, target_height, progress_callback, 
+            return_seams, seam_info
+        )
+        
+        # Calculate timing
+        algorithm_time = time.time() - algorithm_start
+        total_time = time.time() - start_time
+        
+        seam_info['timing'] = {
+            'algorithm': algorithm_time,
+            'total': total_time,
+            'algorithm_name': self.name
+        }
+        
+        if return_seams:
+            # Check if result is already a tuple (image, seam_info)
+            if isinstance(result, tuple) and len(result) == 2:
+                # Unpack and update seam_info
+                carved_img, existing_seam_info = result
+                # Merge timing info into existing seam_info
+                existing_seam_info['timing'] = seam_info['timing']
+                return carved_img, existing_seam_info
+            else:
+                # Just return result with our seam_info
+                return result, seam_info
+        else:
+            # If result is a tuple, extract just the image
+            if isinstance(result, tuple) and len(result) == 2:
+                return result[0]  # Return just the image
+            else:
+                return result  # Return the image directly
+    
+    def _seam_carving_resize(self, img: np.ndarray, new_width: int, new_height: int, 
+                             progress_callback: Optional[Callable] = None,
+                             return_seams: bool = False,
+                             seam_info: Dict = None):
+        """Sequential seam carving with seam tracking"""
+        current_img = img.copy()
+        
+        # Calculate differences
+        width_diff = current_img.shape[1] - new_width
+        height_diff = current_img.shape[0] - new_height
+        
+        # Initialize seam info
+        if seam_info is None:
+            seam_info = {
+                'removed_seams': {'vertical': [], 'horizontal': []},
+                'inserted_seams': {'vertical': [], 'horizontal': []}
+            }
+        
+        # Handle width adjustment
+        if width_diff != 0:
+            if width_diff > 0:
+                # Width reduction
+                current_img, removed_seams = self._reduce_width(
+                    current_img, width_diff, progress_callback, return_seams=True
+                )
+                seam_info['removed_seams']['vertical'] = removed_seams
+            else:
+                # Width enlargement
+                current_img, inserted_seams = self._enlarge_width(
+                    current_img, abs(width_diff), progress_callback, return_seams=True
+                )
+                seam_info['inserted_seams']['vertical'] = inserted_seams
+        
+        # Handle height adjustment
+        if height_diff != 0:
+            if height_diff > 0:
+                # Height reduction (rotate to work with horizontal seams)
+                rotated_img = np.rot90(current_img, 1)
+                rotated_img, removed_seams = self._reduce_width(
+                    rotated_img, height_diff, progress_callback, return_seams=True
+                )
+                current_img = np.rot90(rotated_img, 3)
+                seam_info['removed_seams']['horizontal'] = removed_seams
+            else:
+                # Height enlargement
+                rotated_img = np.rot90(current_img, 1)
+                rotated_img, inserted_seams = self._enlarge_width(
+                    rotated_img, abs(height_diff), progress_callback, return_seams=True
+                )
+                current_img = np.rot90(rotated_img, 3)
+                seam_info['inserted_seams']['horizontal'] = inserted_seams
+        
+        if return_seams:
+            return current_img, seam_info
+        return current_img
+
+
+class SeamCarverHubble002(SeamCarver):
+    """Seam carving algorithm variant 002: Bulk seam processing"""
+    
+    def __init__(self):
+        super().__init__("Hubble 002")
+        self.default_color_space = 'bgr'
+        self.use_absolute_backtrack = True
+    
+    def _find_vertical_seam(self, energy: np.ndarray) -> List[int]:
+        """Hubble 002: Uses absolute backtracking indices"""
+        h, w = energy.shape
+        M = energy.copy().astype(np.float64)
+        backtrack = np.zeros_like(M, dtype=np.int32)
+
+        # Build cumulative energy matrix
+        for i in range(1, h):
+            for j in range(w):
+                left = M[i - 1, j - 1] if j - 1 >= 0 else np.inf
+                middle = M[i - 1, j]
+                right = M[i - 1, j + 1] if j + 1 < w else np.inf
+
+                min_prev = min(left, middle, right)
+                M[i, j] += min_prev
+
+                # Store absolute backtracking information
+                if min_prev == left:
+                    backtrack[i, j] = j - 1
+                elif min_prev == middle:
+                    backtrack[i, j] = j
+                else:
+                    backtrack[i, j] = j + 1
+
+        # Find position of smallest element in last row
+        seam = [0] * h
+        j = int(np.argmin(M[-1]))
+        seam[-1] = j
+        for i in range(h - 1, 0, -1):
+            j = int(backtrack[i, j])
+            seam[i - 1] = j
+        return seam
+    
+    def _remove_multiple_seams_bulk(self, img: np.ndarray, seams_original: List[List[int]]) -> np.ndarray:
+        """
+        Remove multiple seams from the ORIGINAL image in one synchronized pass.
+        """
+        h, w, _ = img.shape
+        result_rows = []
+
+        for i in range(h):
+            cols_to_remove = {seam[i] for seam in seams_original}
+            keep_cols = [col for col in range(w) if col not in cols_to_remove]
+            new_row = img[i, keep_cols, :]
+            result_rows.append(new_row)
+
+        new_img = np.stack(result_rows, axis=0)
+        return new_img
+
+    def _insert_vertical_seam_bulk(self, img: np.ndarray, seam: List[int]) -> np.ndarray:
+        """Insert a single vertical seam into img with blending."""
+        h, w, c = img.shape
+        new_img = np.zeros((h, w + 1, c), dtype=img.dtype)
+
+        for i in range(h):
+            j = seam[i]
+            if j > 0:
+                new_img[i, :j, :] = img[i, :j, :]
+            
+            # Create blended pixel at seam position
+            if j == 0:
+                # Left edge case
+                new_pixel = (img[i, j, :].astype(np.float32) + img[i, j+1, :].astype(np.float32)) / 2
+            elif j == w - 1:
+                # Right edge case
+                new_pixel = (img[i, j-1, :].astype(np.float32) + img[i, j, :].astype(np.float32)) / 2
+            else:
+                # General case - average neighbors
+                new_pixel = (img[i, j-1, :].astype(np.float32) + 
+                            img[i, j, :].astype(np.float32) + 
+                            img[i, j+1, :].astype(np.float32)) / 3
+            
+            new_img[i, j, :] = new_pixel.astype(img.dtype)
+            new_img[i, j + 1, :] = img[i, j, :]
+            
+            if j + 1 < w:
+                new_img[i, j + 2:, :] = img[i, j + 1:, :]
+
+        return new_img
+    
+    def carve(self, img: np.ndarray, target_width: int, target_height: int | None = None, 
+              progress_callback: Optional[Callable] = None,
+              return_seams: bool = False):
+        """
+        Main seam carving function to resize image with timing.
+        
+        Args:
+            img: Input image (BGR format)
+            target_width: Target width for output
+            target_height: Target height for output (optional)
+            progress_callback: Callback for progress updates
+            return_seams: If True, returns both carved image and seam information
+        
+        Returns:
+            If return_seams=True: (carved_image, seam_info_dict)
+            If return_seams=False: carved_image only
+        """
+        start_time = time.time()
+        
+        if target_height is None:
+            target_height = img.shape[0]
+
+        # Initialize seam info
+        seam_info = {
+            'removed_seams': {'vertical': [], 'horizontal': []},
+            'inserted_seams': {'vertical': [], 'horizontal': []},
+            'timing': {}
+        }
+
+        # Start algorithm-specific timing
+        algorithm_start = time.time()
+        
+        result = self._seam_carving_resize(
+            img, target_width, target_height, progress_callback, 
+            return_seams, seam_info
+        )
+        
+        # Calculate timing
+        algorithm_time = time.time() - algorithm_start
+        total_time = time.time() - start_time
+        
+        seam_info['timing'] = {
+            'algorithm': algorithm_time,
+            'total': total_time,
+            'algorithm_name': self.name
+        }
+        
+        if return_seams:
+            # Check if result is already a tuple (image, seam_info)
+            if isinstance(result, tuple) and len(result) == 2:
+                # Unpack and update seam_info
+                carved_img, existing_seam_info = result
+                # Merge timing info into existing seam_info
+                existing_seam_info['timing'] = seam_info['timing']
+                return carved_img, existing_seam_info
+            else:
+                # Just return result with our seam_info
+                return result, seam_info
+        else:
+            # If result is a tuple, extract just the image
+            if isinstance(result, tuple) and len(result) == 2:
+                return result[0]  # Return just the image
+            else:
+                return result  # Return the image directly
+    
+    def _seam_carving_resize(self, img: np.ndarray, new_width: int, new_height: int,
+                             progress_callback: Optional[Callable] = None,
+                             return_seams: bool = False,
+                             seam_info: Dict = None):
+        """
+        Bulk seam carving implementation.
+        """
+        h, w, _ = img.shape
+        width_diff = w - new_width
+        height_diff = h - new_height
+
+        if width_diff == 0 and height_diff == 0:
+            if return_seams:
+                return img, seam_info
+            return img
+
+        # Initialize seam info
+        if seam_info is None:
+            seam_info = {
+                'removed_seams': {'vertical': [], 'horizontal': []},
+                'inserted_seams': {'vertical': [], 'horizontal': []}
+            }
+
+        # Store original dimensions for seam tracking
+        orig_h, orig_w = h, w
+
+        # Helper progress updater
+        def _progress(step, total=None):
+            if progress_callback:
+                try:
+                    if total is None:
+                        progress_callback(step)
+                    else:
+                        progress_callback(step, total)
+                except Exception:
+                    pass
+
+        current_img = img.copy()
+        
+        # Handle width adjustment
+        if width_diff != 0:
+            if width_diff > 0:
+                # Need to reduce width by k seams
+                k = int(width_diff)
+                temp_img = current_img.copy()
+                idx_map = np.tile(np.arange(w), (h, 1))
+
+                seams_original = []  # store seams as original column indices
+                for s in range(k):
+                    energy = self.calculate_energy(temp_img)
+                    seam = self._find_vertical_seam(energy)  # seam indices for temp_img
+                    seam_original = [int(idx_map[i, seam[i]]) for i in range(h)]
+                    seams_original.append(seam_original)
+                    
+                    # Update temp image and index map
+                    new_temp_rows = []
+                    new_idx_rows = []
+                    for i in range(h):
+                        new_temp_rows.append(np.delete(temp_img[i, :, :], seam[i], axis=0))
+                        new_idx_rows.append(np.delete(idx_map[i, :], seam[i], axis=0))
+                    temp_img = np.stack(new_temp_rows, axis=0)
+                    idx_map = np.stack(new_idx_rows, axis=0)
+
+                    _progress(s + 1, k)
+                
+                # Remove all seams at once
+                current_img = self._remove_multiple_seams_bulk(current_img, seams_original)
+                seam_info['removed_seams']['vertical'] = seams_original
+                
+                _progress(k, k)
+            else:
+                # Width enlargement
+                k = int(-width_diff)
+                temp_img = current_img.copy()
+                idx_map = np.tile(np.arange(w), (h, 1))
+                seams_original = []
+                for s in range(k):
+                    energy = self.calculate_energy(temp_img)
+                    seam = self._find_vertical_seam(energy)
+                    seam_original = [int(idx_map[i, seam[i]]) for i in range(h)]
+                    seams_original.append(seam_original)
+                    
+                    new_temp_rows = []
+                    new_idx_rows = []
+                    for i in range(h):
+                        new_temp_rows.append(np.delete(temp_img[i, :, :], seam[i], axis=0))
+                        new_idx_rows.append(np.delete(idx_map[i, :], seam[i], axis=0))
+                    temp_img = np.stack(new_temp_rows, axis=0)
+                    idx_map = np.stack(new_idx_rows, axis=0)
+                    _progress(s + 1, k)
+                
+                # Insert seams one by one (with blending)
+                for s_idx, seam_orig in enumerate(seams_original):
+                    seam_current = []
+                    for i in range(h):
+                        inserts_before = 0
+                        for prev in seams_original[:s_idx]:
+                            if prev[i] <= seam_orig[i]:
+                                inserts_before += 1
+                        current_pos = seam_orig[i] + inserts_before
+                        # Clamp to valid range
+                        current_pos = max(0, min(current_img.shape[1] - 1, current_pos))
+                        seam_current.append(current_pos)
+
+                    current_img = self._insert_vertical_seam_bulk(current_img, seam_current)
+                    _progress(s_idx + 1, k)
+
+                seam_info['inserted_seams']['vertical'] = seams_original
+
+        # Handle height adjustment (rotate for horizontal seams)
+        if height_diff != 0:
+            # Rotate to work with horizontal seams
+            rotated_img = np.rot90(current_img, 1)
+            
+            # Call recursively - pass None for seam_info to get new one for rotated space
+            if return_seams:
+                rotated_result, rotated_seam_info = self._seam_carving_resize(
+                    rotated_img, new_height, new_width, progress_callback, 
+                    return_seams, None  # Create new seam info for rotated space
+                )
+                
+                # Convert rotated seams back to original orientation
+                # Rotated vertical seams are horizontal in original, and vice versa
+                for seam in rotated_seam_info['removed_seams']['vertical']:
+                    # This seam was vertical in rotated space = horizontal in original
+                    seam_info['removed_seams']['horizontal'].append(seam)
+                    
+                for seam in rotated_seam_info['inserted_seams']['vertical']:
+                    # This seam was vertical in rotated space = horizontal in original
+                    seam_info['inserted_seams']['horizontal'].append(seam)
+                    
+                # Note: In rotated space, we only track vertical seams since we rotate
+                # to convert horizontal to vertical
+            else:
+                rotated_result = self._seam_carving_resize(
+                    rotated_img, new_height, new_width, progress_callback, 
+                    return_seams, None
+                )
+            
+            current_img = np.rot90(rotated_result, 3)
+
+        if return_seams:
+            return current_img, seam_info
+        return current_img
+

@@ -165,19 +165,24 @@ class ImageProcessor:
                     # Create seam visualizations if we have seam info
                     if self.last_seam_info and self.original_image is not None:
                         # Create seam carver instance using explicit class
-                        seam_carver = self._create_seam_carver(self.last_algorithm_used)
+                        seam_carver = None
+                        visualizations = None
+                        if self.last_algorithm_used is not None:
+                            seam_carver = self._create_seam_carver(self.last_algorithm_used)
                         
                         # Call the method that returns a tuple of three images
-                        visualizations = seam_carver.create_seam_visualization(
+                        if seam_carver is not None:
+                            visualizations = seam_carver.create_seam_visualization(
                             self.original_image,
                             self.last_seam_info
                         )
                         
                         # Unpack and store the three visualization types
-                        all_seams_img, removed_img, inserted_img = visualizations
-                        self.last_seam_info['all_seams_image'] = all_seams_img
-                        self.last_seam_info['removed_seams_image'] = removed_img
-                        self.last_seam_info['inserted_seams_image'] = inserted_img
+                        if visualizations is not None:
+                            all_seams_img, removed_img, inserted_img = visualizations
+                            self.last_seam_info['all_seams_image'] = all_seams_img
+                            self.last_seam_info['removed_seams_image'] = removed_img
+                            self.last_seam_info['inserted_seams_image'] = inserted_img
                 else:
                     return False
             else:
