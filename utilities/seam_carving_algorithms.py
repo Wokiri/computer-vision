@@ -360,7 +360,7 @@ class SeamCarverHubble001(SeamCarver):
 
     def _reduce_width(self, img: np.ndarray, num_seams: int, 
                      progress_callback: Optional[Callable] = None,
-                     return_seams: bool = False) -> Tuple[np.ndarray, List[List[int]]]:
+                     return_seams: bool = False) -> np.ndarray | Tuple[np.ndarray, List[List[int]]]:
         """
         Reduce image width by removing vertical seams sequentially.
         
@@ -442,7 +442,7 @@ class SeamCarverHubble001(SeamCarver):
         start_time = time.time()
         
         if target_height is None:
-            target_height = img.shape[0]
+            target_height: int = img.shape[0]
 
         # Initialize seam info
         seam_info = {
@@ -490,7 +490,7 @@ class SeamCarverHubble001(SeamCarver):
     def _seam_carving_resize(self, img: np.ndarray, new_width: int, new_height: int, 
                              progress_callback: Optional[Callable] = None,
                              return_seams: bool = False,
-                             seam_info: Dict = None):
+                             seam_info: Dict | None = None):
         """Sequential seam carving with seam tracking"""
         current_img = img.copy()
         

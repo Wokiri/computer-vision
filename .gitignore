@@ -134,8 +134,8 @@ dmypy.json
 *_ui.pyc
 
 # Resource files compiled from .qrc
-*_rc.py
-*_rc.pyc
+# *_rc.py
+# *_rc.pyc
 
 # Qt Designer files
 *.ui.bak

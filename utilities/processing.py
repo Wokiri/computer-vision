@@ -173,9 +173,9 @@ class ImageProcessor:
                         # Call the method that returns a tuple of three images
                         if seam_carver is not None:
                             visualizations = seam_carver.create_seam_visualization(
-                            self.original_image,
-                            self.last_seam_info
-                        )
+                                self.original_image,
+                                self.last_seam_info
+                            )
                         
                         # Unpack and store the three visualization types
                         if visualizations is not None:
@@ -234,6 +234,12 @@ class ImageProcessor:
         seam_carver = self._create_seam_carver(algorithm)
         
         # Use the seam carver to resize the current image
+        if seam_carver is None:
+            raise ValueError(f"Invalid seam carving algorithm: {algorithm}")
+        
+        if self.current_image is None:
+            raise ValueError("No image loaded for seam carving")
+        
         result = seam_carver.carve(
             img=self.current_image.copy(),
             target_width=new_width,

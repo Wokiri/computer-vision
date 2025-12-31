@@ -670,7 +670,6 @@ class ResizeWidget(QtWidgets.QWidget):
         self.ui.resize_algorithm_comboBox.addItems([
             "Hubble 001",
             "Hubble 002",
-            "Hubble 003",
         ])
 
         # Window configuration
