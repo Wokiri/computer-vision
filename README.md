@@ -1,10 +1,10 @@
 # ImageLab - Image Processing Application
 
-## 📖 Project Overview
+## Project Overview
 
 ImageLab is a comprehensive desktop application built with PyQt5 for image processing and computer vision tasks. It provides an intuitive graphical interface for performing various operations on images including resizing, filtering, and object detection.
 
-## 🚀 Features
+## Features
 
 - **Image Upload & Display**: Support for multiple image formats (PNG, JPG, JPEG, BMP, TIFF)
 - **Smart Resizing**: 
@@ -21,7 +21,7 @@ ImageLab is a comprehensive desktop application built with PyQt5 for image proce
 - **Zoom Controls**: Standard zoom levels and custom zoom in/out
 - **Real-time Preview**: Instant visualization of processing results
 
-## 🛠️ Installation
+## Installation
 
 ### Recommended: Virtual Environment
 
